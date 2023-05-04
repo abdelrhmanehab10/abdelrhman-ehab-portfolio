@@ -293,13 +293,10 @@ nav ul li a:hover {
 
 @media screen and (min-width: 768px) {
   #about {
-    display: flex;
+    display: grid;
+    grid-template-columns: 65% 30%;
     align-items: center;
     gap: 5rem;
-  }
-
-  .about {
-    width: 80%;
   }
 
   #about h2 {
