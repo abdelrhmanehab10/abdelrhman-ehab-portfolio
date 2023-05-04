@@ -298,6 +298,10 @@ nav ul li a:hover {
     gap: 5rem;
   }
 
+  .about{
+    width: 50%;
+  }
+
   #about h2 {
     font-size: 30px;
   }
