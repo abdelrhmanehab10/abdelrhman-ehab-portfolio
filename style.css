@@ -302,10 +302,6 @@ nav ul li a:hover {
     font-size: 30px;
   }
 
-  #about p {
-    font-size: 24px;
-  }
-
   .images img:nth-child(1),
   .images img:nth-child(2) {
     display: block;
