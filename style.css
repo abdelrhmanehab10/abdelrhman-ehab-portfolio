@@ -298,8 +298,16 @@ nav ul li a:hover {
     gap: 5rem;
   }
 
+  .about {
+    width: 80%;
+  }
+
   #about h2 {
     font-size: 30px;
+  }
+
+  #about p {
+    font-size: 24px;
   }
 
   .images img:nth-child(1),
