@@ -1,5 +1,13 @@
 const works = [
   {
+    id: 0,
+    imgLink: "assets/works/Guess-My-Number-.png",
+    title: "Guess Number Game",
+    desc: "The Number Guessing Game is an interactive and engaging web-based game that showcases the incredible power of JavaScript. This game challenges players to guess a random number between 1 and 100, providing them with an opportunity to test their intuition and deductive skills.",
+    category: "JS",
+    demoLink: "https://abdelrhmanehab10.github.io/guess-game-js/",
+  },
+  {
     id: 1,
     imgLink: "assets/works/React-App.png",
     title: "Food menu & cart",
