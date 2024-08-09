@@ -115,6 +115,8 @@ nav ul li a:hover {
   height: 60vh;
   position: relative;
   padding: 0 10px;
+  width: 70%;
+  margin: auto;
 }
 
 .hero h1 {
@@ -159,10 +161,10 @@ nav ul li a:hover {
   filter: grayscale(1);
 }
 
-.techs img:nth-child(3) {
-  background-color: var(--netural1);
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+.techs img:nth-child(6) {
+  background-color: white;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 @media screen and (min-width: 768px) {

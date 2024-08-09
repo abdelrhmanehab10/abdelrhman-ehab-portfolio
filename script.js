@@ -1,39 +1,37 @@
 const works = [
   {
     id: 0,
-    imgLink: "assets/works/Guess-My-Number-.png",
-    title: "Guess Number Game",
-    desc: "The Number Guessing Game is an interactive and engaging web-based game that showcases the incredible power of JavaScript. This game challenges players to guess a random number between 1 and 100, providing them with an opportunity to test their intuition and deductive skills.",
-    category: "JS",
-    demoLink: "https://abdelrhmanehab10.github.io/guess-game-js/",
+    imgLink: "assets/works/faster-meet-next.png",
+    title: "Faster Meet",
+    desc: "Faster Meet is a web application that allows users to schedule meetings. It provides a user-friendly interface for creating and managing events. The application is built using Next.js, a popular React framework for server-side rendering and optimized performance.",
+    category: "NEXT JS",
   },
   {
     id: 1,
-    imgLink: "assets/works/React-App.png",
-    title: "Food menu & cart",
-    desc: "Is a dynamic and interactive way to display menu items, add to cart and process orders. It utilizes the power of React's component-based architecture and state management for a seamless user experience.",
-    category: "REACT JS",
-    demoLink: "https://abdelrhmanehab10.github.io/food-app/",
+    imgLink: "assets/works/news-admin-angular.png",
+    title: "News Admin",
+    desc: "News Admin is a web application that allows users to manage news articles. It provides a user-friendly interface for creating, editing, and deleting news articles. The application is built using Angular, a popular JavaScript framework for building dynamic web applications.",
+    category: "ANGULAR JS",
   },
   {
     id: 2,
-    imgLink: "assets/works/SwiftMarket.png",
-    title: "E-Commerce",
-    desc: "E-Commerce built with Next js. It leverages the power of Next js for server-side rendering and optimized performance.",
+    imgLink: "assets/works/cinemation-next.png",
+    title: "Cinemation",
+    desc: "Cinemation is a web application that allows users to search about movies & series using ai. It provides a user-friendly interface for finding movies and series based on user preferences. The application is built using Next.js, a popular React framework for server-side rendering and optimized performance.",
     category: "NEXT JS",
-    demoLink: "https://e-commerce-nine-self.vercel.app/",
   },
 ];
 
 const worksContainer = document.querySelector("#works > div");
 
-worksContainer.innerHTML = works.map(
-  ({ id, imgLink, title, desc, category, demoLink }) =>
-    `${
-      id % 2 === 1
-        ? `<div key=${id} class="work odd">`
-        : `<div key=${id} class="work">`
-    }
+worksContainer.innerHTML = works
+  .map(
+    ({ id, imgLink, title, desc, category, demoLink }) =>
+      `${
+        id % 2 === 1
+          ? `<div key=${id} class="work odd">`
+          : `<div key=${id} class="work">`
+      }
       <img src=${imgLink} alt="project" />
       <div class="details">
         <h6>${title}</h6>
@@ -42,12 +40,17 @@ worksContainer.innerHTML = works.map(
           <span>${desc.split(".")[1] + "."}</span>
         </p>
         <p class="category">${category}</p>
-        <button>
+        ${
+          demoLink
+            ? `<button>
           <a href=${demoLink}>
             View More
             <i class="fa-solid fa-chevron-right"></i>
           </a>
-        </button>
+        </button>`
+            : ""
+        }
       </div>
     </div>`
-);
+  )
+  .join("");
