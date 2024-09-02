@@ -16,34 +16,51 @@
   </head>
   <body>
     <header>
-      <nav>
-        <ul class="screen-menu">
-          <li><a href="#home">Home</a></li>
+      <nav class="navbar">
+        <ul class="menu">
+          <li class="active"><a href="#home">Home</a></li>
           <li><a href="#works">Works</a></li>
           <li><a href="#about">About</a></li>
         </ul>
       </nav>
-      <div class="hero" id="hero">
+      <!-- <button class="login-btn">
+        Login <img src="./assets/icons/logout.svg" />
+      </button> -->
+    </header>
+    <main>
+      <div class="hero" id="home">
         <h1>
-          I’m a Frontend web developer specializing in
-          <span>REACT JS, ANGULAR JS</span> and
+          I’m a Frontend Web Developer specializing in
+          <span>React.js, Next.js</span> and
           <br />
-          <span>NEXT JS</span>
+          <span>Angular</span>
         </h1>
         <i class="fa-solid fa-chevron-down"></i>
       </div>
-    </header>
-    <main>
       <section id="tech">
         <h2>Some of <span>the technologies I have worked with</span></h2>
-        <div class="techs">
-          <img src="assets/tech/html.png" alt="HTML" />
-          <img src="assets/tech/css.png" alt="CSS" />
-          <img src="assets/tech/js.png" alt="JavaScript" />
-          <img src="assets/tech/ts.png" alt="TypeScript" />
-          <img src="assets/tech/react.png" alt="React JS" />
-          <img src="assets/tech/next.png" alt="Next JS" />
-          <img src="assets/tech/angular.svg" alt="Angular JS" />
+        <div class="techs wrapper">
+          <div class="item item1">
+            <img src="assets/tech/html.svg" alt="HTML" />
+          </div>
+          <div class="item item2">
+            <img src="assets/tech/css.svg" alt="CSS" />
+          </div>
+          <div class="item item3">
+            <img src="assets/tech/js.svg" alt="JavaScript" />
+          </div>
+          <div class="item item4">
+            <img src="assets/tech/ts.svg" alt="TypeScript" />
+          </div>
+          <div class="item item5">
+            <img src="assets/tech/react.svg" alt="React JS" />
+          </div>
+          <div class="item item6">
+            <img src="assets/tech/next.svg" alt="Next JS" />
+          </div>
+          <div class="item item7">
+            <img src="assets/tech/angular.svg" alt="Angular JS" />
+          </div>
         </div>
       </section>
       <section id="works">
@@ -100,9 +117,9 @@
     <footer>
       <p>
         Copyrights &copy; is reversed. Coded by
-        <span>Abdelrhman Ehab.</span> Design by <span>Srinivas Dezign</span>
+        <span>Abdelrhman Ehab.</span>
       </p>
     </footer>
-    <script src="script.js"></script>
+    <script src="script.js" type="module"></script>
   </body>
 </html>
