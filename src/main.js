@@ -1,4 +1,4 @@
-import { works } from "./constant.js";
+import { works } from "./constant/index.js";
 
 class Menu {
   constructor() {
