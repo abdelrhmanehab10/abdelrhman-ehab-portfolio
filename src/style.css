@@ -18,6 +18,7 @@
 
 html {
   scroll-behavior: smooth;
+  height: 100%;
 }
 
 body {
@@ -26,6 +27,7 @@ body {
   color: var(--netural2);
   font-weight: 400;
   padding: 1rem;
+  height: 100%;
 }
 
 span {
@@ -71,8 +73,6 @@ section {
   }
 }
 
-/* header */
-
 /* nav */
 .navbar {
   position: fixed;
@@ -90,7 +90,7 @@ section {
 
   width: fit-content;
 
-  padding: 0.5rem;
+  padding: 0.9rem 0.5rem;
 
   border: 1px solid var(--gray);
   border-radius: 5rem;
@@ -101,7 +101,7 @@ section {
   -webkit-backdrop-filter: blur(5px);
 }
 
-.navbar .menu li {
+.navbar .menu li a {
   font-size: 14px;
 
   cursor: pointer;
@@ -111,8 +111,8 @@ section {
   transition: 0.3s all;
 }
 
-.navbar .menu li.active,
-.navbar .menu li:hover {
+.navbar .menu li a.active,
+.navbar .menu li a:hover {
   background-color: #73737e;
 }
 
@@ -360,6 +360,7 @@ section {
 
 .images img {
   border-radius: 0.5rem;
+  filter: grayscale(1);
 }
 
 .images img:nth-child(1),

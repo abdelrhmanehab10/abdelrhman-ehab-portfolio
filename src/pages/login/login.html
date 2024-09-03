@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AE - Login</title>
+    <link rel="stylesheet" href="login.css" />
+    <link rel="stylesheet" href="../../style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <h1>AE Portfolio</h1>
+      <div class="radial-blur"></div>
+      <div class="card-content">
+        <h2 class="card-title">Sign In</h2>
+        <p class="card-description">Enter your email and password to login.</p>
+        <form class="login-form" novalidate>
+          <fieldset>
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="ex. email@gmail.com"
+              autocomplete="off"
+            />
+            <p class="error-message"></p>
+          </fieldset>
+          <fieldset>
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="ex. password12@"
+              autocomplete="off"
+            />
+            <p class="error-message"></p>
+          </fieldset>
+          <button type="submit">Login</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="login.js"></script>
+  </body>
+</html>

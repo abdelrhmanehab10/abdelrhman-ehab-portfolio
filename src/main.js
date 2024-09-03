@@ -1,23 +1,25 @@
 import { works } from "./constant/index.js";
 
-class Menu {
+class App {
   constructor() {
-    this.menuLinks = document.querySelectorAll(`.menu li`);
+    this.menuLinks = document.querySelectorAll(`.menu li a`);
+    this.worksContainer = document.querySelector("#works > div");
+
     this.init();
   }
 
   init() {
     window.addEventListener("scroll", this.updateActiveClass.bind(this));
+
     this.updateActiveClass();
+    this.renderWorks();
   }
 
   updateActiveClass() {
     let currentActive = null;
 
     this.menuLinks.forEach((link) => {
-      const section = document.querySelector(
-        link.querySelector("a").getAttribute("href")
-      );
+      const section = document.querySelector(link.getAttribute("href"));
       const sectionTop = section.offsetTop;
       const sectionHeight = section.offsetHeight;
 
@@ -34,13 +36,6 @@ class Menu {
     if (currentActive) {
       currentActive.classList.add("active");
     }
-  }
-}
-
-class Work {
-  constructor() {
-    this.worksContainer = document.querySelector("#works > div");
-    this.renderWorks();
   }
 
   renderWorks() {
@@ -76,6 +71,5 @@ class Work {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  new Menu();
-  new Work();
+  new App();
 });

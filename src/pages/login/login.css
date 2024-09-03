@@ -1,0 +1,121 @@
+.login-container {
+  position: relative;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+.login-container h1 {
+  margin-bottom: 30px;
+  font-size: 46px;
+}
+
+.login-container .radial-blur {
+  -webkit-backdrop-filter: blur(100px);
+  filter: blur(100px);
+  background: #877874;
+  opacity: 0.4;
+  border-radius: 50%;
+  width: 33%;
+  height: 33%;
+  margin-left: 2.5rem;
+  margin-right: 2.5rem;
+  position: absolute;
+  top: 0;
+  left: 20%;
+}
+
+.card-content {
+  background-clip: padding-box;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  padding: 1.75rem;
+  color: hsl(210, 40%, 98%);
+  background-color: rgba(39, 39, 42, 0.4);
+  border: 1px solid rgba(39, 39, 42);
+  border-radius: 1rem;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(5px);
+
+  width: 40%;
+  height: fit-content;
+}
+
+.card-content:focus {
+  outline: none;
+}
+
+.card-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.card-description {
+  color: rgb(180, 176, 174);
+  line-height: 1.25rem;
+}
+
+.card-content fieldset {
+  margin-top: 1rem;
+  border: 0;
+}
+
+.card-content fieldset label {
+  font-size: 15px;
+  width: 90px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.card-content fieldset input {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+
+  color: rgb(180, 176, 174);
+
+  font-size: 0.8rem;
+  line-height: 1.25rem;
+
+  padding: 0.5rem 0.75rem;
+
+  background-color: rgb(9, 9, 11);
+  border: 1px solid rgb(39, 39, 42);
+
+  border-radius: calc(0.5rem - 2px);
+
+  width: 100%;
+  height: 2.5rem;
+}
+
+.card-content fieldset input.invalid {
+  border: 1px solid rgba(255, 0, 0, 0.1);
+  background-color: rgba(255, 0, 0, 0.05);
+}
+
+.card-content button {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--background);
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.25rem;
+  padding: 0.5rem 1rem;
+  background: var(--netural1);
+  height: 2.5rem;
+  cursor: pointer;
+  border-radius: calc(0.5rem - 2px);
+  border: 1px solid var(--netural1);
+  width: 100%;
+  margin-top: 0.5rem;
+  letter-spacing: 0.1rem;
+}
+
+.card-content .error-message {
+  font-size: 14px;
+  color: rgb(248, 113, 113);
+  margin-top: 0.5rem;
+}
