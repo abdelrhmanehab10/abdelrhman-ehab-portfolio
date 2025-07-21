@@ -58,8 +58,8 @@ class App {
           ${
             demoLink
               ? `<button>
-                  <a href=${demoLink}>
-                    View More
+                  <a target="_blank" href=${demoLink}>
+                    View Demo
                     <i class="fa-solid fa-chevron-right"></i>
                   </a>
                 </button>`
