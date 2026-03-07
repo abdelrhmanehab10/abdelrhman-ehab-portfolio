@@ -1,11 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AE - Home</title>
-    <link rel="stylesheet" href="src/style.css" />
+    <title>Abdelrhman Ehab | Frontend Engineer</title>
+    <meta
+      name="description"
+      content="Frontend Engineer with 2+ years of experience building scalable React, Angular, and Vue web applications."
+    />
+    <meta
+      name="keywords"
+      content="Abdelrhman Ehab, Frontend Engineer, React, Angular, Vue, TypeScript, Portfolio"
+    />
+    <meta name="author" content="Abdelrhman Ehab" />
+    <meta property="og:title" content="Abdelrhman Ehab | Frontend Engineer" />
+    <meta
+      property="og:description"
+      content="Portfolio of Abdelrhman Ehab - Frontend Engineer focused on scalable, performance-driven web applications."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/"
+    />
+    <meta
+      property="og:image"
+      content="https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/assets/images/pro.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Abdelrhman Ehab | Frontend Engineer"
+    />
+    <meta
+      name="twitter:description"
+      content="Frontend Engineer portfolio featuring React, Angular, Vue, and production project outcomes."
+    />
+    <meta
+      name="twitter:image"
+      content="https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/assets/images/pro.png"
+    />
+    <link
+      rel="canonical"
+      href="https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+        --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+      }
+
+      @layer base {
+        body {
+          font-family: var(--font-body);
+        }
+
+        h1,
+        h2,
+        h3 {
+          font-family: var(--font-display);
+        }
+      }
+
+      @layer utilities {
+        @keyframes tech-slider {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-50%);
+          }
+        }
+
+        .tech-slider-track {
+          animation: tech-slider 22s linear infinite;
+          will-change: transform;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .tech-slider-track {
+            animation: none;
+            transform: translateX(0);
+          }
+        }
+      }
+    </style>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -13,102 +99,216 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Abdelrhman Ehab",
+        "jobTitle": "Frontend Engineer",
+        "url": "https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/",
+        "sameAs": [
+          "https://github.com/abdelrhmanehab10/",
+          "https://www.linkedin.com/in/abdelrahman-ehab-87261a244/"
+        ]
+      }
+    </script>
   </head>
-  <body>
-    <header>
-      <nav class="navbar">
-        <ul class="menu">
-          <li class="active"><a href="#home">Home</a></li>
-          <li><a href="#works">Works</a></li>
-          <li><a href="#about">About</a></li>
-        </ul>
-      </nav>
-      <a href="./src/pages/login/login.html" class="login-btn">
-        Login <img src="./assets/icons/logout.svg" />
-      </a>
-    </header>
-    <main>
-      <div class="hero" id="home">
-        <h1>
-          I’m a Frontend Web Developer specializing in
-          <span>React.js, Next.js</span> and
-          <br />
-          <span>Angular</span>
-        </h1>
-        <i class="fa-solid fa-chevron-down"></i>
-      </div>
-      <section id="tech">
-        <h2>Some of <span>the technologies I have worked with</span></h2>
-        <div class="techs wrapper">
-          <div class="item item1">
-            <img src="assets/icons/html.svg" alt="HTML" />
-          </div>
-          <div class="item item2">
-            <img src="assets/icons/css.svg" alt="CSS" />
-          </div>
-          <div class="item item3">
-            <img src="assets/icons/js.svg" alt="JavaScript" />
-          </div>
-          <div class="item item4">
-            <img src="assets/icons/ts.svg" alt="TypeScript" />
-          </div>
-          <div class="item item5">
-            <img src="assets/icons/react.svg" alt="React JS" />
-          </div>
-          <div class="item item6">
-            <img src="assets/icons/next.svg" alt="Next JS" />
-          </div>
-          <div class="item item7">
-            <img src="assets/icons/angular.svg" alt="Angular JS" />
-          </div>
-        </div>
-      </section>
-      <section id="works">
-        <h2>Selected <span>Works</span></h2>
-        <div class="works"></div>
-      </section>
-      <section id="about">
-        <div class="about">
-          <h2>A bit about me</h2>
-          <p>
-            A frontend web developer, I focus on the JavaScript frameworks
-            (React.js, Next.js, Angular.js). I have some experience with version
-            control systems like Git, and have worked on big projects to gain
-            practical experience.
-            <span
-              >I am eager to learn and grow my skills in order to become a
-              proficient Frontend web developer.</span
+  <body
+    class="min-h-screen bg-[#060c17] text-slate-100 antialiased [background-image:radial-gradient(circle_at_10%_10%,#13213b,transparent_40%),radial-gradient(circle_at_90%_0%,#10223e,transparent_28%)]"
+  >
+    <a
+      href="#main-content"
+      class="sr-only z-[200] inline-flex min-h-11 items-center rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+    >
+      Skip to content
+    </a>
+
+    <header class="sticky top-0 z-50 py-4 backdrop-blur-md">
+      <nav
+        class="mx-auto flex w-[min(1120px,calc(100%-2rem))] flex-col gap-3 md:flex-row md:items-center md:justify-between"
+      >
+        <ul
+          class="menu flex w-full flex-nowrap gap-2 overflow-x-auto rounded-full border border-slate-700 bg-slate-900/90 p-1.5 [mask-image:linear-gradient(to_right,black_0%,black_90%,transparent_100%)] md:w-auto md:overflow-visible md:[mask-image:none]"
+        >
+          <li>
+            <a
+              href="#home"
+              class="nav-link active inline-flex min-h-11 flex-none items-center justify-center rounded-full bg-sky-500/20 px-4 text-sm font-semibold text-white transition hover:bg-sky-500/20 hover:text-white"
+              >Home</a
             >
-          </p>
-        </div>
-        <div class="images">
-          <img src="assets/images/about-1.jpg" alt="developer" />
-          <img src="assets/images/about-2.jpg" alt="developer" />
-          <img src="assets/images/about-3.jpg" alt="developer" />
+          </li>
+          <li>
+            <a
+              href="#projects"
+              class="nav-link inline-flex min-h-11 flex-none items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-300 transition hover:bg-sky-500/20 hover:text-white"
+              >Projects</a
+            >
+          </li>
+          <li>
+            <a
+              href="#experience"
+              class="nav-link inline-flex min-h-11 flex-none items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-300 transition hover:bg-sky-500/20 hover:text-white"
+              >Experience</a
+            >
+          </li>
+          <li>
+            <a
+              href="#skills"
+              class="nav-link inline-flex min-h-11 flex-none items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-300 transition hover:bg-sky-500/20 hover:text-white"
+              >Skills</a
+            >
+          </li>
+          <li>
+            <a
+              href="#contact"
+              class="nav-link inline-flex min-h-11 flex-none items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-300 transition hover:bg-sky-500/20 hover:text-white"
+              >Contact</a
+            >
+          </li>
+        </ul>
+
+        <a
+          href="./assets/abdelrhmanehab_resume.pdf"
+          class="resume-link inline-flex min-h-11 items-center justify-center rounded-full border border-slate-700 bg-slate-900 px-4 text-sm font-bold text-white transition hover:border-slate-500 hover:bg-slate-800"
+        >
+          Download Resume (PDF)
+        </a>
+      </nav>
+    </header>
+
+    <main id="main-content" class="mx-auto w-[min(1120px,calc(100%-2rem))]">
+      <section id="home" class="scroll-mt-40 py-16 md:scroll-mt-28 md:py-20">
+        <p
+          id="hero-badge"
+          class="mb-4 inline-flex rounded-full border border-cyan-400/40 px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-cyan-300"
+        >
+          Abdelrhman Ehab - Frontend Engineer
+        </p>
+        <h1 id="hero-headline" class="mb-5 max-w-[18ch] text-4xl leading-tight md:text-6xl">
+          I build production web applications with
+          <span class="text-cyan-300">React, Angular, and Vue</span>.
+        </h1>
+        <p id="hero-summary" class="max-w-3xl text-base text-slate-300 md:text-lg">
+          2+ years of frontend delivery across admin systems, dashboards, and
+          product workflows. Open to remote frontend roles (GMT+2).
+        </p>
+        <div
+          id="hero-meta"
+          class="mt-4 w-full overflow-hidden rounded-full border border-slate-700 bg-slate-900/70 py-1.5 sm:w-3/4 md:w-1/2"
+          aria-label="Core technologies auto slider"
+        ></div>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a
+            href="./assets/abdelrhmanehab_resume.pdf"
+            class="resume-link inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-300 to-sky-500 px-5 text-sm font-bold text-slate-950 transition hover:brightness-110"
+          >
+            Download Resume (PDF)
+          </a>
+          <a
+            href="#contact"
+            class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/70 px-5 text-sm font-bold text-white transition hover:border-slate-500"
+            >Contact Me</a
+          >
         </div>
       </section>
-      <section id="contact">
-        <h2>Get <span>in Touch.</span></h2>
-        <p>So that we can talk more about...</p>
-        <div class="social">
-          <a target="_blank" href="https://wa.me/+201090883652"
-            ><i class="fa-brands fa-whatsapp"></i
-          ></a>
-          <a
-            target="_blank"
-            href="https://www.linkedin.com/in/abdelrahman-ehab-87261a244"
-            ><i class="fa-brands fa-linkedin-in"></i
-          ></a>
-          <a target="_blank" href="https://github.com/abdelrhmanehab10/"
-            ><i class="fa-brands fa-github"></i
-          ></a>
+
+      <section
+        id="impact"
+        aria-label="Impact Snapshot"
+        class="scroll-mt-40 py-16 md:scroll-mt-28 md:py-20"
+      >
+        <h2 class="mb-6 text-3xl md:text-4xl">
+          Impact <span class="text-cyan-300">Snapshot</span>
+        </h2>
+        <p class="mb-6 max-w-2xl text-sm text-slate-300 md:text-base">
+          Selected measurable outcomes from shipped production work.
+        </p>
+        <div
+          class="impact-grid grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        ></div>
+      </section>
+
+      <section
+        id="projects"
+        class="scroll-mt-40 py-16 md:scroll-mt-28 md:py-20"
+      >
+        <h2 class="mb-6 text-3xl md:text-4xl">
+          Featured <span class="text-cyan-300">Projects</span>
+        </h2>
+        <div
+          id="featured-works"
+          class="grid gap-4 md:grid-cols-2 md:[grid-auto-rows:1fr]"
+        ></div>
+        <h3 id="more-projects-heading" class="mt-8 mb-4 text-xl text-white">
+          More Projects
+        </h3>
+        <div
+          id="more-works"
+          class="grid gap-4 md:grid-cols-2 md:[grid-auto-rows:1fr]"
+        ></div>
+      </section>
+
+      <section
+        id="experience"
+        class="scroll-mt-40 py-16 md:scroll-mt-28 md:py-20"
+      >
+        <h2 class="mb-6 text-3xl md:text-4xl">
+          Professional <span class="text-cyan-300">Experience</span>
+        </h2>
+        <div class="relative pl-8">
+          <span
+            aria-hidden="true"
+            class="pointer-events-none absolute left-[7px] top-0 h-full w-px bg-slate-700"
+          ></span>
+          <div id="experience-list" class="space-y-4"></div>
         </div>
+      </section>
+
+      <section id="skills" class="scroll-mt-40 py-16 md:scroll-mt-28 md:py-20">
+        <h2 class="mb-6 text-3xl md:text-4xl">
+          Skills <span class="text-cyan-300">Matrix</span>
+        </h2>
+        <div id="skills-groups" class="grid gap-4 md:grid-cols-2"></div>
+      </section>
+
+      <section
+        id="contact"
+        class="scroll-mt-40 py-16 text-center md:scroll-mt-28 md:py-20"
+      >
+        <h2 class="mb-4 text-3xl md:text-4xl">
+          Let's <span class="text-cyan-300">Work Together</span>
+        </h2>
+        <p class="mx-auto max-w-2xl text-base text-slate-300 md:text-lg">
+          Open to remote frontend opportunities. I usually reply within 24
+          hours.
+        </p>
+        <div class="mt-6 flex flex-wrap justify-center gap-3">
+          <a
+            href="mailto:abdelrhmanehab047@gmail.com"
+            class="inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-300 to-sky-500 px-5 text-sm font-bold text-slate-950 transition hover:brightness-110"
+          >
+            Send Email
+          </a>
+          <a
+            href="./assets/abdelrhmanehab_resume.pdf"
+            class="resume-link inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/70 px-5 text-sm font-bold text-white transition hover:border-slate-500"
+          >
+            Download Resume (PDF)
+          </a>
+        </div>
+        <div id="social-links" class="mt-6 flex flex-wrap justify-center gap-3"></div>
+        <p class="mt-4 text-sm text-slate-300">
+          Based in Cairo, Egypt - Available for remote teams across timezones.
+        </p>
       </section>
     </main>
-    <footer>
-      <p>
-        Copyrights &copy; is reversed. Coded by
-        <span>Abdelrhman Ehab.</span>
+
+    <footer
+      class="mx-auto w-[min(1120px,calc(100%-2rem))] border-t border-slate-700 py-8 text-center"
+    >
+      <p class="text-sm text-slate-300">
+        &copy; <span id="year"></span> Abdelrhman Ehab. Built with HTML, CSS,
+        and JavaScript.
       </p>
     </footer>
 

@@ -1,0 +1,10 @@
+{
+  "name": "abdelrhman-ehab-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm dlx http-server -p 5173",
+    "run": "pnpm run dev",
+    "watch": "pnpm dlx live-server --port=5173 --watch=. --no-browser"
+  }
+}
