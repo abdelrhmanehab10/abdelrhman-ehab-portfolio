@@ -207,13 +207,32 @@ class App {
   }
 
   renderWork(project) {
-    const { title, imageUrl, summary, stack, liveUrl } = project;
+    const {
+      title,
+      imageUrl,
+      summary,
+      stack,
+      visibility,
+      visibilityNote,
+      liveUrl,
+      linkLabel,
+    } = project;
+    const visibilityLabel =
+      visibility === "private" ? "Private product" : "Public project";
 
     return `
       <article class="flex h-full flex-col rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
         <img src="${imageUrl}" alt="${title} project preview" loading="lazy" class="h-56 w-full rounded-xl border border-slate-700 object-cover" />
-        <h3 class="mt-4 text-xl font-semibold leading-snug text-white md:text-2xl">${title}</h3>
+        <div class="mt-4 flex flex-wrap items-start justify-between gap-2">
+          <h3 class="text-xl font-semibold leading-snug text-white md:text-2xl">${title}</h3>
+          <span class="inline-flex shrink-0 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-2.5 py-1 text-xs font-semibold text-cyan-200">${visibilityLabel}</span>
+        </div>
         <p class="mt-2 min-h-12 overflow-hidden text-sm leading-relaxed text-slate-300 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] md:text-base">${summary}</p>
+        ${
+          visibilityNote
+            ? `<p class="mt-2 text-xs leading-relaxed text-slate-400">${visibilityNote}</p>`
+            : ""
+        }
         <div class="mt-4 flex flex-wrap gap-2">
           ${stack
             .map(
@@ -224,7 +243,7 @@ class App {
         </div>
         ${
           liveUrl
-            ? `<a class="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-cyan-400 px-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-300" href="${liveUrl}" target="_blank" rel="noopener noreferrer">Live Demo</a>`
+            ? `<a class="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-cyan-400 px-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-300" href="${liveUrl}" target="_blank" rel="noopener noreferrer">${linkLabel || "Open project"}</a>`
             : ""
         }
       </article>`;
