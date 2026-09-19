@@ -1,41 +1,73 @@
-# Portfolio Website
+# Abdelrhman Ehab — Frontend Engineer Portfolio
 
-This repository contains the code for my personal portfolio website, showcasing projects and skills in Frontend Web Development, specializing in React.js, Next.js, and Angular.
+Live portfolio for Abdelrhman Ehab, a Frontend Engineer building production web applications with React, Angular, Vue, TypeScript, and JavaScript.
 
-## Table of Contents
+The site presents selected product work, measurable frontend outcomes, professional experience, and the technologies used across shipped projects.
 
-1. [Introduction](#introduction)
-2. [Features](#features)
-3. [Technologies Used](#technologies-used)
-4. [Setup and Installation](#setup-and-installation)
-5. [Usage](#usage)
-6. [Project Structure](#project-structure)
-7. [Contributing](#contributing)
-8. [License](#license)
-9. [Contact](#contact)
+**[Open the live portfolio](https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/)**
 
-## Introduction
+## What this project demonstrates
 
-This portfolio website is designed to showcase my web development projects and skills. It includes sections for projects, about me, and a contact form. The website is built using modern frontend technologies and follows best practices in web development.
+- Responsive, accessible portfolio layout built without a frontend framework.
+- Data-driven rendering for projects, experience, impact metrics, skills, and social links.
+- Production-focused presentation of dashboards, admin systems, and operational workflows.
+- Responsive navigation with active-section state while scrolling.
+- Reduced-motion support for the technology slider.
+- Search and social metadata, canonical URL, Open Graph/Twitter cards, and Person structured data.
+- Static deployment through GitHub Pages.
 
-## Features
+Some featured work is client-owned or private. The portfolio intentionally describes that work at a high level without exposing source code or creating public case-study repositories.
 
-- Responsive design, compatible with both desktop and mobile devices.
-- Interactive navigation menu that highlights the active section based on scroll position.
-- Showcases multiple projects, each with a description and image.
-- Easy-to-update project information stored in a separate file for maintainability.
+## Tech stack
 
-## Technologies Used
+- HTML5
+- Tailwind CSS via the browser CDN
+- Vanilla JavaScript modules
+- Font Awesome
+- GitHub Pages
 
-- **HTML5**: Structure of the website.
-- **CSS3**: Styling and layout, including Flexbox for responsive design.
-- **JavaScript**: Interactive features such as dynamic menu and project rendering.
+## Run locally
 
-## Setup and Installation
+Clone the repository and serve it from a local HTTP server so the JavaScript modules load correctly:
 
-To run this project locally, follow these steps:
+```bash
+git clone https://github.com/abdelrhmanehab10/abdelrhman-ehab-portfolio.git
+cd abdelrhman-ehab-portfolio
+pnpm dlx http-server -p 5173
+```
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/portfolio-website.git
-   ```
+Open [http://localhost:5173](http://localhost:5173).
+
+Alternatively, use any static HTTP server. No build step is required.
+
+## Project structure
+
+```text
+.
+├── assets/
+│   ├── icons/       Technology icons
+│   ├── images/      Project and profile imagery
+│   └── *.pdf        Downloadable resume
+├── src/
+│   ├── constant/    Portfolio content and profile data
+│   └── main.js      Rendering and interaction logic
+├── index.html       Page structure and metadata
+└── README.md
+```
+
+Most portfolio content can be updated in [`src/constant/index.js`](src/constant/index.js). The page rendering and interactions live in [`src/main.js`](src/main.js).
+
+## Deployment
+
+The live site is published at:
+
+<https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/>
+
+## Contact
+
+- [LinkedIn](https://www.linkedin.com/in/abdelrahman-ehab-87261a244/)
+- [GitHub](https://github.com/abdelrhmanehab10)
+
+## Reuse
+
+This repository is a personal portfolio. Please contact me before reusing its content, imagery, or resume assets.
