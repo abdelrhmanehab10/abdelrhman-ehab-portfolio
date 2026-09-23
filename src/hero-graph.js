@@ -43,7 +43,7 @@ export function initHeroGraph() {
     listButton.hidden = resetButton.hidden = motionButton.hidden = true;
   }
 
-  const active = () => selected || hovered;
+  const active = () => hovered || selected;
   const neighbourhood = (id) => new Set([id, ...(adjacency.get(id) || [])]);
   function nodeColor(node) {
     const focus = active();
@@ -98,6 +98,7 @@ export function initHeroGraph() {
     const node = byId.get(id);
     if (!node) return;
     lastFocus = origin || document.activeElement;
+    hovered = null;
     selected = id;
     const group = graphGroups[node.group].label;
     const link = node.href && /^(https?:\/\/|mailto:|\.\/assets\/)/.test(node.href)
@@ -128,6 +129,19 @@ export function initHeroGraph() {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !panel.hidden) closePanel();
   });
+  function syncHash() {
+    if (!location.hash.startsWith("#node/")) {
+      closePanel({ restoreFocus: false });
+      return;
+    }
+    let id;
+    try { id = decodeURIComponent(location.hash.slice(6)); }
+    catch { return; }
+    if (byId.has(id) && selected !== id) {
+      openNode(id, index.querySelector(`[data-node="${id}"]`) || listButton);
+    }
+  }
+  window.addEventListener("hashchange", syncHash);
   listButton.addEventListener("click", () => {
     const open = index.classList.toggle("graph-list-open");
     index.classList.toggle("graph-index-hidden", !open);
@@ -166,6 +180,7 @@ export function initHeroGraph() {
   // readable even with JavaScript disabled or when the module fails to load.
   if (typeof window.ForceGraph !== "function") {
     showFallback();
+    syncHash();
     return;
   }
   try {
@@ -257,22 +272,12 @@ export function initHeroGraph() {
     // refit; let it commit its warmup positions to the canvas first.
     if (reduced) requestAnimationFrame(() => requestAnimationFrame(() => fit(0)));
     else fit(0);
-    function syncHash() {
-      if (!location.hash.startsWith("#node/")) {
-        closePanel({ restoreFocus: false });
-        return;
-      }
-      let id;
-      try { id = decodeURIComponent(location.hash.slice(6)); }
-      catch { return; }
-      if (byId.has(id) && selected !== id) openNode(id, listButton);
-    }
-    window.addEventListener("hashchange", syncHash);
     syncHash();
   } catch (error) {
     console.warn("Graph could not start; using profile list", error);
     graph = null;
     showFallback();
+    syncHash();
   }
 
   function fit(duration) {

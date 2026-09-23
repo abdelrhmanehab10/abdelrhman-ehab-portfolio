@@ -15,13 +15,13 @@ function element() {
     insertBefore(child) { child.parent = this; },
     getAttribute(name) { return attributes[name] ?? null; },
     setAttribute(name, value) { attributes[name] = value; },
-    focus() {},
+    focus() { document.activeElement = this; },
     querySelector(selector) { return selector === "canvas" ? canvas : element(); },
   };
 }
 const canvas = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 390, height: 480 }) };
 
-function setup(mobile, libraryAvailable = true) {
+function setup(mobile, libraryAvailable = true, initialHash = "") {
   const selectors = new Map([
     "#graph-stage", "#graph-canvas-host", "#graph-index-wrap", "#graph-panel", "#graph-status",
     "#btn-list", "#btn-reset", "#btn-motion",
@@ -30,15 +30,23 @@ function setup(mobile, libraryAvailable = true) {
   const panel = selectors.get("#graph-panel");
   panel.hidden = true;
   panel.parent = stage;
+  const index = selectors.get("#graph-index-wrap");
+  const nodeButtons = new Map();
+  index.querySelector = (selector) => {
+    if (!selector.startsWith("[data-node=")) return element();
+    if (!nodeButtons.has(selector)) nodeButtons.set(selector, element());
+    return nodeButtons.get(selector);
+  };
   const documentHandlers = {};
   globalThis.document = {
     documentElement: { dataset: {} }, activeElement: selectors.get("#btn-list"),
     querySelector: (key) => selectors.get(key),
     getElementById: () => null,
     addEventListener(name, handler) { documentHandlers[name] = handler; },
+    fire(name, event) { documentHandlers[name]?.(event); },
   };
   const windowHandlers = {};
-  globalThis.location = { pathname: "/", search: "", hash: "" };
+  globalThis.location = { pathname: "/", search: "", hash: initialHash };
   globalThis.history = { replaceState(_state, _title, url) { location.hash = url.startsWith("#") ? url : ""; } };
   globalThis.matchMedia = (query) => ({ matches: query.includes("max-width") ? mobile : false, addEventListener() {} });
   globalThis.requestAnimationFrame = (callback) => { callback(); };
@@ -156,13 +164,19 @@ test("paused dragging redraws a moved node without selecting it on release", () 
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
 });
 
-test("list selection stays highlighted despite a retained canvas hover", () => {
+test("list selection clears stale hover but new canvas hover takes precedence", () => {
   const { graph, selectors, panel } = setup(false);
   graph.callbacks.hover(graph.nodes.find((node) => node.id === "proj-efa"));
   const index = selectors.get("#graph-index-wrap");
   index.fire("click", { target: { closest: () => ({ dataset: { node: "proj-virtuwa-hv" } }) } });
+  const selected = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
-  assert.equal(graph.color(graph.nodes.find((node) => node.id === "proj-virtuwa-hv")), "#67e8f9");
+  assert.equal(graph.color(selected), "#67e8f9");
+  const hovered = graph.nodes.find((node) => node.id === "proj-clinic-flow");
+  graph.callbacks.hover(hovered);
+  assert.equal(graph.color(hovered), "#67e8f9");
+  graph.callbacks.hover(null);
+  assert.equal(graph.color(selected), "#67e8f9");
 });
 
 test("client security work is described without exposing the original detail", () => {
@@ -183,6 +197,21 @@ test("library failure keeps list-selected details visible", () => {
   assert.equal(panel.parent, index);
   assert.equal(panel.hidden, false);
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">EFA<\/h2>/);
+});
+
+test("library failure honors initial and changed deep links with list focus restoration", () => {
+  const { panel, selectors, stage } = setup(false, false, "#node/proj-efa");
+  assert.equal(stage.hidden, true);
+  assert.equal(panel.parent, selectors.get("#graph-index-wrap"));
+  assert.equal(panel.hidden, false);
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">EFA<\/h2>/);
+  location.hash = "#node/proj-virtuwa-hv";
+  window.fire("hashchange");
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
+  document.fire("keydown", { key: "Escape" });
+  assert.equal(panel.hidden, true);
+  assert.equal(document.activeElement, selectors.get("#graph-index-wrap").querySelector('[data-node="proj-virtuwa-hv"]'));
+  assert.equal(location.hash, "");
 });
 
 test("reset restores the same mobile and desktop view after zoom and pan", async () => {
