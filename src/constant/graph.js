@@ -509,7 +509,7 @@ export const graphNodes = [
       "Docker Compose",
       "GitHub Actions CI/CD (self-hosted runners)",
       "pnpm -> dist -> Nginx pipelines",
-      "Nginx reverse proxy (443/6000/5678)",
+      "Nginx reverse proxy",
       "SSL/TLS",
       "WebSocket proxying",
       "Linux administration, sudoers, SCP, SSH",
@@ -633,7 +633,7 @@ export const graphNodes = [
       "Designed and implemented a self-hosted GitHub Actions runner on a private Linux server to enable CI/CD without exposing SSH publicly.",
     bullets: [
       "Automated frontend pipeline: pnpm install -> build -> dist -> Nginx deployment -> safe reload.",
-      "Passwordless sudo rules for controlled deployment commands (rm, copy, nginx reload).",
+      "Least-privilege sudo rules scoped to the deployment commands only.",
       "Zero-downtime frontend updates with configuration validation before reload.",
       "Reduced manual deployment effort to a single Git push -> live deployment.",
     ],

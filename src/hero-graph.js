@@ -67,11 +67,14 @@ export function initHeroGraph() {
     const bounds = canvas.getBoundingClientRect();
     const x = (event.clientX - bounds.left) * stage.clientWidth / bounds.width;
     const y = (event.clientY - bounds.top) * stage.clientHeight / bounds.height;
-    return graph.graphData().nodes.find((node) => {
+    const nodes = graph.graphData().nodes;
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const node = nodes[i];
       const screen = graph.graph2ScreenCoords(node.x, node.y);
       const radius = Math.sqrt(node.val) * graph.nodeRelSize() * graph.zoom();
-      return Math.hypot(screen.x - x, screen.y - y) <= radius;
-    }) || null;
+      if (Math.hypot(screen.x - x, screen.y - y) <= radius) return node;
+    }
+    return null;
   }
 
   function closePanel({ restoreFocus = true } = {}) {
@@ -147,6 +150,14 @@ export function initHeroGraph() {
   });
   host.addEventListener("pointermove", (event) => {
     if (press?.id === event.pointerId && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 5) press.moved = true;
+    if (graph && selected) {
+      const next = nodeAt(event)?.id || null;
+      if (hovered !== next) {
+        hovered = next;
+        host.style.cursor = next ? "pointer" : "grab";
+        repaint();
+      }
+    }
   });
   host.addEventListener("pointercancel", () => { press = null; });
   host.addEventListener("pointerup", (event) => {

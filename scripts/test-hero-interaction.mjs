@@ -92,13 +92,17 @@ function setup(mobile, libraryAvailable = true, initialHash = "", reduced = fals
     fire(name) { windowHandlers[name]?.(); },
   };
   initHeroGraph();
+  let libraryHover = null;
   selectors.get("#graph-canvas-host").addEventListener("pointermove", (event) => {
     if (!graph.rendering || !graph.callbacks.hover) return;
     const hit = graph.nodes.find((node) => {
       const screen = graph.graph2ScreenCoords(node.x, node.y);
       return Math.hypot(screen.x - event.clientX, screen.y - event.clientY) <= Math.sqrt(node.val) * 5 * graph.zoom();
-    });
-    graph.callbacks.hover(hit || null);
+    }) || null;
+    if (hit !== libraryHover) {
+      libraryHover = hit;
+      graph.callbacks.hover(hit);
+    }
     graph.render();
   });
   graph.render();
@@ -134,6 +138,19 @@ test("paused pointer selects a node even when the library has a stale link hover
   host.fire("pointerdown", background);
   host.fire("pointerup", background);
   assert.equal(panel.hidden, false);
+});
+
+test("paused picking chooses the topmost node at an overlap", () => {
+  const { graph, panel, selectors } = setup(false);
+  const lower = graph.nodes.find((node) => node.id === "proj-efa");
+  const upper = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
+  lower.x = upper.x - 2;
+  selectors.get("#btn-motion").fire("click");
+  const host = selectors.get("#graph-canvas-host");
+  const pointer = { pointerId: 1, clientX: lower.x * graph.zoom(), clientY: 0, button: 0 };
+  host.fire("pointerdown", pointer);
+  host.fire("pointerup", pointer);
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
 });
 
 test("paused pan and zoom redraw the view before picking a visible node", () => {
@@ -189,6 +206,18 @@ test("paused and reduced-motion pointer movement updates neighbour highlighting 
   }
 });
 
+test("list selection reactivates a previously hovered node on canvas return", () => {
+  const { graph, selectors } = setup(false);
+  const host = selectors.get("#graph-canvas-host");
+  const efa = graph.nodes.find((node) => node.id === "proj-efa");
+  const virtu = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
+  host.fire("pointermove", { pointerId: 1, clientX: efa.x * graph.zoom(), clientY: 0 });
+  selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: virtu.id } }) } });
+  assert.equal(graph.color(virtu), "#67e8f9");
+  host.fire("pointermove", { pointerId: 1, clientX: efa.x * graph.zoom(), clientY: 0 });
+  assert.equal(graph.color(efa), "#67e8f9");
+});
+
 test("list selection clears stale hover but new canvas hover takes precedence", () => {
   const { graph, selectors, panel } = setup(false);
   graph.callbacks.hover(graph.nodes.find((node) => node.id === "proj-efa"));
@@ -212,6 +241,19 @@ test("client security work is described without exposing the original detail", (
     assert.match(panel.innerHTML, /session-based bootstrap and short-lived, opaque identifiers/);
     assert.doesNotMatch(panel.innerHTML, /sensitive VM\/connection data|browser URLs/i);
   }
+});
+
+test("deployment detail omits private topology and privileged command scope", () => {
+  const { panel, selectors } = setup(false);
+  const index = selectors.get("#graph-index-wrap");
+  for (const id of ["skill-devops", "craft-cicd"]) {
+    index.fire("click", { target: { closest: () => ({ dataset: { node: id } }) } });
+    assert.doesNotMatch(panel.innerHTML, /443\/6000\/5678|passwordless sudo|\(rm, copy, nginx reload\)/i);
+  }
+  index.fire("click", { target: { closest: () => ({ dataset: { node: "skill-devops" } }) } });
+  assert.match(panel.innerHTML, />Nginx reverse proxy</);
+  index.fire("click", { target: { closest: () => ({ dataset: { node: "craft-cicd" } }) } });
+  assert.match(panel.innerHTML, /Least-privilege sudo rules scoped to the deployment commands only/);
 });
 
 test("library failure keeps list-selected details visible", () => {
