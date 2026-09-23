@@ -84,6 +84,8 @@ try {
   await check('paused pan preserves precise canvas click',`document.querySelector('#graph-panel-title')?.textContent`,r=>r===pannedHit.title);
   await screenshot('live-paused-pan-detail.png');
   await evalJs(`document.querySelector('#graph-panel-close').click();document.querySelector('#btn-motion').click();document.querySelector('#btn-list').click()`);
+  await check('List view exposes the index', `({visible:getComputedStyle(document.querySelector('#graph-index-wrap')).clip === 'auto',expanded:document.querySelector('#btn-list').getAttribute('aria-expanded'),entries:document.querySelectorAll('#graph-index [data-node]').length})`, r=>r.visible&&r.expanded==='true'&&r.entries===52);
+  await evalJs(`document.querySelector('#graph-index-wrap').scrollIntoView({block:'start'})`); await delay(250); await screenshot('live-list-view.png');
   await check('list links navigate to another entry', `(()=>{let a=document.querySelector('#graph-node-proj-efa .graph-index-connections a[href="#graph-node-craft-performance"]');a.click();return {hash:location.hash,target:document.querySelector(location.hash)?.querySelector('button')?.textContent,listVisible:getComputedStyle(document.querySelector('#graph-index-wrap')).clip}})()`,r=>r.hash==='#graph-node-craft-performance'&&r.target==='Performance & Quality');
   await evalJs(`document.querySelector('[data-node="proj-efa"]').focus()`);
   await delay(350);
@@ -99,6 +101,8 @@ try {
   await screenshot('live-desktop-detail.png');
   await evalJs(`document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`);
   await check('Escape returns focus', `({hidden:document.querySelector('#graph-panel').hidden,focused:document.activeElement?.dataset.node,hash:location.hash})`,r=>r.hidden&&r.focused==='proj-virtuwa-hv'&&r.hash==='');
+  await evalJs(`document.querySelector('#btn-list').click()`);
+  await check('Hide list conceals index without hiding the graph', `({hidden:document.querySelector('#graph-index-wrap').classList.contains('graph-index-hidden'),expanded:document.querySelector('#btn-list').getAttribute('aria-expanded'),canvas:!!document.querySelector('#graph-canvas-host canvas')})`, r=>r.hidden&&r.expanded==='false'&&r.canvas);
   await go('/#node/proj-efa');
   await check('deep link opens on load', `({title:document.querySelector('#graph-panel-title')?.textContent,hidden:document.querySelector('#graph-panel').hidden})`,r=>r.title==='EFA'&&!r.hidden);
   await evalJs(`location.hash='#node/proj-virtuwa-hv'`); await delay(200);
@@ -124,6 +128,10 @@ try {
   await screenshot('live-mobile-reset.png');
   await go('/',true,390,844,true);
   await check('reduced motion settled graph', `({pressed:document.querySelector('#btn-motion').getAttribute('aria-pressed'),canvas:!!document.querySelector('canvas'),status:document.querySelector('#graph-status').textContent})`,r=>r.pressed==='true'&&r.canvas&&r.status.includes('52 nodes'));
+  const stillCanvas=await evalJs(`document.querySelector('#graph-canvas-host canvas').toDataURL()`);
+  await delay(1100);
+  assert.equal(await evalJs(`document.querySelector('#graph-canvas-host canvas').toDataURL()`),stillCanvas,'reduced-motion graph should not animate while idle');
+  console.log('REDUCED MOTION', 'idle canvas unchanged after 1100 ms');
   await evalJs(`document.querySelector('#graph-stage').scrollIntoView({block:'center'})`); await delay(300);
   await screenshot('live-mobile-reduced.png');
   const reducedRect=await evalJs(`document.querySelector('#graph-stage').getBoundingClientRect().toJSON()`);

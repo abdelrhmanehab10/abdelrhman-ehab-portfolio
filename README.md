@@ -49,10 +49,15 @@ Alternatively, use any static HTTP server. No build step is required.
 ├── assets/
 │   ├── icons/       Technology icons
 │   ├── images/      Project and profile imagery
+│   ├── vendor/      Vendored graph library and licence
 │   └── *.pdf        Downloadable resume
+├── docs/graph-hero/  Browser verification and screenshots
+├── scripts/          Graph index generator and checks
 ├── src/
-│   ├── constant/    Portfolio content and profile data
-│   └── main.js      Rendering and interaction logic
+│   ├── constant/    Portfolio and graph data
+│   ├── hero-graph.js Graph rendering and interactions
+│   ├── hero-graph.css Graph and fallback styles
+│   └── main.js      Page rendering and interactions
 ├── index.html       Page structure and metadata
 └── README.md
 ```
