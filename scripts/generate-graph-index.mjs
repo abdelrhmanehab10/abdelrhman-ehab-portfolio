@@ -3,7 +3,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { graphNodes, graphEdges } from "../src/constant/graph.js";
 
-const ids = new Set(graphNodes.map(({ id }) => id));
+const nodesById = new Map(graphNodes.map((node) => [node.id, node]));
+const ids = new Set(nodesById.keys());
 if (ids.size !== graphNodes.length || graphNodes.length !== 52 || graphEdges.length !== 104 ||
     graphEdges.some(({ source, target }) => !ids.has(source) || !ids.has(target))) {
   throw new Error("Graph IDs, endpoints or expected node/edge counts are invalid");
@@ -12,10 +13,17 @@ const esc = (text) => String(text).replace(/[&<>"']/g, (char) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
 })[char]);
 const children = (id) => graphEdges.filter((edge) => edge.type === "contains" && edge.source === id)
-  .map((edge) => graphNodes.find((node) => node.id === edge.target));
-const row = (node) => `<li><button type="button" data-node="${esc(node.id)}">${esc(node.title)}</button><span class="graph-index-summary">${esc(node.summary)}</span></li>`;
+  .map((edge) => nodesById.get(edge.target));
+const neighbours = new Map(graphNodes.map((node) => [node.id, []]));
+for (const { source, target } of graphEdges) {
+  neighbours.get(source).push(target);
+  neighbours.get(target).push(source);
+}
+const connections = (node) => `<p class="graph-index-connections">Connected to: ${neighbours.get(node.id)
+  .map((id) => `<a href="#graph-node-${esc(id)}">${esc(nodesById.get(id).title)}</a>`).join(", ")}</p>`;
+const row = (node) => `<li id="graph-node-${esc(node.id)}" tabindex="-1"><button type="button" data-node="${esc(node.id)}">${esc(node.title)}</button><span class="graph-index-summary">${esc(node.summary)}</span>${connections(node)}</li>`;
 const root = graphNodes.find((node) => node.id === "me");
-const index = `<ul id="graph-index">\n  ${row(root)}\n  ${children("me").map((hub) => `<li><h3><button type="button" data-node="${esc(hub.id)}">${esc(hub.title)}</button></h3><p>${esc(hub.summary)}</p><ul>${children(hub.id).map(row).join("\n")}</ul></li>`).join("\n  ")}\n</ul>`;
+const index = `<ul id="graph-index">\n  ${row(root)}\n  ${children("me").map((hub) => `<li id="graph-node-${esc(hub.id)}" tabindex="-1"><h3><button type="button" data-node="${esc(hub.id)}">${esc(hub.title)}</button></h3><p>${esc(hub.summary)}</p>${connections(hub)}<ul>${children(hub.id).map(row).join("\n")}</ul></li>`).join("\n  ")}\n</ul>`;
 const base = "https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/";
 const person = {
   "@context": "https://schema.org", "@type": "Person", name: root.title,
