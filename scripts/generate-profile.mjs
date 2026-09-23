@@ -102,8 +102,9 @@ const skillBlocks = {
 const splitTags = (text) => text.flatMap(s => s.split(/, (?=(?:[^()]*\([^()]*\))*[^()]*$)/));
 const contact = Object.fromEntries(bullets(get('Contact')).map(s => { const i = s.indexOf(': '); return [s.slice(0, i), s.slice(i + 2)]; }));
 const summary = get('Summary').lines.join(' ');
-const experienceYears = summary.match(/\b\d+\+ years of professional web-development experience\b/i)?.[0];
-if (!experienceYears) throw new Error('Missing professional web-development experience figure in Summary');
+const headline = summary.match(/^(.+?) with (\d+\+ years of professional web-development experience)\b/i);
+if (!headline) throw new Error('Summary must begin with a job title and professional web-development experience figure');
+const [, jobTitle, experienceYears] = headline;
 const achievement = bullets(get('CI/CD & Deployment Automation'));
 const bleu = bullets(get('BLEU Community Blog (Eleventy/Tailwind open-source tech community website)'));
 const careerNote = get('Experience').lines.find(s => s.startsWith('> '))?.slice(2);
@@ -111,13 +112,13 @@ const industries = bullets(get('Industries'));
 const languages = bullets(get('Languages'));
 const softSkills = bullets(get('Soft Skills'));
 const highlights = bullets(get('Additional Highlights'));
-const profileDetails = { contact, summary, experienceYears, careerNote, industries, languages, softSkills, highlights };
+const profileDetails = { contact, summary, jobTitle, experienceYears, careerNote, industries, languages, softSkills, highlights };
 const nodes = layout.nodes.map((node) => {
   const n = { ...node };
   let sourceBullets = [];
   if (node.group === 'root') {
     n.title = get('Abdelrhman Ehab').title;
-    n.meta = `${summary.split(' with ')[0]} · ${languages.join(' · ')}`;
+    n.meta = `${jobTitle} · ${languages.join(' · ')}`;
     n.summary = summary;
     n.bullets = [...highlights];
     n.tags = splitTags(bullets(get('Programming & Frameworks'))).slice(0, 5);
@@ -128,7 +129,8 @@ const nodes = layout.nodes.map((node) => {
     n.title = `${role} - ${employer}`;
     n.meta = `${block.lines[0]} · ${arrangement || ''}`;
     sourceBullets = bullets(block);
-    if (!sourceBullets.length) sourceBullets = [`Delivered ${layout.edges.filter(e => e.source === node.id || e.target === node.id).filter(e => e.type === 'delivered-in').map(e => projectMap.get(e.source)?.title.replace(/^Project: /, '')).filter(Boolean).join(', ')}.`];
+    if (!sourceBullets.length && node.id === 'role-virtuwa-pt') sourceBullets = [`Delivered ${layout.edges.filter(e => e.source === node.id || e.target === node.id).filter(e => e.type === 'delivered-in').map(e => projectMap.get(e.source)?.title.replace(/^Project: /, '')).filter(Boolean).join(', ')}.`];
+    if (!sourceBullets.length) throw new Error(`Missing role evidence: ${node.id}`);
   } else if (node.group === 'project') {
     const block = projectMap.get(node.id);
     n.title = block.title.replace(/^Project: /, '').replace(/ \((?:in development|Oct 2025[^)]*)\)$/, '');
@@ -144,7 +146,12 @@ const nodes = layout.nodes.map((node) => {
   } else if (node.group === 'craft') {
     const data = {
       'craft-cicd': ['CI/CD & Deployment Automation', achievement],
-      'craft-bilingual': ['Bilingual & RTL Engineering', [...languages, ...bullets(get('Other')).filter(s => /Bilingual/.test(s)), ...bleu.slice(0, 2)]],
+      'craft-bilingual': ['Bilingual & RTL Engineering', [
+        ...languages,
+        ...bullets(get('Other')).filter(s => /Bilingual/.test(s)),
+        onlyBullet(bleu, b => /Arabic-first internationalization/i.test(b), 'BLEU Arabic-first internationalization'),
+        onlyBullet(bleu, b => /Arabic\/English translation files/i.test(b), 'BLEU Arabic/English translations'),
+      ]],
       'craft-security': ['Access Control & Security', bullets(projectMap.get('proj-virtuwa-hv')).filter(s => /session|RBAC/.test(s))],
       'craft-performance': ['Performance & Quality', [
         onlyBullet(bullets(roleMap.get('role-smartly-fe')), b => /\bEFA\b.*Lighthouse/i.test(b), 'EFA performance'),

@@ -19,12 +19,12 @@ const projectHeadings = [
   ['proj-flow-bridge', 'Project: Virtuwa Flow Bridge (in development)'],
   ['proj-qr-verify', 'Project: QR-code verification platform (Sara Beauty)'],
 ];
-const roleSection = (id, extra = []) => {
+const roleSection = (id, extra = [], empty = false) => {
   const role = node(id);
   const [title, employer] = role.title.split(' - ');
   const [date, arrangement] = role.meta.split(' · ');
   return [`### ${title} | ${employer} | ${arrangement}`, date,
-    ...bulletLines([role.summary, ...extra, ...(role.bullets || [])])];
+    ...bulletLines(empty ? [] : [role.summary, ...extra, ...(role.bullets || [])])];
 };
 const profile = (roles, extra = {}) => [
   '# Abdelrhman Ehab',
@@ -39,7 +39,7 @@ const profile = (roles, extra = {}) => [
   ...lines('Industries', bulletLines(profileDetails.industries)),
   ...lines('Languages', bulletLines(profileDetails.languages)),
   ...lines('Experience', [`> ${profileDetails.careerNote}`]),
-  ...roles.flatMap(id => roleSection(id, id === 'role-smartly-fe' ? (extra.smartlyBullets || []) : [])),
+  ...roles.flatMap(id => roleSection(id, id === 'role-smartly-fe' ? (extra.smartlyBullets || []) : [], id === extra.emptyRole)),
   ...projectHeadings.flatMap(([id, heading]) => [`#### ${heading}`, ...bulletLines([node(id).summary, ...(node(id).bullets || [])])]),
 ].join('\n') + '\n';
 
@@ -56,7 +56,7 @@ const sandbox = (action) => {
       execFileSync(process.execPath, [join(dir, 'scripts/generate-profile.mjs'), join(dir, 'profile.md')]);
       const url = pathToFileURL(join(dir, 'src/constant/graph.js')).href;
       return JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e',
-        `import { graphNodes } from ${JSON.stringify(url)}; console.log(JSON.stringify(graphNodes));`], { encoding: 'utf8' }));
+        `import { graphNodes, profileDetails } from ${JSON.stringify(url)}; console.log(JSON.stringify({ graphNodes, profileDetails }));`], { encoding: 'utf8' }));
     };
     return action({ dir, generate });
   } finally {
@@ -64,21 +64,27 @@ const sandbox = (action) => {
   }
 };
 
-test('role identities survive reordering and performance evidence survives inserted bullets', () => sandbox(({ dir, generate }) => {
+test('role identities and bilingual and performance evidence survive reordered and inserted bullets', () => sandbox(({ generate }) => {
   const reordered = [...roleIds];
   [reordered[2], reordered[3]] = [reordered[3], reordered[2]];
-  const roles = generate(profile(reordered, {
+  const { graphNodes: roles, profileDetails: details } = generate(profile(reordered, {
     smartlyBullets: ['Enhanced UI/UX on another Smartly product.'],
     bleuBullets: ['Assisted contributors with open-source onboarding.'],
+    emptyRole: 'role-virtuwa-pt',
   }));
+  assert.equal(details.jobTitle, 'Frontend Engineer');
   assert.match(roles.find(n => n.id === 'role-virtuwa-pt').title, /Frontend Web Developer - Virtuwa/);
   assert.match(roles.find(n => n.id === 'role-virtuwa-freelance').title, /Freelance Frontend Engineer - Virtuwa/);
   assert.match(roles.find(n => n.id === 'proj-boots-ladders').summary, /Boots & Ladders/);
   assert.match(roles.find(n => n.id === 'craft-performance').summary, /EFA.*Lighthouse/);
   assert.match(roles.find(n => n.id === 'craft-performance').bullets[0], /semantic blog datetime/);
+  assert.match(roles.find(n => n.id === 'role-virtuwa-pt').summary, /VirtuWa HV/);
+  const bilingual = roles.find(n => n.id === 'craft-bilingual');
+  assert.match(bilingual.bullets.join(' '), /Arabic\/English translation files/);
+  assert.doesNotMatch(bilingual.bullets.join(' '), /Assisted contributors with open-source onboarding/);
 }));
 
-test('missing role identity, ambiguous evidence and unrecognized experience figure fail generation', () => sandbox(({ dir }) => {
+test('missing roles, ambiguous evidence and unrecognized headline fail generation', () => sandbox(({ dir }) => {
   const run = (text) => {
     writeFileSync(join(dir, 'profile.md'), text);
     try {
@@ -92,5 +98,8 @@ test('missing role identity, ambiguous evidence and unrecognized experience figu
   assert.match(run(profile(roleIds).replace('Freelance Frontend Engineer | Virtuwa', 'Frontend Engineer | Virtuwa')), /Expected one role for role-virtuwa-freelance/);
   assert.match(run(profile(roleIds, { smartlyBullets: ['Enhanced UI/UX for Boots & Ladders again.'] })), /Expected one bullet for proj-boots-ladders, got 2/);
   assert.match(run(profile(roleIds, { bleuBullets: ['Improved semantic blog datetime and font loading again.'] })), /Expected one bullet for BLEU performance, got 2/);
-  assert.match(run(profile(roleIds, { summary: profileDetails.summary.replace('web-development experience', 'web development') })), /Missing professional web-development experience figure/);
+  assert.match(run(profile(roleIds, { bleuBullets: ['Added and refined Arabic\/English translation files for contributors.'] })), /Expected one bullet for BLEU Arabic\/English translations, got 2/);
+  assert.match(run(profile(roleIds, { emptyRole: 'role-shortcutadv' })), /Missing role evidence: role-shortcutadv/);
+  assert.match(run(profile(roleIds, { summary: profileDetails.summary.replace('web-development experience', 'web development') })), /Summary must begin with a job title and professional web-development experience figure/);
+  assert.match(run(profile(roleIds, { summary: profileDetails.summary.replace('Frontend Engineer with', 'Frontend Engineer building') })), /Summary must begin with a job title and professional web-development experience figure/);
 }));

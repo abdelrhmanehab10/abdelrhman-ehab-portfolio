@@ -6,7 +6,7 @@ const links = Object.fromEntries(ofGroup('link').map((node) => [node.id, node]))
 
 export const profileMeta = {
   name: root.title,
-  title: root.summary.split(' with ')[0],
+  title: profileDetails.jobTitle,
   heroSummary: profileDetails.summary,
   resumeUrl: links['link-resume'].href,
 };

@@ -28,7 +28,7 @@ const base = profileDetails.contact.Portfolio;
 const links = Object.fromEntries(graphNodes.filter(node => node.group === 'link').map(node => [node.id, node]));
 const person = {
   "@context": "https://schema.org", "@type": "Person", name: root.title,
-  jobTitle: root.summary.split(' with ')[0], description: root.summary, url: base,
+  jobTitle: profileDetails.jobTitle, description: root.summary, url: base,
   sameAs: [links['link-github'].href, links['link-linkedin'].href],
   knowsAbout: graphNodes.filter((node) => ["skill", "craft", "domain"].includes(node.group)).map((node) => node.title),
   hasOccupation: graphNodes.filter((node) => node.group === "role").map((node) => ({
@@ -45,10 +45,10 @@ html = html.replace(/<!-- graph-index:start -->[\s\S]*?<!-- graph-index:end -->/
 html = html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/,
   `<script type="application/ld+json">\n${JSON.stringify(person, null, 2)}\n    </script>`);
 const description = esc(root.summary);
-const jobTitle = esc(root.summary.split(' with ')[0]);
+const jobTitle = esc(profileDetails.jobTitle);
 const name = esc(root.title);
 const pageTitle = `${name} | ${jobTitle}`;
-const keywords = esc([root.title, root.summary.split(' with ')[0], ...nodesById.get('skill-frameworks').tags.slice(0, 4).map(tag => tag.split(' (')[0]), 'Portfolio'].join(', '));
+const keywords = esc([root.title, profileDetails.jobTitle, ...nodesById.get('skill-frameworks').tags.slice(0, 4).map(tag => tag.split(' (')[0]), 'Portfolio'].join(', '));
 const image = esc(new URL('assets/images/pro.png', base).href);
 for (const [pattern, value] of [
   [/(<p\s+id="hero-badge"[^>]*>)[\s\S]*?(<\/p>)/, `${name} - ${jobTitle}`],

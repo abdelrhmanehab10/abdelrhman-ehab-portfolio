@@ -1191,6 +1191,7 @@ export const profileDetails = {
     "Portfolio": "https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/"
   },
   "summary": "Frontend Engineer with 4+ years of professional web-development experience, including 2+ years building production React, Angular, and Vue applications with TypeScript. Specializes in Arabic-first and bilingual RTL interfaces, complex forms, role-based access control, dashboards, and workflow-heavy products across healthcare, virtualization, regulatory, editorial, and e-commerce domains. Experienced in building Node.js/Express services and delivering applications through GitHub Actions, Docker, Nginx, Linux, and Cloudflare. Strong at turning complex requirements into maintainable, accessible, and production-ready user experiences.",
+  "jobTitle": "Frontend Engineer",
   "experienceYears": "4+ years of professional web-development experience",
   "careerNote": "Career note: The Riyada, Virtuwa, and Pro Event roles were part-time engagements held concurrently with my full-time position at Smartly Techs. Dates below reflect the actual engagement periods.",
   "industries": [
