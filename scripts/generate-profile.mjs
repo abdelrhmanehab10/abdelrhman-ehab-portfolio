@@ -36,38 +36,61 @@ for (const line of lines) {
   else if (blocks.length && line.trim()) blocks.at(-1).lines.push(line.trim());
 }
 const get = (title) => {
-  const block = blocks.find((b) => b.title === title);
-  if (!block) throw new Error(`Missing profile section: ${title}`);
-  return block;
+  const matches = blocks.filter((b) => b.title === title);
+  if (matches.length !== 1) throw new Error(`Expected one profile section: ${title}, got ${matches.length}`);
+  return matches[0];
 };
 const bullets = (block) => block.lines.filter((line) => line.startsWith('- ')).map((line) => line.slice(2));
 const roleBlocks = blocks.filter((b) => b.depth === 3 && blocks.indexOf(b) > blocks.indexOf(get('Experience')));
 const roleIds = ['role-smartly-fse','role-smartly-fe','role-virtuwa-freelance','role-virtuwa-pt','role-riyada','role-pro-event','role-independent-qr','role-shortcutadv'];
 if (roleBlocks.length !== roleIds.length) throw new Error(`Expected ${roleIds.length} roles, got ${roleBlocks.length}; review layout`);
-const roleMap = new Map(roleIds.map((id, i) => [id, roleBlocks[i]]));
+const roleIdentity = {
+  'role-smartly-fse': 'Full Stack Engineer | Smartly Techs',
+  'role-smartly-fe': 'Frontend Web Developer | Smartly Techs',
+  'role-virtuwa-freelance': 'Freelance Frontend Engineer | Virtuwa',
+  'role-virtuwa-pt': 'Frontend Web Developer | Virtuwa',
+  'role-riyada': 'Frontend Web Developer | Riyada Al Arabiya For Information Technology',
+  'role-pro-event': 'Software Engineer | Pro Event',
+  'role-independent-qr': 'Independent Product Development | QR Verification Platform',
+  'role-shortcutadv': 'WordPress Developer | Shortcutadv',
+};
+const roleMap = new Map(roleIds.map((id) => {
+  const matches = roleBlocks.filter((block) => block.title.startsWith(`${roleIdentity[id]} |`) || block.title === roleIdentity[id]);
+  if (matches.length !== 1) throw new Error(`Expected one role for ${id} (${roleIdentity[id]}), got ${matches.length}`);
+  return [id, matches[0]];
+}));
+const projectHeading = (prefix) => {
+  const matches = blocks.filter(b => b.title.startsWith(prefix));
+  if (matches.length !== 1) throw new Error(`Expected one project heading for ${prefix}, got ${matches.length}`);
+  return matches[0];
+};
 const projectMap = new Map([
-  ['proj-clinic-flow', get('Clinic Flow')], ['proj-bleu-blog', blocks.find(b => b.title.startsWith('BLEU Community Blog'))],
-  ['proj-gas-reg', blocks.find(b => b.title.startsWith('Project: GAS-REG'))],
+  ['proj-clinic-flow', get('Clinic Flow')], ['proj-bleu-blog', projectHeading('BLEU Community Blog (')],
+  ['proj-gas-reg', projectHeading('Project: GAS-REG Portal')],
   ['proj-competition-admin', get('Project: Competition Management Admin')],
   ['proj-akhbar-admin', get('Project: Akhbar AlKhaleej Admin FE')],
-  ['proj-virtuwa-hv', blocks.find(b => b.title.startsWith('Project: VirtuWa HV'))],
-  ['proj-virtuwa-cloud', blocks.find(b => b.title.startsWith('Project: VirtuWa Cloud Manager'))],
+  ['proj-virtuwa-hv', projectHeading('Project: VirtuWa HV -')],
+  ['proj-virtuwa-cloud', projectHeading('Project: VirtuWa Cloud Manager -')],
   ['proj-flow-bridge', get('Project: Virtuwa Flow Bridge (in development)')],
   ['proj-qr-verify', get('Project: QR-code verification platform (Sara Beauty)')],
 ]);
 // Standalone products mentioned within role bullets rather than in their own subheadings.
+const onlyBullet = (items, matches, label) => {
+  const found = items.filter(matches);
+  if (found.length !== 1) throw new Error(`Expected one bullet for ${label}, got ${found.length}`);
+  return found[0];
+};
 const inlineProjects = new Map([
-  ['proj-bidding-wallet', ['role-smartly-fse', 'Built a secure bidding-wallet', 'Bidding Wallet Flow']],
-  ['proj-faster-meeting', ['role-smartly-fe', 'Developed the Faster Meeting', 'Faster Meeting']],
-  ['proj-efa', ['role-smartly-fe', 'Improved EFA', 'EFA']],
-  ['proj-boots-ladders', ['role-smartly-fe', 'Enhanced UI/UX', 'Boots & Ladders']],
-  ['proj-care-connect', ['role-riyada', 'Contributed to the Laravel-to-Vue', 'Care Connect Dashboard']],
-  ['proj-watu', ['role-riyada', 'Worked on Watu', 'Watu']],
-  ['proj-pro-event-storefront', ['role-pro-event', 'Built and standardized the storefront', 'Pro Event Storefront']],
+  ['proj-bidding-wallet', ['role-smartly-fse', /bidding-wallet/i, 'Bidding Wallet Flow']],
+  ['proj-faster-meeting', ['role-smartly-fe', /Faster Meeting/i, 'Faster Meeting']],
+  ['proj-efa', ['role-smartly-fe', /\bEFA\b/i, 'EFA']],
+  ['proj-boots-ladders', ['role-smartly-fe', /Boots & Ladders/i, 'Boots & Ladders']],
+  ['proj-care-connect', ['role-riyada', /Care Connect Dashboard/i, 'Care Connect Dashboard']],
+  ['proj-watu', ['role-riyada', /\bWatu\b/i, 'Watu']],
+  ['proj-pro-event-storefront', ['role-pro-event', /storefront UI/i, 'Pro Event Storefront']],
 ]);
-for (const [id, [role, prefix, name]] of inlineProjects) {
-  const text = bullets(roleMap.get(role)).find(b => b.startsWith(prefix));
-  if (!text) throw new Error(`Missing project evidence: ${id}`);
+for (const [id, [role, identity, name]] of inlineProjects) {
+  const text = onlyBullet(bullets(roleMap.get(role)), b => identity.test(b), id);
   projectMap.set(id, { title: name, lines: [`- ${text}`] });
 }
 if (projectMap.size !== 16 || [...projectMap.values()].some(b => !b)) throw new Error('Project headings changed; review mapping');
@@ -79,6 +102,8 @@ const skillBlocks = {
 const splitTags = (text) => text.flatMap(s => s.split(/, (?=(?:[^()]*\([^()]*\))*[^()]*$)/));
 const contact = Object.fromEntries(bullets(get('Contact')).map(s => { const i = s.indexOf(': '); return [s.slice(0, i), s.slice(i + 2)]; }));
 const summary = get('Summary').lines.join(' ');
+const experienceYears = summary.match(/\b\d+\+ years of professional web-development experience\b/i)?.[0];
+if (!experienceYears) throw new Error('Missing professional web-development experience figure in Summary');
 const achievement = bullets(get('CI/CD & Deployment Automation'));
 const bleu = bullets(get('BLEU Community Blog (Eleventy/Tailwind open-source tech community website)'));
 const careerNote = get('Experience').lines.find(s => s.startsWith('> '))?.slice(2);
@@ -86,7 +111,7 @@ const industries = bullets(get('Industries'));
 const languages = bullets(get('Languages'));
 const softSkills = bullets(get('Soft Skills'));
 const highlights = bullets(get('Additional Highlights'));
-const profileDetails = { contact, summary, careerNote, industries, languages, softSkills, highlights };
+const profileDetails = { contact, summary, experienceYears, careerNote, industries, languages, softSkills, highlights };
 const nodes = layout.nodes.map((node) => {
   const n = { ...node };
   let sourceBullets = [];
@@ -121,7 +146,10 @@ const nodes = layout.nodes.map((node) => {
       'craft-cicd': ['CI/CD & Deployment Automation', achievement],
       'craft-bilingual': ['Bilingual & RTL Engineering', [...languages, ...bullets(get('Other')).filter(s => /Bilingual/.test(s)), ...bleu.slice(0, 2)]],
       'craft-security': ['Access Control & Security', bullets(projectMap.get('proj-virtuwa-hv')).filter(s => /session|RBAC/.test(s))],
-      'craft-performance': ['Performance & Quality', [bullets(roleMap.get('role-smartly-fe'))[1], bleu[4]]],
+      'craft-performance': ['Performance & Quality', [
+        onlyBullet(bullets(roleMap.get('role-smartly-fe')), b => /\bEFA\b.*Lighthouse/i.test(b), 'EFA performance'),
+        onlyBullet(bleu, b => /semantic blog datetime.*font loading/i.test(b), 'BLEU performance'),
+      ]],
       'craft-ways-of-working': ['Ways of Working', softSkills],
     }[node.id];
     n.title = data[0]; n.meta = 'Practice'; sourceBullets = data[1];

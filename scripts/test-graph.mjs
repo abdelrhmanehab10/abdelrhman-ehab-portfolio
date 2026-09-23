@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { test } from "node:test";
 import { graphNodes, graphEdges, graphGroups, profileDetails, profileSourceHash } from "../src/constant/graph.js";
 import { works, experiences, skills, impactStats } from "../src/constant/index.js";
@@ -55,6 +57,43 @@ test("the no-JS index and Person metadata stay in sync with graph.js", () => {
   assert.ok(html.includes(`<p id="hero-summary" class="max-w-3xl text-base text-slate-300 md:text-lg">${person.description}</p>`), 'first paint hero matches model');
   for (const attribute of ['name="description"', 'property="og:description"', 'name="twitter:description"']) {
     assert.ok(html.includes(`${attribute}\n      content="${person.description.replaceAll('&', '&amp;').replaceAll('"', '&quot;')}"`), `${attribute} matches model`);
+  }
+});
+
+test('HTML generation follows changed profile contact and identity', () => {
+  const dir = mkdtempSync(join(import.meta.dirname, '.index-test-'));
+  try {
+    mkdirSync(join(dir, 'scripts'));
+    mkdirSync(join(dir, 'src/constant'), { recursive: true });
+    writeFileSync(join(dir, 'package.json'), '{"type":"module"}');
+    copyFileSync(new URL('./generate-graph-index.mjs', import.meta.url), join(dir, 'scripts/generate-graph-index.mjs'));
+    copyFileSync(new URL('../index.html', import.meta.url), join(dir, 'index.html'));
+    const changedNodes = structuredClone(graphNodes);
+    changedNodes.find(n => n.id === 'me').title = 'Updated Profile Name';
+    changedNodes.find(n => n.id === 'link-email').href = 'mailto:updated@example.com';
+    changedNodes.find(n => n.id === 'link-github').href = 'https://github.com/updated';
+    changedNodes.find(n => n.id === 'link-resume').href = './assets/new-resume.pdf';
+    const details = structuredClone(profileDetails);
+    details.contact.Portfolio = 'https://example.com/portfolio/';
+    writeFileSync(join(dir, 'src/constant/graph.js'),
+      `export const graphNodes = ${JSON.stringify(changedNodes)};\nexport const graphEdges = ${JSON.stringify(graphEdges)};\nexport const profileDetails = ${JSON.stringify(details)};\n`);
+    const command = [join(dir, 'scripts/generate-graph-index.mjs')];
+    assert.throws(() => execFileSync(process.execPath, [...command, '--check'], { stdio: 'pipe' }),
+      error => /Committed HTML is stale/.test(error.stderr.toString()));
+    execFileSync(process.execPath, command);
+    const output = readFileSync(join(dir, 'index.html'), 'utf8');
+    assert.match(output, /href="mailto:updated@example.com"/);
+    assert.doesNotMatch(output, /mailto:abdelrhmanehab047@gmail.com/);
+    assert.match(output, /<title>Updated Profile Name \| Frontend Engineer<\/title>/);
+    assert.match(output, /&copy; <span id="year"><\/span> Updated Profile Name\. Built with/);
+    assert.equal((output.match(/href="\.\/assets\/new-resume\.pdf"/g) || []).length, 3);
+    assert.match(output, /content="https:\/\/example.com\/portfolio\/assets\/images\/pro.png"/);
+    const person = JSON.parse(output.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+    assert.equal(person.url, details.contact.Portfolio);
+    assert.equal(person.sameAs[0], 'https://github.com/updated');
+    execFileSync(process.execPath, [...command, '--check']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 });
 

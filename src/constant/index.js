@@ -3,17 +3,15 @@ import { graphNodes, profileDetails } from './graph.js';
 const ofGroup = (group) => graphNodes.filter((node) => node.group === group);
 const root = graphNodes.find((node) => node.id === 'me');
 const links = Object.fromEntries(ofGroup('link').map((node) => [node.id, node]));
-const years = profileDetails.summary.match(/\d\+ years of professional web-development experience/i)?.[0] || 'Professional web development';
 
 export const profileMeta = {
   name: root.title,
   title: root.summary.split(' with ')[0],
-  heroHeadline: `${root.title} · ${root.summary.split(' with ')[0]}`,
   heroSummary: profileDetails.summary,
   resumeUrl: links['link-resume'].href,
 };
 export const impactStats = [
-  { label: 'Professional Web Development', value: years.replace(/ years of professional web-development experience/i, ' Years') },
+  { label: 'Professional Web Development', value: profileDetails.experienceYears.replace(/ years of professional web-development experience/i, ' Years') },
   { label: 'Professional Roles', value: `${ofGroup('role').length} Engagements` },
   { label: 'Projects & Contributions', value: `${ofGroup('project').length} Products` },
   { label: 'Industries', value: profileDetails.industries.join(' · ') },
