@@ -28,6 +28,7 @@ export function initHeroGraph() {
   let hovered = null;
   let selected = null;
   let lastFocus = null;
+  let press = null;
   let moved = false;
   let zooming = false;
   let pauseTicket = 0;
@@ -42,7 +43,7 @@ export function initHeroGraph() {
     listButton.hidden = resetButton.hidden = motionButton.hidden = true;
   }
 
-  const active = () => hovered || selected;
+  const active = () => selected || hovered;
   const neighbourhood = (id) => new Set([id, ...(adjacency.get(id) || [])]);
   function nodeColor(node) {
     const focus = active();
@@ -138,6 +139,20 @@ export function initHeroGraph() {
     moved = false;
     fit(400);
   });
+  host.addEventListener("pointerdown", (event) => {
+    press = event.isPrimary === false ? null : { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+  });
+  host.addEventListener("pointermove", (event) => {
+    if (press?.id === event.pointerId && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 5) press.moved = true;
+  });
+  host.addEventListener("pointercancel", () => { press = null; });
+  host.addEventListener("pointerup", (event) => {
+    if (press?.id === event.pointerId && !press.moved && event.button === 0 && motionButton.getAttribute("aria-pressed") === "true") {
+      const clicked = nodeAt(event);
+      if (clicked) openNode(clicked.id, listButton);
+    }
+    press = null;
+  });
   motionButton.addEventListener("click", () => {
     const paused = motionButton.getAttribute("aria-pressed") !== "true";
     motionButton.setAttribute("aria-pressed", String(paused));
@@ -192,16 +207,14 @@ export function initHeroGraph() {
         host.style.cursor = node ? "pointer" : "grab";
         repaint();
       })
-      .onNodeClick((node, event) => {
-        const clicked = motionButton.getAttribute("aria-pressed") === "true" ? nodeAt(event) : node;
-        if (clicked) openNode(clicked.id, listButton);
+      .onNodeClick((node) => {
+        if (motionButton.getAttribute("aria-pressed") !== "true") openNode(node.id, listButton);
       })
-      .onBackgroundClick((event) => {
-        if (motionButton.getAttribute("aria-pressed") === "true") {
-          const clicked = nodeAt(event);
-          if (clicked) openNode(clicked.id, listButton);
-        } else closePanel();
+      .onBackgroundClick(() => {
+        if (motionButton.getAttribute("aria-pressed") !== "true") closePanel();
       })
+      .onNodeDrag(() => { if (motionButton.getAttribute("aria-pressed") === "true") repaint(); })
+      .onNodeDragEnd(() => { if (motionButton.getAttribute("aria-pressed") === "true") repaint(); })
       .onZoom(() => {
         if (motionButton.getAttribute("aria-pressed") === "true") {
           zooming = true;

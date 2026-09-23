@@ -370,7 +370,7 @@ export const graphNodes = [
       "A React/TypeScript hypervisor management console with live monitoring, RBAC and bilingual English/Arabic UX.",
     bullets: [
       "VM lifecycle workflows (power, clone, snapshots, console), storage/network management and backup/restore interfaces with search and filtering.",
-      "Reworked the console flow after finding sensitive VM/connection data in browser URLs, replacing it with session-based bootstrap and opaque, short-lived identifiers.",
+      "Hardened the console’s session handling with session-based bootstrap and short-lived, opaque identifiers.",
       "Shipped to a startup environment with early users; mentored a new frontend developer through implementation and delivery.",
     ],
     tags: ["React", "TypeScript", "RBAC", "RTL"],
@@ -668,7 +668,7 @@ export const graphNodes = [
     bullets: [
       "RBAC scoping by role, section and category; state-dependent route and action guards.",
       "JWT login/refresh, persistent session hydration, token refresh and inactivity logout; TOTP/MFA.",
-      "Found sensitive VM/connection data in browser URLs and replaced it with session-based bootstrap and opaque, short-lived identifiers.",
+      "Hardened session handling with session-based bootstrap and short-lived, opaque identifiers.",
       "Rate limiting, session revocation, audit events and CORS/security controls.",
     ],
     tags: ["RBAC", "JWT", "TOTP/MFA", "Audit logging"],

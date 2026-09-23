@@ -10,8 +10,8 @@ function element() {
   return {
     hidden: false, style: {}, dataset: {}, classList: { add() {}, remove() {}, toggle() {} },
     innerHTML: "", textContent: "", clientWidth: 390, clientHeight: 480,
-    addEventListener(name, handler) { handlers[name] = handler; },
-    fire(name, event = {}) { handlers[name]?.(event); },
+    addEventListener(name, handler) { (handlers[name] ||= []).push(handler); },
+    fire(name, event = {}) { handlers[name]?.forEach((handler) => handler(event)); },
     insertBefore(child) { child.parent = this; },
     getAttribute(name) { return attributes[name] ?? null; },
     setAttribute(name, value) { attributes[name] = value; },
@@ -48,11 +48,13 @@ function setup(mobile, libraryAvailable = true) {
     nodes, callbacks: {}, scale: 1, center: null, offset: 0, visibleScale: 1, visibleOffset: 0,
     width() { return this; }, height() { return this; }, backgroundColor() { return this; },
     nodeId() { return this; }, nodeVal() { return this; }, nodeRelSize(value) { return value === undefined ? 5 : this; },
-    nodeLabel() { return this; }, nodeColor() { return this; }, linkColor() { return this; }, linkWidth() { return this; },
+    nodeLabel() { return this; }, nodeColor(callback) { this.color = callback; return this; }, linkColor() { return this; }, linkWidth() { return this; },
     linkCurvature() { return this; }, nodeCanvasObjectMode() { return this; }, nodeCanvasObject() { return this; },
     onNodeHover(callback) { this.callbacks.hover = callback; return this; },
     onNodeClick(callback) { this.callbacks.click = callback; return this; },
     onBackgroundClick(callback) { this.callbacks.background = callback; return this; },
+    onNodeDrag(callback) { this.callbacks.drag = callback; return this; },
+    onNodeDragEnd(callback) { this.callbacks.dragEnd = callback; return this; },
     onZoom(callback) { this.callbacks.zoom = callback; return this; },
     onZoomEnd(callback) { this.callbacks.zoomEnd = callback; return this; },
     onEngineTick() { return this; }, onEngineStop() { return this; },
@@ -70,7 +72,12 @@ function setup(mobile, libraryAvailable = true) {
       return this;
     },
     pauseAnimation() { return this; },
-    resumeAnimation() { this.visibleScale = this.scale; this.visibleOffset = this.offset; return this; },
+    resumeAnimation() {
+      this.visibleScale = this.scale;
+      this.visibleOffset = this.offset;
+      this.visiblePositions = new Map(this.nodes.map((node) => [node.id, { x: node.x, y: node.y }]));
+      return this;
+    },
   };
   globalThis.window = {
     ForceGraph: libraryAvailable ? class { constructor() { return graph; } } : undefined,
@@ -95,16 +102,20 @@ test("hash navigation opens the newly linked node and closes on another section"
   assert.equal(location.hash, "#contact");
 });
 
-test("paused clicks pick by pointer location rather than stale library hover", () => {
+test("paused pointer selects a node even when the library has a stale link hover", () => {
   const { graph, panel, selectors } = setup(false);
   selectors.get("#btn-motion").fire("click");
-  const stale = graph.nodes.find((node) => node.id === "proj-efa");
+  const host = selectors.get("#graph-canvas-host");
   const actual = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
-  const pointer = { clientX: actual.x * graph.zoom(), clientY: 0 };
-  graph.callbacks.click(stale, pointer);
+  const pointer = { pointerId: 1, clientX: actual.x * graph.zoom(), clientY: 0, button: 0 };
+  host.fire("pointerdown", pointer);
+  host.fire("pointerup", pointer);
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
-  graph.callbacks.background({ clientX: 389, clientY: 450 });
+  graph.callbacks.click(graph.nodes.find((node) => node.id === "proj-efa"), pointer);
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
+  const background = { pointerId: 1, clientX: 389, clientY: 450, button: 0 };
+  host.fire("pointerdown", background);
+  host.fire("pointerup", background);
   assert.equal(panel.hidden, false);
 });
 
@@ -118,8 +129,50 @@ test("paused pan and zoom redraw the view before picking a visible node", () => 
   assert.equal(graph.visibleScale, graph.zoom());
   assert.equal(graph.visibleOffset, graph.offset);
   const actual = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
-  graph.callbacks.background({ clientX: actual.x * graph.visibleScale + graph.visibleOffset, clientY: 0 });
+  const pointer = { pointerId: 1, clientX: actual.x * graph.visibleScale + graph.visibleOffset, clientY: 0, button: 0 };
+  selectors.get("#graph-canvas-host").fire("pointerdown", pointer);
+  selectors.get("#graph-canvas-host").fire("pointerup", pointer);
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
+});
+
+test("paused dragging redraws a moved node without selecting it on release", () => {
+  const { graph, panel, selectors } = setup(false);
+  const host = selectors.get("#graph-canvas-host");
+  selectors.get("#btn-motion").fire("click");
+  graph.resumeAnimation();
+  const actual = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
+  const start = { pointerId: 1, clientX: actual.x * graph.zoom(), clientY: 0, button: 0 };
+  host.fire("pointerdown", start);
+  actual.x += 50;
+  const end = { ...start, clientX: actual.x * graph.zoom() };
+  host.fire("pointermove", end);
+  graph.callbacks.drag(actual);
+  graph.callbacks.dragEnd(actual);
+  assert.equal(graph.visiblePositions.get(actual.id).x, actual.x);
+  host.fire("pointerup", end);
+  assert.equal(panel.hidden, true);
+  host.fire("pointerdown", end);
+  host.fire("pointerup", end);
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
+});
+
+test("list selection stays highlighted despite a retained canvas hover", () => {
+  const { graph, selectors, panel } = setup(false);
+  graph.callbacks.hover(graph.nodes.find((node) => node.id === "proj-efa"));
+  const index = selectors.get("#graph-index-wrap");
+  index.fire("click", { target: { closest: () => ({ dataset: { node: "proj-virtuwa-hv" } }) } });
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
+  assert.equal(graph.color(graph.nodes.find((node) => node.id === "proj-virtuwa-hv")), "#67e8f9");
+});
+
+test("client security work is described without exposing the original detail", () => {
+  const { panel, selectors } = setup(false);
+  const index = selectors.get("#graph-index-wrap");
+  for (const id of ["proj-virtuwa-hv", "craft-security"]) {
+    index.fire("click", { target: { closest: () => ({ dataset: { node: id } }) } });
+    assert.match(panel.innerHTML, /session-based bootstrap and short-lived, opaque identifiers/);
+    assert.doesNotMatch(panel.innerHTML, /sensitive VM\/connection data|browser URLs/i);
+  }
 });
 
 test("library failure keeps list-selected details visible", () => {

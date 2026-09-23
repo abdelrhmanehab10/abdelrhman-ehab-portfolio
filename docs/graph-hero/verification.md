@@ -5,7 +5,6 @@ Run against the real page, served at `http://127.0.0.1:5173/`, via `chrome-devto
 | State | Desktop 1440 × 900 | Phone 390 × 844, DPR 3 |
 | --- | --- | --- |
 | Settled default | [desktop](desktop-default.png) | [phone](mobile-default.png) |
-| Selected VirtuWa HV + 5 neighbours | [desktop](desktop-selected.png) | [phone bottom sheet](mobile-selected.png) |
 | Keyboard focus | [desktop list](desktop-focus.png) | [phone list](mobile-keyboard-focus.png) |
 | Library request returns 503 | — | [visible list](library-failure.png) |
 | OS reduced motion | [settled without animated ticks](reduced-motion-stage.png) | — |
