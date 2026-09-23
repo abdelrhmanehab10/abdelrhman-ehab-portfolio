@@ -6,6 +6,6 @@
     "dev": "pnpm dlx http-server -p 5173",
     "run": "pnpm run dev",
     "watch": "pnpm dlx live-server --port=5173 --watch=. --no-browser",
-    "test:graph": "node --test scripts/test-graph.mjs"
+    "test:graph": "node --test scripts/test-graph.mjs scripts/test-hero-interaction.mjs"
   }
 }

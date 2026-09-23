@@ -58,12 +58,24 @@ export function initHeroGraph() {
   }
   function repaint() {
     graph?.nodeColor(nodeColor).linkColor(edgeColor).linkWidth(edgeWidth);
-    // pauseAnimation also stops painting. Allow one frame for interaction
-    // feedback, then freeze again without leaving ambient motion running.
     if (graph && motionButton.getAttribute("aria-pressed") === "true" && !reduced) {
       graph.resumeAnimation();
-      requestAnimationFrame(() => requestAnimationFrame(() => graph?.pauseAnimation()));
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (motionButton.getAttribute("aria-pressed") === "true") graph?.pauseAnimation();
+      }));
     }
+  }
+  function nodeAt(event) {
+    const canvas = host.querySelector("canvas");
+    if (!canvas || !graph) return null;
+    const bounds = canvas.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) * stage.clientWidth / bounds.width;
+    const y = (event.clientY - bounds.top) * stage.clientHeight / bounds.height;
+    return graph.graphData().nodes.find((node) => {
+      const screen = graph.graph2ScreenCoords(node.x, node.y);
+      const radius = Math.sqrt(node.val) * graph.nodeRelSize() * graph.zoom();
+      return Math.hypot(screen.x - x, screen.y - y) <= radius;
+    }) || null;
   }
 
   function closePanel({ restoreFocus = true } = {}) {
@@ -122,9 +134,9 @@ export function initHeroGraph() {
   });
   motionButton.addEventListener("click", () => {
     const paused = motionButton.getAttribute("aria-pressed") !== "true";
+    motionButton.setAttribute("aria-pressed", String(paused));
     if (paused) graph?.pauseAnimation();
     else graph?.resumeAnimation();
-    motionButton.setAttribute("aria-pressed", String(paused));
     motionButton.textContent = paused ? "Resume motion" : "Pause motion";
   });
 
@@ -173,8 +185,16 @@ export function initHeroGraph() {
         host.style.cursor = node ? "pointer" : "grab";
         repaint();
       })
-      .onNodeClick((node) => openNode(node.id, listButton))
-      .onBackgroundClick(() => closePanel())
+      .onNodeClick((node, event) => {
+        const clicked = motionButton.getAttribute("aria-pressed") === "true" ? nodeAt(event) : node;
+        if (clicked) openNode(clicked.id, listButton);
+      })
+      .onBackgroundClick((event) => {
+        if (motionButton.getAttribute("aria-pressed") === "true") {
+          const clicked = nodeAt(event);
+          if (clicked) openNode(clicked.id, listButton);
+        } else closePanel();
+      })
       .onEngineTick(() => { if (!moved && ++ticks % 12 === 0) fit(0); })
       .onEngineStop(() => { if (!moved) fit(reduced ? 0 : 400); });
 
@@ -204,7 +224,18 @@ export function initHeroGraph() {
     // refit; let it commit its warmup positions to the canvas first.
     if (reduced) requestAnimationFrame(() => requestAnimationFrame(() => fit(0)));
     else fit(0);
-    if (location.hash.startsWith("#node/")) openNode(decodeURIComponent(location.hash.slice(6)), listButton);
+    function syncHash() {
+      if (!location.hash.startsWith("#node/")) {
+        closePanel({ restoreFocus: false });
+        return;
+      }
+      let id;
+      try { id = decodeURIComponent(location.hash.slice(6)); }
+      catch { return; }
+      if (byId.has(id) && selected !== id) openNode(id, listButton);
+    }
+    window.addEventListener("hashchange", syncHash);
+    syncHash();
   } catch (error) {
     console.warn("Graph could not start; using profile list", error);
     graph = null;
@@ -213,19 +244,20 @@ export function initHeroGraph() {
 
   function fit(duration) {
     if (!graph) return;
-    graph.zoomToFit(duration, 48);
+    const time = motionButton.getAttribute("aria-pressed") === "true" ? 0 : duration;
     if (mobile.matches) {
-      // Phone option A: keep all 52 nodes and all edges, but open on a
-      // readable ~40 px project node near the root, then let visitors pan.
-      requestAnimationFrame(() => {
-        if (moved || !graph) return;
-        const fitted = graph.zoom();
+      const bbox = graph.getGraphBbox();
+      const root = graph.graphData().nodes.find((node) => node.id === "me");
+      if (bbox && root && Number.isFinite(root.x) && Number.isFinite(root.y)) {
+        const fitted = Math.min(
+          (stage.clientWidth - 96) / (bbox.x[1] - bbox.x[0]),
+          (stage.clientHeight - 96) / (bbox.y[1] - bbox.y[0]),
+        );
         const target = 40 / (2 * Math.sqrt(graphGroups.project.size) * graph.nodeRelSize());
-        const root = graph.graphData().nodes.find((node) => node.id === "me");
-        if (!root || !Number.isFinite(root.x)) return;
-        graph.centerAt(root.x, root.y, duration);
-        graph.zoom(Math.min(Math.max(target, fitted), fitted * 2), duration);
-      });
-    }
+        graph.centerAt(root.x, root.y, time);
+        graph.zoom(Math.min(Math.max(target, fitted), fitted * 2), time);
+      }
+    } else graph.zoomToFit(time, 48);
+    if (time === 0) repaint();
   }
 }

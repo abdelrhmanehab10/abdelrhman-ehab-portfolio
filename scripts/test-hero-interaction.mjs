@@ -1,0 +1,132 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { graphGroups, graphNodes } from "../src/constant/graph.js";
+import { coreTechnologies } from "../src/constant/index.js";
+import { initHeroGraph } from "../src/hero-graph.js";
+
+function element() {
+  const handlers = {};
+  const attributes = {};
+  return {
+    hidden: false, style: {}, dataset: {}, classList: { add() {}, remove() {}, toggle() {} },
+    innerHTML: "", textContent: "", clientWidth: 390, clientHeight: 480,
+    addEventListener(name, handler) { handlers[name] = handler; },
+    fire(name, event = {}) { handlers[name]?.(event); },
+    getAttribute(name) { return attributes[name] ?? null; },
+    setAttribute(name, value) { attributes[name] = value; },
+    focus() {},
+    querySelector(selector) { return selector === "canvas" ? canvas : element(); },
+  };
+}
+const canvas = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 390, height: 480 }) };
+
+function setup(mobile) {
+  const selectors = new Map([
+    "#graph-stage", "#graph-canvas-host", "#graph-index-wrap", "#graph-panel", "#graph-status",
+    "#btn-list", "#btn-reset", "#btn-motion",
+  ].map((key) => [key, element()]));
+  const stage = selectors.get("#graph-stage");
+  const panel = selectors.get("#graph-panel");
+  panel.hidden = true;
+  const documentHandlers = {};
+  globalThis.document = {
+    documentElement: { dataset: {} }, activeElement: selectors.get("#btn-list"),
+    querySelector: (key) => selectors.get(key),
+    getElementById: () => null,
+    addEventListener(name, handler) { documentHandlers[name] = handler; },
+  };
+  const windowHandlers = {};
+  globalThis.location = { pathname: "/", search: "", hash: "" };
+  globalThis.history = { replaceState(_state, _title, url) { location.hash = url.startsWith("#") ? url : ""; } };
+  globalThis.matchMedia = (query) => ({ matches: query.includes("max-width") ? mobile : false, addEventListener() {} });
+  globalThis.requestAnimationFrame = (callback) => { callback(); };
+  globalThis.ResizeObserver = class { observe() {} };
+  const nodes = graphNodes.map((node, i) => ({ ...node, x: i * 100, y: 0, val: graphGroups[node.group].size }));
+  const graph = {
+    nodes, callbacks: {}, scale: 1, center: null,
+    width() { return this; }, height() { return this; }, backgroundColor() { return this; },
+    nodeId() { return this; }, nodeVal() { return this; }, nodeRelSize(value) { return value === undefined ? 5 : this; },
+    nodeLabel() { return this; }, nodeColor() { return this; }, linkColor() { return this; }, linkWidth() { return this; },
+    linkCurvature() { return this; }, nodeCanvasObjectMode() { return this; }, nodeCanvasObject() { return this; },
+    onNodeHover(callback) { this.callbacks.hover = callback; return this; },
+    onNodeClick(callback) { this.callbacks.click = callback; return this; },
+    onBackgroundClick(callback) { this.callbacks.background = callback; return this; },
+    onEngineTick() { return this; }, onEngineStop() { return this; },
+    d3Force() { return { strength: () => ({ distanceMax() {} }), distance() {} }; },
+    d3VelocityDecay() { return this; }, cooldownTicks() { return this; }, cooldownTime() { return this; },
+    graphData(value) { if (value) return this; return { nodes: this.nodes }; },
+    getGraphBbox() { return { x: [-100, 5300], y: [-100, 100] }; },
+    graph2ScreenCoords(x, y) { return { x: x * this.scale, y: y * this.scale }; },
+    zoom(value) { if (value === undefined) return this.scale; this.scale = value; return this; },
+    centerAt(x, y) { this.center = { x, y }; return this; },
+    zoomToFit(duration) {
+      const apply = () => { this.scale = 0.12; this.center = { x: 2600, y: 0 }; };
+      if (duration) setTimeout(apply, 0);
+      else apply();
+      return this;
+    },
+    pauseAnimation() { return this; }, resumeAnimation() { return this; },
+  };
+  globalThis.window = {
+    ForceGraph: class { constructor() { return graph; } },
+    addEventListener(name, handler) { windowHandlers[name] = handler; },
+    fire(name) { windowHandlers[name]?.(); },
+  };
+  initHeroGraph();
+  return { graph, stage, panel, selectors };
+}
+
+test("hash navigation opens the newly linked node and closes on another section", () => {
+  const { panel } = setup(false);
+  location.hash = "#node/proj-efa";
+  window.fire("hashchange");
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">EFA<\/h2>/);
+  location.hash = "#node/proj-virtuwa-hv";
+  window.fire("hashchange");
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
+  location.hash = "#contact";
+  window.fire("hashchange");
+  assert.equal(panel.hidden, true);
+  assert.equal(location.hash, "#contact");
+});
+
+test("paused clicks pick by pointer location rather than stale library hover", () => {
+  const { graph, panel, selectors } = setup(false);
+  selectors.get("#btn-motion").fire("click");
+  const stale = graph.nodes.find((node) => node.id === "proj-efa");
+  const actual = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
+  const pointer = { clientX: actual.x * graph.zoom(), clientY: 0 };
+  graph.callbacks.click(stale, pointer);
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
+  graph.callbacks.background({ clientX: 389, clientY: 450 });
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
+  assert.equal(panel.hidden, false);
+});
+
+test("reset restores the same mobile and desktop view after zoom and pan", async () => {
+  for (const mobile of [false, true]) {
+    const { graph, selectors } = setup(mobile);
+    const opening = { scale: graph.zoom(), center: graph.center };
+    graph.zoom(5);
+    graph.centerAt(50, 50);
+    selectors.get("#btn-reset").fire("click");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(graph.zoom(), opening.scale);
+    assert.deepEqual(graph.center, opening.center);
+  }
+});
+
+test("the rendered hero keeps core technologies", async () => {
+  const meta = element();
+  const callbacks = {};
+  globalThis.document = {
+    querySelector: (selector) => selector === "#hero-meta" ? meta :
+      ["#experience-list", "#skills-groups", "#social-links"].includes(selector) ? element() : null,
+    querySelectorAll: () => [],
+    addEventListener(name, handler) { callbacks[name] = handler; },
+  };
+  globalThis.window = { addEventListener() {}, scrollY: 0 };
+  await import("../src/main.js");
+  callbacks.DOMContentLoaded();
+  for (const technology of coreTechnologies) assert.ok(meta.innerHTML.includes(technology));
+});

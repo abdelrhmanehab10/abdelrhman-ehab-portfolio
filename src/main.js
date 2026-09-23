@@ -1,5 +1,6 @@
 import { initHeroGraph } from "./hero-graph.js";
 import {
+  coreTechnologies,
   experiences,
   impactStats,
   profileMeta,
@@ -57,6 +58,7 @@ class App {
     this.heroBadge = document.querySelector("#hero-badge");
     this.heroHeadline = document.querySelector("#hero-headline");
     this.heroSummary = document.querySelector("#hero-summary");
+    this.heroMeta = document.querySelector("#hero-meta");
 
     this.init();
   }
@@ -119,6 +121,29 @@ class App {
 
     if (this.heroSummary) {
       this.heroSummary.textContent = profileMeta.heroSummary;
+    }
+
+    if (this.heroMeta) {
+      const sliderItems = coreTechnologies
+        .map(
+          (item) =>
+            `<span class="inline-flex items-center gap-1.5 rounded-full border border-slate-600 bg-slate-800/80 px-2.5 py-1 text-[11px] font-semibold tracking-[0.02em] text-slate-200">
+              <span class="h-1.5 w-1.5 rounded-full bg-cyan-300"></span>
+              ${item}
+            </span>`
+        )
+        .join("");
+
+      this.heroMeta.innerHTML = `
+        <div class="tech-slider-track flex w-max items-center gap-2 px-3">
+          <div class="flex items-center gap-2">
+            ${sliderItems}
+          </div>
+          <div class="flex items-center gap-2" aria-hidden="true">
+            ${sliderItems}
+          </div>
+        </div>
+      `;
     }
 
     const isExternalResume = /^https?:\/\//i.test(profileMeta.resumeUrl);
