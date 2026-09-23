@@ -1,0 +1,792 @@
+{
+  "nodes": [
+    {
+      "id": "me",
+      "group": "root"
+    },
+    {
+      "id": "hub-experience",
+      "group": "hub",
+      "sectionId": "experience"
+    },
+    {
+      "id": "hub-projects",
+      "group": "hub",
+      "sectionId": "projects"
+    },
+    {
+      "id": "hub-skills",
+      "group": "hub",
+      "sectionId": "skills"
+    },
+    {
+      "id": "hub-domains",
+      "group": "hub"
+    },
+    {
+      "id": "hub-craft",
+      "group": "hub"
+    },
+    {
+      "id": "hub-connect",
+      "group": "hub",
+      "sectionId": "contact"
+    },
+    {
+      "id": "role-smartly-fse",
+      "group": "role",
+      "sectionId": "experience"
+    },
+    {
+      "id": "role-smartly-fe",
+      "group": "role",
+      "sectionId": "experience"
+    },
+    {
+      "id": "role-virtuwa-freelance",
+      "group": "role",
+      "sectionId": "experience"
+    },
+    {
+      "id": "role-virtuwa-pt",
+      "group": "role",
+      "sectionId": "experience"
+    },
+    {
+      "id": "role-riyada",
+      "group": "role",
+      "sectionId": "experience"
+    },
+    {
+      "id": "role-pro-event",
+      "group": "role",
+      "sectionId": "experience"
+    },
+    {
+      "id": "role-independent-qr",
+      "group": "role",
+      "sectionId": "experience"
+    },
+    {
+      "id": "role-shortcutadv",
+      "group": "role",
+      "sectionId": "experience"
+    },
+    {
+      "id": "proj-clinic-flow",
+      "group": "project"
+    },
+    {
+      "id": "proj-bleu-blog",
+      "group": "project"
+    },
+    {
+      "id": "proj-gas-reg",
+      "group": "project"
+    },
+    {
+      "id": "proj-competition-admin",
+      "group": "project"
+    },
+    {
+      "id": "proj-akhbar-admin",
+      "group": "project"
+    },
+    {
+      "id": "proj-bidding-wallet",
+      "group": "project"
+    },
+    {
+      "id": "proj-faster-meeting",
+      "group": "project"
+    },
+    {
+      "id": "proj-efa",
+      "group": "project"
+    },
+    {
+      "id": "proj-boots-ladders",
+      "group": "project"
+    },
+    {
+      "id": "proj-virtuwa-hv",
+      "group": "project",
+      "href": "https://virtuwa.com/",
+      "linkLabel": "Visit VirtuWa"
+    },
+    {
+      "id": "proj-virtuwa-cloud",
+      "group": "project"
+    },
+    {
+      "id": "proj-flow-bridge",
+      "group": "project"
+    },
+    {
+      "id": "proj-care-connect",
+      "group": "project"
+    },
+    {
+      "id": "proj-watu",
+      "group": "project"
+    },
+    {
+      "id": "proj-pro-event-storefront",
+      "group": "project"
+    },
+    {
+      "id": "proj-qr-verify",
+      "group": "project",
+      "href": "https://verify.sarabeauty.net/scan",
+      "linkLabel": "Open live scanner"
+    },
+    {
+      "id": "skill-frameworks",
+      "group": "skill"
+    },
+    {
+      "id": "skill-ecommerce",
+      "group": "skill"
+    },
+    {
+      "id": "skill-devops",
+      "group": "skill"
+    },
+    {
+      "id": "skill-data",
+      "group": "skill"
+    },
+    {
+      "id": "skill-other",
+      "group": "skill"
+    },
+    {
+      "id": "skill-tools",
+      "group": "skill"
+    },
+    {
+      "id": "domain-healthcare",
+      "group": "domain"
+    },
+    {
+      "id": "domain-virtualization",
+      "group": "domain"
+    },
+    {
+      "id": "domain-regulatory",
+      "group": "domain"
+    },
+    {
+      "id": "domain-editorial",
+      "group": "domain"
+    },
+    {
+      "id": "domain-ecommerce",
+      "group": "domain"
+    },
+    {
+      "id": "domain-public",
+      "group": "domain"
+    },
+    {
+      "id": "craft-cicd",
+      "group": "craft"
+    },
+    {
+      "id": "craft-bilingual",
+      "group": "craft"
+    },
+    {
+      "id": "craft-security",
+      "group": "craft"
+    },
+    {
+      "id": "craft-performance",
+      "group": "craft"
+    },
+    {
+      "id": "craft-ways-of-working",
+      "group": "craft"
+    },
+    {
+      "id": "link-email",
+      "group": "link"
+    },
+    {
+      "id": "link-linkedin",
+      "group": "link"
+    },
+    {
+      "id": "link-github",
+      "group": "link"
+    },
+    {
+      "id": "link-resume",
+      "group": "link"
+    }
+  ],
+  "edges": [
+    {
+      "source": "me",
+      "target": "hub-experience",
+      "type": "contains"
+    },
+    {
+      "source": "me",
+      "target": "hub-projects",
+      "type": "contains"
+    },
+    {
+      "source": "me",
+      "target": "hub-skills",
+      "type": "contains"
+    },
+    {
+      "source": "me",
+      "target": "hub-domains",
+      "type": "contains"
+    },
+    {
+      "source": "me",
+      "target": "hub-craft",
+      "type": "contains"
+    },
+    {
+      "source": "me",
+      "target": "hub-connect",
+      "type": "contains"
+    },
+    {
+      "source": "hub-experience",
+      "target": "role-smartly-fse",
+      "type": "contains"
+    },
+    {
+      "source": "hub-experience",
+      "target": "role-smartly-fe",
+      "type": "contains"
+    },
+    {
+      "source": "hub-experience",
+      "target": "role-virtuwa-freelance",
+      "type": "contains"
+    },
+    {
+      "source": "hub-experience",
+      "target": "role-virtuwa-pt",
+      "type": "contains"
+    },
+    {
+      "source": "hub-experience",
+      "target": "role-riyada",
+      "type": "contains"
+    },
+    {
+      "source": "hub-experience",
+      "target": "role-pro-event",
+      "type": "contains"
+    },
+    {
+      "source": "hub-experience",
+      "target": "role-independent-qr",
+      "type": "contains"
+    },
+    {
+      "source": "hub-experience",
+      "target": "role-shortcutadv",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-clinic-flow",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-bleu-blog",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-gas-reg",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-competition-admin",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-akhbar-admin",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-bidding-wallet",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-faster-meeting",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-efa",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-boots-ladders",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-virtuwa-hv",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-virtuwa-cloud",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-flow-bridge",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-care-connect",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-watu",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-pro-event-storefront",
+      "type": "contains"
+    },
+    {
+      "source": "hub-projects",
+      "target": "proj-qr-verify",
+      "type": "contains"
+    },
+    {
+      "source": "hub-skills",
+      "target": "skill-frameworks",
+      "type": "contains"
+    },
+    {
+      "source": "hub-skills",
+      "target": "skill-ecommerce",
+      "type": "contains"
+    },
+    {
+      "source": "hub-skills",
+      "target": "skill-devops",
+      "type": "contains"
+    },
+    {
+      "source": "hub-skills",
+      "target": "skill-data",
+      "type": "contains"
+    },
+    {
+      "source": "hub-skills",
+      "target": "skill-other",
+      "type": "contains"
+    },
+    {
+      "source": "hub-skills",
+      "target": "skill-tools",
+      "type": "contains"
+    },
+    {
+      "source": "hub-domains",
+      "target": "domain-healthcare",
+      "type": "contains"
+    },
+    {
+      "source": "hub-domains",
+      "target": "domain-virtualization",
+      "type": "contains"
+    },
+    {
+      "source": "hub-domains",
+      "target": "domain-regulatory",
+      "type": "contains"
+    },
+    {
+      "source": "hub-domains",
+      "target": "domain-editorial",
+      "type": "contains"
+    },
+    {
+      "source": "hub-domains",
+      "target": "domain-ecommerce",
+      "type": "contains"
+    },
+    {
+      "source": "hub-domains",
+      "target": "domain-public",
+      "type": "contains"
+    },
+    {
+      "source": "hub-craft",
+      "target": "craft-cicd",
+      "type": "contains"
+    },
+    {
+      "source": "hub-craft",
+      "target": "craft-bilingual",
+      "type": "contains"
+    },
+    {
+      "source": "hub-craft",
+      "target": "craft-security",
+      "type": "contains"
+    },
+    {
+      "source": "hub-craft",
+      "target": "craft-performance",
+      "type": "contains"
+    },
+    {
+      "source": "hub-craft",
+      "target": "craft-ways-of-working",
+      "type": "contains"
+    },
+    {
+      "source": "hub-connect",
+      "target": "link-email",
+      "type": "contains"
+    },
+    {
+      "source": "hub-connect",
+      "target": "link-linkedin",
+      "type": "contains"
+    },
+    {
+      "source": "hub-connect",
+      "target": "link-github",
+      "type": "contains"
+    },
+    {
+      "source": "hub-connect",
+      "target": "link-resume",
+      "type": "contains"
+    },
+    {
+      "source": "proj-gas-reg",
+      "target": "role-smartly-fse",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-competition-admin",
+      "target": "role-smartly-fse",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-akhbar-admin",
+      "target": "role-smartly-fse",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-bidding-wallet",
+      "target": "role-smartly-fse",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-faster-meeting",
+      "target": "role-smartly-fe",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-efa",
+      "target": "role-smartly-fe",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-boots-ladders",
+      "target": "role-smartly-fe",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-virtuwa-hv",
+      "target": "role-virtuwa-pt",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-virtuwa-cloud",
+      "target": "role-virtuwa-pt",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-flow-bridge",
+      "target": "role-virtuwa-pt",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-care-connect",
+      "target": "role-riyada",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-watu",
+      "target": "role-riyada",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-pro-event-storefront",
+      "target": "role-pro-event",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-qr-verify",
+      "target": "role-pro-event",
+      "type": "delivered-in"
+    },
+    {
+      "source": "proj-qr-verify",
+      "target": "role-independent-qr",
+      "type": "continued-as"
+    },
+    {
+      "source": "proj-virtuwa-cloud",
+      "target": "role-virtuwa-freelance",
+      "type": "continued-as"
+    },
+    {
+      "source": "proj-clinic-flow",
+      "target": "domain-healthcare",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-care-connect",
+      "target": "domain-healthcare",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-virtuwa-hv",
+      "target": "domain-virtualization",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-virtuwa-cloud",
+      "target": "domain-virtualization",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-flow-bridge",
+      "target": "domain-virtualization",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-gas-reg",
+      "target": "domain-regulatory",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-akhbar-admin",
+      "target": "domain-editorial",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-bleu-blog",
+      "target": "domain-editorial",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-pro-event-storefront",
+      "target": "domain-ecommerce",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-qr-verify",
+      "target": "domain-ecommerce",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-competition-admin",
+      "target": "domain-public",
+      "type": "in-domain"
+    },
+    {
+      "source": "proj-watu",
+      "target": "domain-public",
+      "type": "in-domain"
+    },
+    {
+      "source": "role-virtuwa-pt",
+      "target": "role-smartly-fse",
+      "type": "concurrent-with"
+    },
+    {
+      "source": "role-riyada",
+      "target": "role-smartly-fse",
+      "type": "concurrent-with"
+    },
+    {
+      "source": "role-pro-event",
+      "target": "role-smartly-fse",
+      "type": "concurrent-with"
+    },
+    {
+      "source": "role-smartly-fe",
+      "target": "role-smartly-fse",
+      "type": "continued-as"
+    },
+    {
+      "source": "role-virtuwa-pt",
+      "target": "role-virtuwa-freelance",
+      "type": "continued-as"
+    },
+    {
+      "source": "role-pro-event",
+      "target": "role-independent-qr",
+      "type": "continued-as"
+    },
+    {
+      "source": "proj-flow-bridge",
+      "target": "craft-cicd",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-qr-verify",
+      "target": "craft-cicd",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-virtuwa-hv",
+      "target": "craft-security",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-akhbar-admin",
+      "target": "craft-security",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-competition-admin",
+      "target": "craft-security",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-clinic-flow",
+      "target": "craft-security",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-virtuwa-cloud",
+      "target": "craft-security",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-gas-reg",
+      "target": "craft-bilingual",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-bleu-blog",
+      "target": "craft-bilingual",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-akhbar-admin",
+      "target": "craft-bilingual",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-clinic-flow",
+      "target": "craft-bilingual",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-qr-verify",
+      "target": "craft-bilingual",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-efa",
+      "target": "craft-performance",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-bleu-blog",
+      "target": "craft-performance",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-boots-ladders",
+      "target": "craft-performance",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-care-connect",
+      "target": "craft-ways-of-working",
+      "type": "evidences"
+    },
+    {
+      "source": "proj-virtuwa-hv",
+      "target": "craft-ways-of-working",
+      "type": "evidences"
+    },
+    {
+      "source": "skill-devops",
+      "target": "craft-cicd",
+      "type": "evidences"
+    },
+    {
+      "source": "skill-other",
+      "target": "craft-bilingual",
+      "type": "evidences"
+    }
+  ],
+  "groups": {
+    "root": {
+      "color": "#f8fafc",
+      "size": 13,
+      "label": "Me"
+    },
+    "hub": {
+      "color": "#67e8f9",
+      "size": 9,
+      "label": "Sections"
+    },
+    "role": {
+      "color": "#cbd5e1",
+      "size": 6.5,
+      "label": "Experience"
+    },
+    "project": {
+      "color": "#e2e8f0",
+      "size": 6,
+      "label": "Projects"
+    },
+    "skill": {
+      "color": "#94a3b8",
+      "size": 6,
+      "label": "Skills"
+    },
+    "domain": {
+      "color": "#cbd5e1",
+      "size": 6,
+      "label": "Domains"
+    },
+    "craft": {
+      "color": "#e2e8f0",
+      "size": 6,
+      "label": "Practices"
+    },
+    "link": {
+      "color": "#94a3b8",
+      "size": 5,
+      "label": "Connect"
+    }
+  }
+}

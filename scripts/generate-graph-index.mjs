@@ -1,4 +1,4 @@
-// Run with `node scripts/generate-graph-index.mjs` after changing graph.js.
+// Run after regenerating graph.js; --check compares committed HTML without writing.
 // The checked-in index is the no-JS, crawler and keyboard-readable graph layer.
 import { readFileSync, writeFileSync } from "node:fs";
 import { graphNodes, graphEdges } from "../src/constant/graph.js";
@@ -27,7 +27,7 @@ const index = `<ul id="graph-index">\n  ${row(root)}\n  ${children("me").map((hu
 const base = "https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/";
 const person = {
   "@context": "https://schema.org", "@type": "Person", name: root.title,
-  jobTitle: "Frontend Engineer", url: base,
+  jobTitle: root.summary.split(' with ')[0], description: root.summary, url: base,
   sameAs: ["https://github.com/abdelrhmanehab10/", "https://www.linkedin.com/in/abdelrahman-ehab-87261a244/"],
   knowsAbout: graphNodes.filter((node) => ["skill", "craft", "domain"].includes(node.group)).map((node) => node.title),
   hasOccupation: graphNodes.filter((node) => node.group === "role").map((node) => ({
@@ -43,5 +43,20 @@ html = html.replace(/<!-- graph-index:start -->[\s\S]*?<!-- graph-index:end -->/
   `<!-- graph-index:start -->\n          ${index}\n          <!-- graph-index:end -->`);
 html = html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/,
   `<script type="application/ld+json">\n${JSON.stringify(person, null, 2)}\n    </script>`);
-writeFileSync(path, html);
-console.log(`Generated ${graphNodes.length} index nodes, ${graphEdges.length} edges and Person JSON-LD`);
+const description = esc(root.summary);
+const jobTitle = esc(root.summary.split(' with ')[0]);
+for (const [pattern, replacement] of [
+  [/(<p\s+id="hero-badge"[^>]*>)[\s\S]*?(<\/p>)/, `$1${esc(root.title)} - ${jobTitle}$2`],
+  [/(<h1\s+id="hero-headline"[^>]*>)[\s\S]*?(<\/h1>)/, `$1${esc(root.title)} · <span class="text-cyan-300">${jobTitle}</span>$2`],
+  [/(<p\s+id="hero-summary"[^>]*>)[\s\S]*?(<\/p>)/, `$1${description}$2`],
+  [/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${description}$2`],
+  [/(<meta\s+property="og:description"\s+content=")[^"]*(")/, `$1${description}$2`],
+  [/(<meta\s+name="twitter:description"\s+content=")[^"]*(")/, `$1${description}$2`],
+]) {
+  if (!pattern.test(html)) throw new Error(`Missing SEO description: ${pattern}`);
+  html = html.replace(pattern, replacement);
+}
+if (process.argv.includes('--check')) {
+  if (readFileSync(path, 'utf8') !== html) throw new Error('Committed HTML is stale; run node scripts/generate-graph-index.mjs');
+} else writeFileSync(path, html);
+console.log(`${process.argv.includes('--check') ? 'Checked' : 'Generated'} ${graphNodes.length} index nodes, ${graphEdges.length} edges and Person JSON-LD`);

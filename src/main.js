@@ -1,6 +1,7 @@
 import { initHeroGraph } from "./hero-graph.js";
 import {
   coreTechnologies,
+  careerNote,
   experiences,
   impactStats,
   profileMeta,
@@ -11,37 +12,9 @@ import {
 
 const ACTIVE_LINK_CLASSES = ["bg-sky-500/20", "text-white"];
 const INACTIVE_LINK_CLASSES = ["text-slate-300"];
-const MONTH_INDEX = {
-  jan: 0,
-  feb: 1,
-  mar: 2,
-  apr: 3,
-  may: 4,
-  jun: 5,
-  jul: 6,
-  aug: 7,
-  sep: 8,
-  oct: 9,
-  nov: 10,
-  dec: 11,
-};
-
-function parseExperienceStart(period) {
-  if (!period) {
-    return Number.POSITIVE_INFINITY;
-  }
-
-  const [startToken] = period.split("-").map((part) => part.trim());
-  const [monthRaw, yearRaw] = startToken.split(/\s+/);
-  const month = MONTH_INDEX[(monthRaw || "").slice(0, 3).toLowerCase()];
-  const year = Number.parseInt(yearRaw, 10);
-
-  if (!Number.isFinite(year) || month === undefined) {
-    return Number.POSITIVE_INFINITY;
-  }
-
-  return new Date(year, month, 1).getTime();
-}
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+})[char]);
 
 class App {
   constructor() {
@@ -115,10 +88,6 @@ class App {
       this.heroBadge.textContent = `${profileMeta.name} - ${profileMeta.title}`;
     }
 
-    if (this.heroHeadline) {
-      this.heroHeadline.textContent = profileMeta.heroHeadline;
-    }
-
     if (this.heroSummary) {
       this.heroSummary.textContent = profileMeta.heroSummary;
     }
@@ -129,7 +98,7 @@ class App {
           (item) =>
             `<span class="inline-flex items-center gap-1.5 rounded-full border border-slate-600 bg-slate-800/80 px-2.5 py-1 text-[11px] font-semibold tracking-[0.02em] text-slate-200">
               <span class="h-1.5 w-1.5 rounded-full bg-cyan-300"></span>
-              ${item}
+              ${escapeHtml(item)}
             </span>`
         )
         .join("");
@@ -177,8 +146,8 @@ class App {
       .map(
         ({ value, label }) => `
           <article class="flex h-full flex-col rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
-            <p class="min-h-10 text-xl leading-tight font-bold text-white md:text-2xl">${value}</p>
-            <p class="mt-1 min-h-10 text-sm leading-snug text-slate-300">${label}</p>
+            <p class="min-h-10 text-xl leading-tight font-bold text-white md:text-2xl">${escapeHtml(value)}</p>
+            <p class="mt-1 min-h-10 text-sm leading-snug text-slate-300">${escapeHtml(label)}</p>
           </article>
         `
       )
@@ -211,43 +180,25 @@ class App {
   renderWork(project) {
     const {
       title,
+      meta,
       imageUrl,
       summary,
       stack,
-      visibility,
-      visibilityNote,
+      bullets = [],
       liveUrl,
       linkLabel,
     } = project;
-    const visibilityLabel =
-      visibility === "private" ? "Private product" : "Public project";
-
     return `
-      <article class="flex h-full flex-col rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
-        <img src="${imageUrl}" alt="${title} project preview" loading="lazy" class="h-56 w-full rounded-xl border border-slate-700 object-cover" />
-        <div class="mt-4 flex flex-wrap items-start justify-between gap-2">
-          <h3 class="text-xl font-semibold leading-snug text-white md:text-2xl">${title}</h3>
-          <span class="inline-flex shrink-0 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-2.5 py-1 text-xs font-semibold text-cyan-200">${visibilityLabel}</span>
-        </div>
-        <p class="mt-2 min-h-12 overflow-hidden text-sm leading-relaxed text-slate-300 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] md:text-base">${summary}</p>
-        ${
-          visibilityNote
-            ? `<p class="mt-2 text-xs leading-relaxed text-slate-400">${visibilityNote}</p>`
-            : ""
-        }
+      <article class="flex h-full min-w-0 flex-col rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
+        ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)} project preview" loading="lazy" class="h-56 w-full rounded-xl border border-slate-700 object-cover" />` : ''}
+        <h3 class="mt-4 break-words text-xl font-semibold leading-snug text-white md:text-2xl">${escapeHtml(title)}</h3>
+        ${meta && meta !== 'Product work' ? `<p class="mt-2 text-xs font-semibold text-cyan-200">${escapeHtml(meta)}</p>` : ''}
+        <p class="mt-2 text-sm leading-relaxed text-slate-300 md:text-base">${escapeHtml(summary)}</p>
+        ${bullets.length ? `<details class="mt-3 text-sm text-slate-300"><summary class="min-h-11 cursor-pointer py-2 font-semibold text-cyan-200">Read contributions</summary><ul class="list-disc space-y-2 pl-5">${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></details>` : ''}
         <div class="mt-4 flex flex-wrap gap-2">
-          ${stack
-            .map(
-              (item) =>
-                `<span class="rounded-full border border-sky-900 bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-100">${item}</span>`
-            )
-            .join("")}
+          ${stack.map(item => `<span class="max-w-full break-words rounded-full border border-sky-900 bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-100">${escapeHtml(item)}</span>`).join('')}
         </div>
-        ${
-          liveUrl
-            ? `<a class="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-cyan-400 px-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-300" href="${liveUrl}" target="_blank" rel="noopener noreferrer">${linkLabel || "Open project"}</a>`
-            : ""
-        }
+        ${liveUrl ? `<a class="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-cyan-400 px-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-300" href="${escapeHtml(liveUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(linkLabel || 'Open project')}</a>` : ''}
       </article>`;
   }
 
@@ -256,11 +207,7 @@ class App {
       return;
     }
 
-    const timelineData = [...experiences].sort(
-      (a, b) => parseExperienceStart(a.period) - parseExperienceStart(b.period)
-    );
-
-    this.experienceContainer.innerHTML = timelineData
+    this.experienceContainer.innerHTML = `<p class="mb-4 text-sm leading-relaxed text-slate-300">${escapeHtml(careerNote)}</p>` + experiences
       .map(
         ({ company, role, period, location, highlights }) => `
           <article class="relative rounded-2xl border border-slate-700 bg-slate-900/70 p-4 md:p-5">
@@ -270,16 +217,16 @@ class App {
             ></span>
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h3 class="text-lg font-semibold text-white md:text-xl">${role}</h3>
-                <p class="mt-1 text-sm font-semibold text-slate-100 md:text-base">${company}</p>
+                <h3 class="break-words text-lg font-semibold text-white md:text-xl">${escapeHtml(role)}</h3>
+                <p class="mt-1 text-sm font-semibold text-slate-100 md:text-base">${escapeHtml(company)}</p>
               </div>
               <p class="inline-flex shrink-0 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 md:ml-auto">
-                ${period}
+                ${escapeHtml(period)}
               </p>
             </div>
-            <p class="mt-2 text-sm text-slate-300">${location}</p>
+            <p class="mt-2 text-sm text-slate-300">${escapeHtml(location)}</p>
             <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-300 md:text-base">
-              ${highlights.map((item) => `<li>${item}</li>`).join("")}
+              ${highlights.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
             </ul>
           </article>
         `
@@ -296,12 +243,12 @@ class App {
       .map(
         ({ group, items }) => `
           <article class="rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
-            <h3 class="text-lg font-semibold text-white">${group}</h3>
+            <h3 class="text-lg font-semibold text-white">${escapeHtml(group)}</h3>
             <div class="mt-3 flex flex-wrap gap-2">
               ${items
                 .map(
                   (item) =>
-                    `<span class="rounded-full border border-sky-900 bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-100">${item}</span>`
+                    `<span class="rounded-full border border-sky-900 bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-100">${escapeHtml(item)}</span>`
                 )
                 .join("")}
             </div>
@@ -320,10 +267,10 @@ class App {
       .map(
         ({ label, iconClass, href }) => `
           <a
-            href="${href}"
+            href="${escapeHtml(href)}"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="${label}"
+            aria-label="${escapeHtml(label)}"
             class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-lg text-white transition hover:border-slate-500"
           >
             <i class="${iconClass}" aria-hidden="true"></i>

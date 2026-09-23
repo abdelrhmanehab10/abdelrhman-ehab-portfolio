@@ -1,12 +1,14 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { graphNodes, graphEdges, graphGroups } from "../src/constant/graph.js";
+import { graphNodes, graphEdges, graphGroups, profileDetails, profileSourceHash } from "../src/constant/graph.js";
+import { works, experiences, skills, impactStats } from "../src/constant/index.js";
 
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const ids = graphNodes.map(({ id }) => id);
 
 test("52 nodes and 104 edges with unique, connected endpoints", () => {
+  assert.match(profileSourceHash, /^[0-9a-f]{64}$/);
   assert.equal(ids.length, 52);
   assert.equal(graphEdges.length, 104);
   assert.equal(new Set(ids).size, ids.length);
@@ -49,4 +51,21 @@ test("the no-JS index and Person metadata stay in sync with graph.js", () => {
   assert.equal(person.knowsAbout.length, graphNodes.filter((node) => ["skill", "craft", "domain"].includes(node.group)).length);
   assert.equal(person.hasOccupation.length, graphNodes.filter((node) => node.group === "role").length);
   assert.equal(person.subjectOf.length, graphNodes.filter((node) => node.group === "project").length);
+  assert.equal(person.description, graphNodes.find(n => n.id === 'me').summary);
+  assert.ok(html.includes(`<p id="hero-summary" class="max-w-3xl text-base text-slate-300 md:text-lg">${person.description}</p>`), 'first paint hero matches model');
+  for (const attribute of ['name="description"', 'property="og:description"', 'name="twitter:description"']) {
+    assert.ok(html.includes(`${attribute}\n      content="${person.description.replaceAll('&', '&amp;').replaceAll('"', '&quot;')}"`), `${attribute} matches model`);
+  }
+});
+
+test('every page section projects the committed graph and public copy stays safe', () => {
+  assert.equal(experiences.length, 8);
+  assert.equal(works.length, 16);
+  assert.deepEqual(works.map(w => w.id), graphNodes.filter(n => n.group === 'project').map(n => n.id));
+  assert.deepEqual(skills.slice(0, 6).map(s => s.group), graphNodes.filter(n => n.group === 'skill').map(n => n.title));
+  assert.match(impactStats[0].value, /4\+ Years/);
+  assert.deepEqual(profileDetails.industries, ['E-commerce', 'Journalism', 'Medical']);
+  assert.equal(profileDetails.languages.length, 2);
+  const publicSurfaces = [html, JSON.stringify(graphNodes), JSON.stringify(skills), JSON.stringify(experiences), JSON.stringify(works)].join('\n');
+  assert.doesNotMatch(publicSurfaces, /443\/6000|passwordless sudo|rm, copy|sensitive VM\/connection data|Jisir process|`current` Nginx symlink|2\+ years delivering production dashboards/i);
 });
