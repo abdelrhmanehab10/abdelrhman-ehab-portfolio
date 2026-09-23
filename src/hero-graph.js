@@ -29,9 +29,12 @@ export function initHeroGraph() {
   let selected = null;
   let lastFocus = null;
   let moved = false;
+  let zooming = false;
+  let pauseTicket = 0;
   let ticks = 0;
 
   function showFallback() {
+    index.insertBefore(panel, index.querySelector("#graph-index"));
     stage.hidden = true;
     index.classList.remove("graph-index-hidden");
     index.classList.add("graph-list-open");
@@ -58,11 +61,14 @@ export function initHeroGraph() {
   }
   function repaint() {
     graph?.nodeColor(nodeColor).linkColor(edgeColor).linkWidth(edgeWidth);
-    if (graph && motionButton.getAttribute("aria-pressed") === "true" && !reduced) {
+    if (graph && motionButton.getAttribute("aria-pressed") === "true") {
       graph.resumeAnimation();
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        if (motionButton.getAttribute("aria-pressed") === "true") graph?.pauseAnimation();
-      }));
+      if (!zooming) {
+        const ticket = ++pauseTicket;
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          if (ticket === pauseTicket && !zooming && motionButton.getAttribute("aria-pressed") === "true") graph?.pauseAnimation();
+        }));
+      }
     }
   }
   function nodeAt(event) {
@@ -135,6 +141,7 @@ export function initHeroGraph() {
   motionButton.addEventListener("click", () => {
     const paused = motionButton.getAttribute("aria-pressed") !== "true";
     motionButton.setAttribute("aria-pressed", String(paused));
+    ++pauseTicket;
     if (paused) graph?.pauseAnimation();
     else graph?.resumeAnimation();
     motionButton.textContent = paused ? "Resume motion" : "Pause motion";
@@ -194,6 +201,19 @@ export function initHeroGraph() {
           const clicked = nodeAt(event);
           if (clicked) openNode(clicked.id, listButton);
         } else closePanel();
+      })
+      .onZoom(() => {
+        if (motionButton.getAttribute("aria-pressed") === "true") {
+          zooming = true;
+          ++pauseTicket;
+          graph?.resumeAnimation();
+        }
+      })
+      .onZoomEnd(() => {
+        if (zooming) {
+          zooming = false;
+          repaint();
+        }
       })
       .onEngineTick(() => { if (!moved && ++ticks % 12 === 0) fit(0); })
       .onEngineStop(() => { if (!moved) fit(reduced ? 0 : 400); });

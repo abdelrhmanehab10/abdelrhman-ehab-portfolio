@@ -12,6 +12,7 @@ function element() {
     innerHTML: "", textContent: "", clientWidth: 390, clientHeight: 480,
     addEventListener(name, handler) { handlers[name] = handler; },
     fire(name, event = {}) { handlers[name]?.(event); },
+    insertBefore(child) { child.parent = this; },
     getAttribute(name) { return attributes[name] ?? null; },
     setAttribute(name, value) { attributes[name] = value; },
     focus() {},
@@ -20,7 +21,7 @@ function element() {
 }
 const canvas = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 390, height: 480 }) };
 
-function setup(mobile) {
+function setup(mobile, libraryAvailable = true) {
   const selectors = new Map([
     "#graph-stage", "#graph-canvas-host", "#graph-index-wrap", "#graph-panel", "#graph-status",
     "#btn-list", "#btn-reset", "#btn-motion",
@@ -28,6 +29,7 @@ function setup(mobile) {
   const stage = selectors.get("#graph-stage");
   const panel = selectors.get("#graph-panel");
   panel.hidden = true;
+  panel.parent = stage;
   const documentHandlers = {};
   globalThis.document = {
     documentElement: { dataset: {} }, activeElement: selectors.get("#btn-list"),
@@ -43,7 +45,7 @@ function setup(mobile) {
   globalThis.ResizeObserver = class { observe() {} };
   const nodes = graphNodes.map((node, i) => ({ ...node, x: i * 100, y: 0, val: graphGroups[node.group].size }));
   const graph = {
-    nodes, callbacks: {}, scale: 1, center: null,
+    nodes, callbacks: {}, scale: 1, center: null, offset: 0, visibleScale: 1, visibleOffset: 0,
     width() { return this; }, height() { return this; }, backgroundColor() { return this; },
     nodeId() { return this; }, nodeVal() { return this; }, nodeRelSize(value) { return value === undefined ? 5 : this; },
     nodeLabel() { return this; }, nodeColor() { return this; }, linkColor() { return this; }, linkWidth() { return this; },
@@ -51,12 +53,14 @@ function setup(mobile) {
     onNodeHover(callback) { this.callbacks.hover = callback; return this; },
     onNodeClick(callback) { this.callbacks.click = callback; return this; },
     onBackgroundClick(callback) { this.callbacks.background = callback; return this; },
+    onZoom(callback) { this.callbacks.zoom = callback; return this; },
+    onZoomEnd(callback) { this.callbacks.zoomEnd = callback; return this; },
     onEngineTick() { return this; }, onEngineStop() { return this; },
     d3Force() { return { strength: () => ({ distanceMax() {} }), distance() {} }; },
     d3VelocityDecay() { return this; }, cooldownTicks() { return this; }, cooldownTime() { return this; },
     graphData(value) { if (value) return this; return { nodes: this.nodes }; },
     getGraphBbox() { return { x: [-100, 5300], y: [-100, 100] }; },
-    graph2ScreenCoords(x, y) { return { x: x * this.scale, y: y * this.scale }; },
+    graph2ScreenCoords(x, y) { return { x: x * this.scale + this.offset, y: y * this.scale }; },
     zoom(value) { if (value === undefined) return this.scale; this.scale = value; return this; },
     centerAt(x, y) { this.center = { x, y }; return this; },
     zoomToFit(duration) {
@@ -65,10 +69,11 @@ function setup(mobile) {
       else apply();
       return this;
     },
-    pauseAnimation() { return this; }, resumeAnimation() { return this; },
+    pauseAnimation() { return this; },
+    resumeAnimation() { this.visibleScale = this.scale; this.visibleOffset = this.offset; return this; },
   };
   globalThis.window = {
-    ForceGraph: class { constructor() { return graph; } },
+    ForceGraph: libraryAvailable ? class { constructor() { return graph; } } : undefined,
     addEventListener(name, handler) { windowHandlers[name] = handler; },
     fire(name) { windowHandlers[name]?.(); },
   };
@@ -101,6 +106,30 @@ test("paused clicks pick by pointer location rather than stale library hover", (
   graph.callbacks.background({ clientX: 389, clientY: 450 });
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
   assert.equal(panel.hidden, false);
+});
+
+test("paused pan and zoom redraw the view before picking a visible node", () => {
+  const { graph, panel, selectors } = setup(false);
+  selectors.get("#btn-motion").fire("click");
+  graph.scale = 0.3;
+  graph.offset = 14;
+  graph.callbacks.zoom();
+  graph.callbacks.zoomEnd();
+  assert.equal(graph.visibleScale, graph.zoom());
+  assert.equal(graph.visibleOffset, graph.offset);
+  const actual = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
+  graph.callbacks.background({ clientX: actual.x * graph.visibleScale + graph.visibleOffset, clientY: 0 });
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
+});
+
+test("library failure keeps list-selected details visible", () => {
+  const { panel, stage, selectors } = setup(false, false);
+  assert.equal(stage.hidden, true);
+  const index = selectors.get("#graph-index-wrap");
+  index.fire("click", { target: { closest: () => ({ dataset: { node: "proj-efa" } }) } });
+  assert.equal(panel.parent, index);
+  assert.equal(panel.hidden, false);
+  assert.match(panel.innerHTML, /<h2 id="graph-panel-title">EFA<\/h2>/);
 });
 
 test("reset restores the same mobile and desktop view after zoom and pan", async () => {
