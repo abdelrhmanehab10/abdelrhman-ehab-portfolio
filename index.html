@@ -50,6 +50,18 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="src/hero-graph.css" />
+    <script>
+      document.documentElement.classList.add("graph-js");
+      // If the module itself fails, reveal the checked-in HTML index on load.
+      window.addEventListener("load", () => {
+        if (document.documentElement.dataset.graphReady) return;
+        document.querySelector("#graph-stage").hidden = true;
+        document.querySelector("#graph-index-wrap").classList.remove("graph-index-hidden");
+        document.querySelector("#graph-controls").hidden = true;
+      });
+    </script>
+    <script src="assets/vendor/force-graph-1.51.4.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss">
       @theme {
@@ -100,17 +112,160 @@
       referrerpolicy="no-referrer"
     />
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Abdelrhman Ehab",
-        "jobTitle": "Frontend Engineer",
-        "url": "https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/",
-        "sameAs": [
-          "https://github.com/abdelrhmanehab10/",
-          "https://www.linkedin.com/in/abdelrahman-ehab-87261a244/"
-        ]
-      }
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Abdelrhman Ehab",
+  "jobTitle": "Frontend Engineer",
+  "url": "https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/",
+  "sameAs": [
+    "https://github.com/abdelrhmanehab10/",
+    "https://www.linkedin.com/in/abdelrahman-ehab-87261a244/"
+  ],
+  "knowsAbout": [
+    "Programming & Frameworks",
+    "E-commerce & CMS",
+    "DevOps & Infrastructure",
+    "Databases & Analytics",
+    "Other Skills",
+    "Tools",
+    "Healthcare",
+    "Virtualization & Infrastructure",
+    "Regulatory & Compliance",
+    "Editorial & Journalism",
+    "E-commerce & Retail",
+    "Education & Public Programs",
+    "CI/CD & Deployment Automation",
+    "Bilingual & RTL Engineering",
+    "Access Control & Security",
+    "Performance & Quality",
+    "Ways of Working"
+  ],
+  "hasOccupation": [
+    {
+      "@type": "Occupation",
+      "name": "Full Stack Engineer - Smartly Techs",
+      "description": "Promoted to Full Stack Engineer after joining Smartly as a Frontend Web Developer in Feb 2024."
+    },
+    {
+      "@type": "Occupation",
+      "name": "Frontend Web Developer - Smartly Techs",
+      "description": "First role at Smartly Techs, delivering meeting, association and game products before the promotion to Full Stack Engineer."
+    },
+    {
+      "@type": "Occupation",
+      "name": "Freelance Frontend Engineer - Virtuwa",
+      "description": "Continued follow-up frontend development after the part-time engagement ended, maintaining and extending the virtualization products."
+    },
+    {
+      "@type": "Occupation",
+      "name": "Frontend Web Developer - Virtuwa",
+      "description": "Part-time engagement building Virtuwa's three virtualization products, held concurrently with the full-time Smartly Techs role."
+    },
+    {
+      "@type": "Occupation",
+      "name": "Frontend Web Developer - Riyada Al Arabiya For Information Technology",
+      "description": "Short part-time engagement on a healthcare dashboard migration and a university platform, concurrent with the full-time Smartly Techs role."
+    },
+    {
+      "@type": "Occupation",
+      "name": "Software Engineer - Pro Event",
+      "description": "Proposed creating a dedicated software section in the company and led the migration direction from Salla/Zid to WordPress + WooCommerce."
+    },
+    {
+      "@type": "Occupation",
+      "name": "Independent Product Development - QR Verification Platform",
+      "description": "Continued improving the QR-verification platform beyond the initial Sara Beauty delivery so it can be reused and marketed for future clients."
+    },
+    {
+      "@type": "Occupation",
+      "name": "WordPress Developer - Shortcutadv",
+      "description": "Two years of WordPress client delivery - the foundation of the 4+ years of professional web development."
+    }
+  ],
+  "subjectOf": [
+    {
+      "@type": "CreativeWork",
+      "name": "Clinic Flow",
+      "description": "An Arabic-first, RTL clinic operations app built around same-day visit intake, doctor queue management, patient files and staff access control."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "BLEU Community Blog",
+      "description": "Arabic-first internationalization work across an open-source community website: locale data, localized routes, RTL-aware UI and a language switcher."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "GAS-REG Portal",
+      "description": "An Angular 21 frontend for complex regulatory and HSE workflows, built with standalone components, routing and Reactive Forms."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Competition Management Admin",
+      "description": "A role-based React/TypeScript administration platform for system admins, supervisors, judges and reviewers."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Akhbar AlKhaleej Admin FE",
+      "description": "A modular Angular SPA for editorial administration, with standalone components and lazy-loaded routes."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Bidding Wallet Flow",
+      "description": "A secure bidding-wallet flow enforcing a minimum 10% balance requirement before bidding and placing funds on hold during active bids."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Faster Meeting",
+      "description": "A Next.js meeting platform with authenticated scheduling, editing and management of Zoom meetings through custom .NET APIs."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "EFA",
+      "description": "Improved UI/UX and web performance, raising Lighthouse from 61 to 84 by optimizing LCP, FCP and layout shifts."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Boots & Ladders",
+      "description": "Enhanced UI/UX and performance using Vue.js."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "VirtuWa HV - Hypervisor Management Interface",
+      "description": "A React/TypeScript hypervisor management console with live monitoring, RBAC and bilingual English/Arabic UX."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "VirtuWa Cloud Manager - Enterprise Hypervisor Control Plane",
+      "description": "A React/TypeScript control plane for VMs, hosts, clusters, storage, networking, licensing and events."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Virtuwa Flow Bridge",
+      "description": "Target-host management and process orchestration, delivered on a CI/CD pipeline built from scratch."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Care Connect Dashboard",
+      "description": "Appointment table and calendar workflows delivered as part of a Laravel-to-Vue 3 migration, with Pinia-managed filters."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Watu",
+      "description": "Refactored the Apply Now flow into a unified multi-step form and integrated location and information-request APIs."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Pro Event Storefront",
+      "description": "A standardized storefront UI across product, category, blog and checkout, with a consistent design system and light/dark themes."
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "QR-code Verification Platform (Sara Beauty)",
+      "description": "A full-stack Node.js/Express and MongoDB QR-verification service used internally to generate and manage over a million unique product codes."
+    }
+  ]
+}
     </script>
   </head>
   <body
@@ -192,11 +347,6 @@
           2+ years of frontend delivery across admin systems, dashboards, and
           product workflows. Open to remote frontend roles (GMT+2).
         </p>
-        <div
-          id="hero-meta"
-          class="mt-4 w-full overflow-hidden rounded-full border border-slate-700 bg-slate-900/70 py-1.5 sm:w-3/4 md:w-1/2"
-          aria-label="Core technologies auto slider"
-        ></div>
         <div class="mt-6 flex flex-wrap gap-3">
           <a
             href="./assets/abdelrhmanehab_resume.pdf"
@@ -209,6 +359,73 @@
             class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/70 px-5 text-sm font-bold text-white transition hover:border-slate-500"
             >Contact Me</a
           >
+        </div>
+        <div id="graph-controls" aria-label="Graph controls">
+          <span id="graph-status" role="status">Explore the profile graph</span>
+          <div class="graph-buttons">
+            <button id="btn-list" type="button" aria-controls="graph-index-wrap" aria-expanded="false">List view</button>
+            <button id="btn-reset" type="button">Reset view</button>
+            <button id="btn-motion" type="button" aria-pressed="false">Pause motion</button>
+          </div>
+        </div>
+        <div id="graph-stage" role="group" aria-label="Interactive graph of Abdelrhman Ehab's work">
+          <div id="graph-canvas-host" aria-hidden="true"></div>
+          <div id="graph-panel" role="dialog" aria-modal="false" aria-labelledby="graph-panel-title" hidden tabindex="-1"></div>
+        </div>
+        <p id="graph-caption">Large outlined nodes are sections; smaller nodes are work, skills and connections. Drag to pan, scroll or pinch to zoom, select a node to see its neighbours. Use List view or Tab to explore by keyboard.</p>
+        <div id="graph-index-wrap" class="graph-index-hidden" aria-label="Profile graph as a list">
+          <h2>Profile index</h2>
+          <p>All 52 nodes in the graph, grouped by section. Select a node for its details and connections.</p>
+          <!-- graph-index:start -->
+          <ul id="graph-index">
+  <li><button type="button" data-node="me">Abdelrhman Ehab</button><span class="graph-index-summary">Frontend Engineer with 4+ years of professional web development, including 2+ years of production React, Angular and Vue with TypeScript.</span></li>
+  <li><h3><button type="button" data-node="hub-experience">Experience</button></h3><p>Eight engagements across four employers, with three part-time roles run concurrently with a full-time position.</p><ul><li><button type="button" data-node="role-smartly-fse">Full Stack Engineer - Smartly Techs</button><span class="graph-index-summary">Promoted to Full Stack Engineer after joining Smartly as a Frontend Web Developer in Feb 2024.</span></li>
+<li><button type="button" data-node="role-smartly-fe">Frontend Web Developer - Smartly Techs</button><span class="graph-index-summary">First role at Smartly Techs, delivering meeting, association and game products before the promotion to Full Stack Engineer.</span></li>
+<li><button type="button" data-node="role-virtuwa-freelance">Freelance Frontend Engineer - Virtuwa</button><span class="graph-index-summary">Continued follow-up frontend development after the part-time engagement ended, maintaining and extending the virtualization products.</span></li>
+<li><button type="button" data-node="role-virtuwa-pt">Frontend Web Developer - Virtuwa</button><span class="graph-index-summary">Part-time engagement building Virtuwa&#39;s three virtualization products, held concurrently with the full-time Smartly Techs role.</span></li>
+<li><button type="button" data-node="role-riyada">Frontend Web Developer - Riyada Al Arabiya For Information Technology</button><span class="graph-index-summary">Short part-time engagement on a healthcare dashboard migration and a university platform, concurrent with the full-time Smartly Techs role.</span></li>
+<li><button type="button" data-node="role-pro-event">Software Engineer - Pro Event</button><span class="graph-index-summary">Proposed creating a dedicated software section in the company and led the migration direction from Salla/Zid to WordPress + WooCommerce.</span></li>
+<li><button type="button" data-node="role-independent-qr">Independent Product Development - QR Verification Platform</button><span class="graph-index-summary">Continued improving the QR-verification platform beyond the initial Sara Beauty delivery so it can be reused and marketed for future clients.</span></li>
+<li><button type="button" data-node="role-shortcutadv">WordPress Developer - Shortcutadv</button><span class="graph-index-summary">Two years of WordPress client delivery - the foundation of the 4+ years of professional web development.</span></li></ul></li>
+  <li><h3><button type="button" data-node="hub-projects">Projects</button></h3><p>Sixteen products spanning regulatory portals, hypervisor control planes, clinic operations, editorial CMS admin and e-commerce storefronts.</p><ul><li><button type="button" data-node="proj-clinic-flow">Clinic Flow</button><span class="graph-index-summary">An Arabic-first, RTL clinic operations app built around same-day visit intake, doctor queue management, patient files and staff access control.</span></li>
+<li><button type="button" data-node="proj-bleu-blog">BLEU Community Blog</button><span class="graph-index-summary">Arabic-first internationalization work across an open-source community website: locale data, localized routes, RTL-aware UI and a language switcher.</span></li>
+<li><button type="button" data-node="proj-gas-reg">GAS-REG Portal</button><span class="graph-index-summary">An Angular 21 frontend for complex regulatory and HSE workflows, built with standalone components, routing and Reactive Forms.</span></li>
+<li><button type="button" data-node="proj-competition-admin">Competition Management Admin</button><span class="graph-index-summary">A role-based React/TypeScript administration platform for system admins, supervisors, judges and reviewers.</span></li>
+<li><button type="button" data-node="proj-akhbar-admin">Akhbar AlKhaleej Admin FE</button><span class="graph-index-summary">A modular Angular SPA for editorial administration, with standalone components and lazy-loaded routes.</span></li>
+<li><button type="button" data-node="proj-bidding-wallet">Bidding Wallet Flow</button><span class="graph-index-summary">A secure bidding-wallet flow enforcing a minimum 10% balance requirement before bidding and placing funds on hold during active bids.</span></li>
+<li><button type="button" data-node="proj-faster-meeting">Faster Meeting</button><span class="graph-index-summary">A Next.js meeting platform with authenticated scheduling, editing and management of Zoom meetings through custom .NET APIs.</span></li>
+<li><button type="button" data-node="proj-efa">EFA</button><span class="graph-index-summary">Improved UI/UX and web performance, raising Lighthouse from 61 to 84 by optimizing LCP, FCP and layout shifts.</span></li>
+<li><button type="button" data-node="proj-boots-ladders">Boots &amp; Ladders</button><span class="graph-index-summary">Enhanced UI/UX and performance using Vue.js.</span></li>
+<li><button type="button" data-node="proj-virtuwa-hv">VirtuWa HV - Hypervisor Management Interface</button><span class="graph-index-summary">A React/TypeScript hypervisor management console with live monitoring, RBAC and bilingual English/Arabic UX.</span></li>
+<li><button type="button" data-node="proj-virtuwa-cloud">VirtuWa Cloud Manager - Enterprise Hypervisor Control Plane</button><span class="graph-index-summary">A React/TypeScript control plane for VMs, hosts, clusters, storage, networking, licensing and events.</span></li>
+<li><button type="button" data-node="proj-flow-bridge">Virtuwa Flow Bridge</button><span class="graph-index-summary">Target-host management and process orchestration, delivered on a CI/CD pipeline built from scratch.</span></li>
+<li><button type="button" data-node="proj-care-connect">Care Connect Dashboard</button><span class="graph-index-summary">Appointment table and calendar workflows delivered as part of a Laravel-to-Vue 3 migration, with Pinia-managed filters.</span></li>
+<li><button type="button" data-node="proj-watu">Watu</button><span class="graph-index-summary">Refactored the Apply Now flow into a unified multi-step form and integrated location and information-request APIs.</span></li>
+<li><button type="button" data-node="proj-pro-event-storefront">Pro Event Storefront</button><span class="graph-index-summary">A standardized storefront UI across product, category, blog and checkout, with a consistent design system and light/dark themes.</span></li>
+<li><button type="button" data-node="proj-qr-verify">QR-code Verification Platform (Sara Beauty)</button><span class="graph-index-summary">A full-stack Node.js/Express and MongoDB QR-verification service used internally to generate and manage over a million unique product codes.</span></li></ul></li>
+  <li><h3><button type="button" data-node="hub-skills">Core Skills</button></h3><p>Programming and frameworks, e-commerce and CMS, DevOps and infrastructure, databases, cross-cutting skills, and day-to-day tools.</p><ul><li><button type="button" data-node="skill-frameworks">Programming &amp; Frameworks</button><span class="graph-index-summary">The day-to-day stack across every engagement.</span></li>
+<li><button type="button" data-node="skill-ecommerce">E-commerce &amp; CMS</button><span class="graph-index-summary">Storefront and content platforms, mostly in the Gulf market.</span></li>
+<li><button type="button" data-node="skill-devops">DevOps &amp; Infrastructure</button><span class="graph-index-summary">Enough infrastructure to own a deployment end to end, not just hand off a dist folder.</span></li>
+<li><button type="button" data-node="skill-data">Databases &amp; Analytics</button><span class="graph-index-summary">Data work behind the interfaces.</span></li>
+<li><button type="button" data-node="skill-other">Other Skills</button><span class="graph-index-summary">Skills that do not fit a stack label but show up in every project.</span></li>
+<li><button type="button" data-node="skill-tools">Tools</button><span class="graph-index-summary">The tools the work actually happens in.</span></li></ul></li>
+  <li><h3><button type="button" data-node="hub-domains">Domains</button></h3><p>The problem spaces the work lands in - the same engineering patterns recur across very different industries.</p><ul><li><button type="button" data-node="domain-healthcare">Healthcare</button><span class="graph-index-summary">Clinic operations and appointment scheduling, where a wrong status transition is a missed patient.</span></li>
+<li><button type="button" data-node="domain-virtualization">Virtualization &amp; Infrastructure</button><span class="graph-index-summary">Hypervisor consoles and control planes: VM lifecycle, live monitoring, and browser-based remote consoles.</span></li>
+<li><button type="button" data-node="domain-regulatory">Regulatory &amp; Compliance</button><span class="graph-index-summary">HSE and permission-request workflows where the form itself is the product and every field is conditional.</span></li>
+<li><button type="button" data-node="domain-editorial">Editorial &amp; Journalism</button><span class="graph-index-summary">Newsroom administration: drafts, version history, publish workflows and RTL rich-text editing.</span></li>
+<li><button type="button" data-node="domain-ecommerce">E-commerce &amp; Retail</button><span class="graph-index-summary">Storefronts, product verification and the platform migrations that sit behind them.</span></li>
+<li><button type="button" data-node="domain-public">Education &amp; Public Programs</button><span class="graph-index-summary">University admissions and national competition administration - many roles, strict eligibility rules.</span></li></ul></li>
+  <li><h3><button type="button" data-node="hub-craft">How I Work</button></h3><p>The themes that repeat across every engagement: deployment automation, bilingual RTL, access control, performance, and how I work with a team.</p><ul><li><button type="button" data-node="craft-cicd">CI/CD &amp; Deployment Automation</button><span class="graph-index-summary">Designed and implemented a self-hosted GitHub Actions runner on a private Linux server to enable CI/CD without exposing SSH publicly.</span></li>
+<li><button type="button" data-node="craft-bilingual">Bilingual &amp; RTL Engineering</button><span class="graph-index-summary">Arabic-first and bilingual RTL interfaces are the through-line of almost every product here, not an afterthought bolted on at the end.</span></li>
+<li><button type="button" data-node="craft-security">Access Control &amp; Security</button><span class="graph-index-summary">Role-based access, session handling and the kind of security review that changes a shipped design.</span></li>
+<li><button type="button" data-node="craft-performance">Performance &amp; Quality</button><span class="graph-index-summary">Measured performance work and automated coverage, with numbers attached.</span></li>
+<li><button type="button" data-node="craft-ways-of-working">Ways of Working</button><span class="graph-index-summary">Team leadership, requirements clarification, documentation and bilingual communication - each backed by something shipped.</span></li></ul></li>
+  <li><h3><button type="button" data-node="hub-connect">Connect</button></h3><p>Ways to reach me and read the long form.</p><ul><li><button type="button" data-node="link-email">Email</button><span class="graph-index-summary">abdelrhmanehab047@gmail.com</span></li>
+<li><button type="button" data-node="link-linkedin">LinkedIn</button><span class="graph-index-summary">The long-form version of this graph.</span></li>
+<li><button type="button" data-node="link-github">GitHub</button><span class="graph-index-summary">Where the open-source contributions and personal products live.</span></li>
+<li><button type="button" data-node="link-resume">Resume (PDF)</button><span class="graph-index-summary">The complete CV: every bullet, the full tool list, and contact details not published on this page.</span></li></ul></li>
+</ul>
+          <!-- graph-index:end -->
         </div>
       </section>
 
@@ -313,5 +530,9 @@
     </footer>
 
     <script src="src/main.js" type="module"></script>
+    <noscript><style>
+      #graph-stage, #graph-controls { display: none !important; }
+      #graph-index-wrap.graph-index-hidden { position: static; width: auto; height: auto; clip: auto; overflow: visible; margin: 1rem 0; padding: 1rem; white-space: normal; border: 1px solid #334155; }
+    </style></noscript>
   </body>
 </html>
