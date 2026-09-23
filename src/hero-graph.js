@@ -30,8 +30,6 @@ export function initHeroGraph() {
   let lastFocus = null;
   let press = null;
   let moved = false;
-  let zooming = false;
-  let pauseTicket = 0;
   let ticks = 0;
 
   function showFallback() {
@@ -62,15 +60,6 @@ export function initHeroGraph() {
   }
   function repaint() {
     graph?.nodeColor(nodeColor).linkColor(edgeColor).linkWidth(edgeWidth);
-    if (graph && motionButton.getAttribute("aria-pressed") === "true") {
-      graph.resumeAnimation();
-      if (!zooming) {
-        const ticket = ++pauseTicket;
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          if (ticket === pauseTicket && !zooming && motionButton.getAttribute("aria-pressed") === "true") graph?.pauseAnimation();
-        }));
-      }
-    }
   }
   function nodeAt(event) {
     const canvas = host.querySelector("canvas");
@@ -170,9 +159,8 @@ export function initHeroGraph() {
   motionButton.addEventListener("click", () => {
     const paused = motionButton.getAttribute("aria-pressed") !== "true";
     motionButton.setAttribute("aria-pressed", String(paused));
-    ++pauseTicket;
-    if (paused) graph?.pauseAnimation();
-    else graph?.resumeAnimation();
+    if (paused) graph?.cooldownTicks(0);
+    else graph?.cooldownTicks(coarse ? 120 : 200).d3ReheatSimulation();
     motionButton.textContent = paused ? "Resume motion" : "Pause motion";
   });
 
@@ -227,21 +215,6 @@ export function initHeroGraph() {
       })
       .onBackgroundClick(() => {
         if (motionButton.getAttribute("aria-pressed") !== "true") closePanel();
-      })
-      .onNodeDrag(() => { if (motionButton.getAttribute("aria-pressed") === "true") repaint(); })
-      .onNodeDragEnd(() => { if (motionButton.getAttribute("aria-pressed") === "true") repaint(); })
-      .onZoom(() => {
-        if (motionButton.getAttribute("aria-pressed") === "true") {
-          zooming = true;
-          ++pauseTicket;
-          graph?.resumeAnimation();
-        }
-      })
-      .onZoomEnd(() => {
-        if (zooming) {
-          zooming = false;
-          repaint();
-        }
       })
       .onEngineTick(() => { if (!moved && ++ticks % 12 === 0) fit(0); })
       .onEngineStop(() => { if (!moved) fit(reduced ? 0 : 400); });

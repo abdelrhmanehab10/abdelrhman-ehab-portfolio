@@ -21,7 +21,7 @@ function element() {
 }
 const canvas = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 390, height: 480 }) };
 
-function setup(mobile, libraryAvailable = true, initialHash = "") {
+function setup(mobile, libraryAvailable = true, initialHash = "", reduced = false) {
   const selectors = new Map([
     "#graph-stage", "#graph-canvas-host", "#graph-index-wrap", "#graph-panel", "#graph-status",
     "#btn-list", "#btn-reset", "#btn-motion",
@@ -48,12 +48,12 @@ function setup(mobile, libraryAvailable = true, initialHash = "") {
   const windowHandlers = {};
   globalThis.location = { pathname: "/", search: "", hash: initialHash };
   globalThis.history = { replaceState(_state, _title, url) { location.hash = url.startsWith("#") ? url : ""; } };
-  globalThis.matchMedia = (query) => ({ matches: query.includes("max-width") ? mobile : false, addEventListener() {} });
+  globalThis.matchMedia = (query) => ({ matches: query.includes("max-width") ? mobile : query.includes("prefers-reduced-motion") ? reduced : false, addEventListener() {} });
   globalThis.requestAnimationFrame = (callback) => { callback(); };
   globalThis.ResizeObserver = class { observe() {} };
   const nodes = graphNodes.map((node, i) => ({ ...node, x: i * 100, y: 0, val: graphGroups[node.group].size }));
   const graph = {
-    nodes, callbacks: {}, scale: 1, center: null, offset: 0, visibleScale: 1, visibleOffset: 0,
+    nodes, callbacks: {}, scale: 1, center: null, offset: 0, visibleScale: 1, visibleOffset: 0, rendering: true,
     width() { return this; }, height() { return this; }, backgroundColor() { return this; },
     nodeId() { return this; }, nodeVal() { return this; }, nodeRelSize(value) { return value === undefined ? 5 : this; },
     nodeLabel() { return this; }, nodeColor(callback) { this.color = callback; return this; }, linkColor() { return this; }, linkWidth() { return this; },
@@ -61,13 +61,11 @@ function setup(mobile, libraryAvailable = true, initialHash = "") {
     onNodeHover(callback) { this.callbacks.hover = callback; return this; },
     onNodeClick(callback) { this.callbacks.click = callback; return this; },
     onBackgroundClick(callback) { this.callbacks.background = callback; return this; },
-    onNodeDrag(callback) { this.callbacks.drag = callback; return this; },
-    onNodeDragEnd(callback) { this.callbacks.dragEnd = callback; return this; },
-    onZoom(callback) { this.callbacks.zoom = callback; return this; },
-    onZoomEnd(callback) { this.callbacks.zoomEnd = callback; return this; },
     onEngineTick() { return this; }, onEngineStop() { return this; },
     d3Force() { return { strength: () => ({ distanceMax() {} }), distance() {} }; },
-    d3VelocityDecay() { return this; }, cooldownTicks() { return this; }, cooldownTime() { return this; },
+    d3VelocityDecay() { return this; }, warmupTicks() { return this; },
+    cooldownTicks(value) { this.cooldown = value; return this; }, cooldownTime() { return this; },
+    d3ReheatSimulation() { this.reheated = true; return this; },
     graphData(value) { if (value) return this; return { nodes: this.nodes }; },
     getGraphBbox() { return { x: [-100, 5300], y: [-100, 100] }; },
     graph2ScreenCoords(x, y) { return { x: x * this.scale + this.offset, y: y * this.scale }; },
@@ -79,12 +77,13 @@ function setup(mobile, libraryAvailable = true, initialHash = "") {
       else apply();
       return this;
     },
-    pauseAnimation() { return this; },
-    resumeAnimation() {
+    pauseAnimation() { this.rendering = false; return this; },
+    resumeAnimation() { this.rendering = true; this.render(); return this; },
+    render() {
+      if (!this.rendering) return;
       this.visibleScale = this.scale;
       this.visibleOffset = this.offset;
       this.visiblePositions = new Map(this.nodes.map((node) => [node.id, { x: node.x, y: node.y }]));
-      return this;
     },
   };
   globalThis.window = {
@@ -93,6 +92,16 @@ function setup(mobile, libraryAvailable = true, initialHash = "") {
     fire(name) { windowHandlers[name]?.(); },
   };
   initHeroGraph();
+  selectors.get("#graph-canvas-host").addEventListener("pointermove", (event) => {
+    if (!graph.rendering || !graph.callbacks.hover) return;
+    const hit = graph.nodes.find((node) => {
+      const screen = graph.graph2ScreenCoords(node.x, node.y);
+      return Math.hypot(screen.x - event.clientX, screen.y - event.clientY) <= Math.sqrt(node.val) * 5 * graph.zoom();
+    });
+    graph.callbacks.hover(hit || null);
+    graph.render();
+  });
+  graph.render();
   return { graph, stage, panel, selectors };
 }
 
@@ -130,10 +139,9 @@ test("paused pointer selects a node even when the library has a stale link hover
 test("paused pan and zoom redraw the view before picking a visible node", () => {
   const { graph, panel, selectors } = setup(false);
   selectors.get("#btn-motion").fire("click");
-  graph.scale = 0.3;
+  graph.zoom(0.3);
   graph.offset = 14;
-  graph.callbacks.zoom();
-  graph.callbacks.zoomEnd();
+  graph.render();
   assert.equal(graph.visibleScale, graph.zoom());
   assert.equal(graph.visibleOffset, graph.offset);
   const actual = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
@@ -147,21 +155,38 @@ test("paused dragging redraws a moved node without selecting it on release", () 
   const { graph, panel, selectors } = setup(false);
   const host = selectors.get("#graph-canvas-host");
   selectors.get("#btn-motion").fire("click");
-  graph.resumeAnimation();
+  assert.equal(graph.rendering, true);
   const actual = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
   const start = { pointerId: 1, clientX: actual.x * graph.zoom(), clientY: 0, button: 0 };
   host.fire("pointerdown", start);
   actual.x += 50;
   const end = { ...start, clientX: actual.x * graph.zoom() };
   host.fire("pointermove", end);
-  graph.callbacks.drag(actual);
-  graph.callbacks.dragEnd(actual);
+  graph.render();
   assert.equal(graph.visiblePositions.get(actual.id).x, actual.x);
   host.fire("pointerup", end);
   assert.equal(panel.hidden, true);
   host.fire("pointerdown", end);
   host.fire("pointerup", end);
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
+});
+
+test("paused and reduced-motion pointer movement updates neighbour highlighting without force ticks", () => {
+  for (const reduced of [false, true]) {
+    const { graph, selectors } = setup(false, true, "", reduced);
+    if (!reduced) selectors.get("#btn-motion").fire("click");
+    assert.equal(graph.cooldown, 0);
+    assert.equal(graph.rendering, true);
+    const host = selectors.get("#graph-canvas-host");
+    for (const id of ["proj-efa", "proj-virtuwa-hv"]) {
+      const node = graph.nodes.find((entry) => entry.id === id);
+      host.fire("pointermove", { pointerId: 1, clientX: node.x * graph.zoom(), clientY: 0 });
+      assert.equal(graph.color(node), "#67e8f9");
+      assert.equal(graph.cooldown, 0);
+    }
+    selectors.get("#btn-motion").fire("click");
+    assert.equal(graph.reheated, true);
+  }
 });
 
 test("list selection clears stale hover but new canvas hover takes precedence", () => {
