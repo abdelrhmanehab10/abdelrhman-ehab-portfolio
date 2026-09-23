@@ -36,7 +36,6 @@ export function initHeroGraph() {
     index.insertBefore(panel, index.querySelector("#graph-index"));
     stage.hidden = true;
     index.classList.remove("graph-index-hidden");
-    index.classList.add("graph-list-open");
     status.textContent = "Graph unavailable — showing profile list";
     listButton.hidden = resetButton.hidden = motionButton.hidden = true;
   }
@@ -135,8 +134,7 @@ export function initHeroGraph() {
   }
   window.addEventListener("hashchange", syncHash);
   listButton.addEventListener("click", () => {
-    const open = index.classList.toggle("graph-list-open");
-    index.classList.toggle("graph-index-hidden", !open);
+    const open = !index.classList.toggle("graph-index-hidden");
     listButton.setAttribute("aria-expanded", String(open));
     listButton.textContent = open ? "Hide list" : "List view";
   });

@@ -7,8 +7,18 @@ import { initHeroGraph } from "../src/hero-graph.js";
 function element() {
   const handlers = {};
   const attributes = {};
+  const classes = new Set();
   return {
-    hidden: false, style: {}, dataset: {}, classList: { add() {}, remove() {}, toggle() {} },
+    hidden: false, style: {}, dataset: {}, classList: {
+      add(name) { classes.add(name); },
+      remove(name) { classes.delete(name); },
+      contains(name) { return classes.has(name); },
+      toggle(name) {
+        if (classes.has(name)) { classes.delete(name); return false; }
+        classes.add(name);
+        return true;
+      },
+    },
     innerHTML: "", textContent: "", clientWidth: 390, clientHeight: 480,
     addEventListener(name, handler) { (handlers[name] ||= []).push(handler); },
     fire(name, event = {}) { handlers[name]?.forEach((handler) => handler(event)); },
@@ -31,6 +41,7 @@ function setup(mobile, libraryAvailable = true, initialHash = "", reduced = fals
   panel.hidden = true;
   panel.parent = stage;
   const index = selectors.get("#graph-index-wrap");
+  index.classList.add("graph-index-hidden");
   const nodeButtons = new Map();
   index.querySelector = (selector) => {
     if (!selector.startsWith("[data-node=")) return element();
@@ -256,10 +267,27 @@ test("deployment detail omits private topology and privileged command scope", ()
   assert.match(panel.innerHTML, /Least-privilege sudo rules scoped to the deployment commands only/);
 });
 
+test("List view toggles index visibility and expanded state", () => {
+  const { selectors } = setup(false);
+  const index = selectors.get("#graph-index-wrap");
+  const button = selectors.get("#btn-list");
+  assert.equal(index.classList.contains("graph-index-hidden"), true);
+  button.fire("click");
+  assert.equal(index.classList.contains("graph-index-hidden"), false);
+  assert.equal(button.getAttribute("aria-expanded"), "true");
+  assert.equal(button.textContent, "Hide list");
+  button.fire("click");
+  assert.equal(index.classList.contains("graph-index-hidden"), true);
+  assert.equal(button.getAttribute("aria-expanded"), "false");
+  assert.equal(button.textContent, "List view");
+});
+
 test("library failure keeps list-selected details visible", () => {
   const { panel, stage, selectors } = setup(false, false);
   assert.equal(stage.hidden, true);
   const index = selectors.get("#graph-index-wrap");
+  assert.equal(index.classList.contains("graph-index-hidden"), false);
+  assert.equal(selectors.get("#btn-list").hidden, true);
   index.fire("click", { target: { closest: () => ({ dataset: { node: "proj-efa" } }) } });
   assert.equal(panel.parent, index);
   assert.equal(panel.hidden, false);
