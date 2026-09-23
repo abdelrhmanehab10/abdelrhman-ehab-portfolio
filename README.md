@@ -12,7 +12,8 @@ The site presents selected product work, measurable frontend outcomes, professio
 - Data-driven rendering for projects, experience, impact metrics, skills, and social links.
 - Production-focused presentation of dashboards, admin systems, and operational workflows.
 - Responsive navigation with active-section state while scrolling.
-- Reduced-motion support for the technology slider.
+- Dark, interactive profile graph with pan, zoom, node details and shareable `#node/<id>` links; List view provides a keyboard-readable index with linked connections, also available without JavaScript or the graph library.
+- Reduced-motion support for the technology slider and graph (pre-warmed without animated ticks), with a manual graph pause control.
 - Search and social metadata, canonical URL, Open Graph/Twitter cards, and Person structured data.
 - Static deployment through GitHub Pages.
 
@@ -23,6 +24,7 @@ Some featured work is client-owned or private. The portfolio intentionally descr
 - HTML5
 - Tailwind CSS via the browser CDN
 - Vanilla JavaScript modules
+- Vendored [force-graph 1.51.4](assets/vendor/force-graph-1.51.4.min.js) (MIT; [licence](assets/vendor/force-graph-LICENSE.txt)) for the canvas graph
 - Font Awesome
 - GitHub Pages
 
@@ -47,15 +49,20 @@ Alternatively, use any static HTTP server. No build step is required.
 ├── assets/
 │   ├── icons/       Technology icons
 │   ├── images/      Project and profile imagery
+│   ├── vendor/      Vendored graph library and licence
 │   └── *.pdf        Downloadable resume
+├── docs/graph-hero/  Browser verification and screenshots
+├── scripts/          Graph index generator and checks
 ├── src/
-│   ├── constant/    Portfolio content and profile data
-│   └── main.js      Rendering and interaction logic
+│   ├── constant/    Portfolio and graph data
+│   ├── hero-graph.js Graph rendering and interactions
+│   ├── hero-graph.css Graph and fallback styles
+│   └── main.js      Page rendering and interactions
 ├── index.html       Page structure and metadata
 └── README.md
 ```
 
-Most portfolio content can be updated in [`src/constant/index.js`](src/constant/index.js). The page rendering and interactions live in [`src/main.js`](src/main.js).
+Most portfolio content can be updated in [`src/constant/index.js`](src/constant/index.js). The page rendering and interactions live in [`src/main.js`](src/main.js). The graph has its own model in [`src/constant/graph.js`](src/constant/graph.js). After changing graph nodes or edges, run `node scripts/generate-graph-index.mjs` to regenerate the checked-in no-JavaScript HTML index (including connections) and Person JSON-LD from that model. The canvas renderer is in [`src/hero-graph.js`](src/hero-graph.js); its critical styles are in [`src/hero-graph.css`](src/hero-graph.css). Run `npm run test:graph` to check model/index integrity. Browser verification and screenshots are in [`docs/graph-hero/`](docs/graph-hero/).
 
 ## Deployment
 

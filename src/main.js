@@ -1,3 +1,4 @@
+import { initHeroGraph } from "./hero-graph.js";
 import {
   coreTechnologies,
   experiences,
@@ -73,6 +74,7 @@ class App {
     this.renderSkills();
     this.renderSocialLinks();
     this.setYear();
+    initHeroGraph();
   }
 
   updateActiveClass() {
