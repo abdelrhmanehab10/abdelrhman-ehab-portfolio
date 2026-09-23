@@ -3,7 +3,7 @@
 This file is the project's committed home for project-intrinsic agent knowledge: build, test, release, architecture, and sharp-edge notes that should travel with the code.
 
 - This is a static GitHub Pages site; serve it locally via the command in `README.md` (no bundler or install step).
-- The graph model is `src/constant/graph.js`. After changing it, run `node scripts/generate-graph-index.mjs` to keep the checked-in no-JS index and Person JSON-LD in `index.html` in sync. `README.md` documents the renderer, vendored dependency and browser evidence.
+- `README.md` owns graph maintenance guidance and links to browser evidence; follow its generation step when changing the graph model.
 
 ## Maintaining this file
 

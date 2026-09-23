@@ -1,18 +1,16 @@
 /**
  * Graph model derived from profile.md (read-only source: /mnt/d/CVs/profile.md).
- * Intended destination: src/constant/graph.js, imported by src/main.js the same
- * way `works`, `experiences` and `skills` already are.
+ * Consumed by hero-graph.js and by the checked-in index/JSON-LD generator.
  *
  * Node shape
  *   id        stable kebab-case key, also the deep-link hash (#node/<id>)
  *   group     "root" | "hub" | "role" | "project" | "skill" | "domain" | "craft" | "link"
- *   label     short text drawn on the graph (keep <= ~22 chars so it fits a node chip)
- *   title     heading shown in the detail panel
+ *   label     short text drawn on the canvas
+ *   title     heading in the detail panel and text in the hover tooltip
  *   meta      one-line context under the panel heading (period, employer, status)
- *   summary   one sentence, also used as the hover tooltip and as the text in the
- *             no-JS / no-canvas fallback list
- *   bullets   2-4 lines lifted from profile.md; the resume PDF keeps the long form
- *   tags      technology chips (NOT drawn as nodes - see edge policy below)
+ *   summary   short description in the detail panel and generated no-JS index
+ *   bullets   additional detail; the resume PDF keeps the long form
+ *   tags      technology chips in the detail panel, not separate nodes
  *   href      optional outbound link rendered as the panel's primary action
  *   sectionId optional existing page section to scroll to ("projects", "experience", ...)
  */
@@ -752,7 +750,7 @@ export const graphNodes = [
 
 /**
  * Edge types
- *   contains        hub -> child. The structural backbone the force layout clusters on.
+ *   contains        root -> hub or hub -> child. The structural backbone the force layout clusters on.
  *   delivered-in    project -> role. Where the work shipped.
  *   in-domain       project -> domain. The cross-cluster tension that makes the graph mean something.
  *   concurrent-with role <-> role. The career note: part-time engagements held during the full-time role.
