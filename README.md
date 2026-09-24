@@ -51,7 +51,7 @@ Alternatively, use any static HTTP server. No build step is required.
 │   ├── images/      Project and profile imagery
 │   ├── vendor/      Vendored graph library and licence
 │   └── *.pdf        Downloadable resume
-├── docs/graph-hero/  Browser verification and screenshots
+├── docs/             Browser verification and screenshots
 ├── scripts/          Profile/graph generators, graph topology and checks
 ├── src/
 │   ├── constant/    Portfolio and graph data
@@ -62,7 +62,7 @@ Alternatively, use any static HTTP server. No build step is required.
 └── README.md
 ```
 
-The authoritative content is the external, read-only `profile.md`. After editing it, regenerate the checked-in public model and crawlable HTML (no build step at deploy time):
+The authoritative profile content is external `profile.md`; the generator reads it without modifying it. After editing the source, regenerate the checked-in public model and crawlable HTML (no build step at deploy time):
 
 ```bash
 node scripts/generate-profile.mjs /mnt/d/CVs/source/profile.md
@@ -71,7 +71,7 @@ npm run test:graph
 node scripts/generate-profile.mjs /mnt/d/CVs/source/profile.md --check
 ```
 
-Pass **your own absolute profile path** if it differs. `--check` exits nonzero if the committed graph no longer matches that source; `npm run test:graph` also checks the committed model, page projections and index/metadata without needing access to the external file. CI cannot compare against a private file it cannot read, so run the profile-path check whenever the source changes. Graph node IDs and edges are structural metadata in [`scripts/graph-layout.json`](scripts/graph-layout.json); update that mapping and the generator when profile headings or product relationships change. Verified project chips and their repository provenance are site-side metadata in [`scripts/project-tags.json`](scripts/project-tags.json), not profile-derived guesses; review repository manifests/languages before editing them. EFA, Boots & Ladders, Watu, and Pro Event Storefront have no verified repository in the accessible account/org and intentionally have no chips; include this limitation in the PR. Do not edit generated [`src/constant/graph.js`](src/constant/graph.js) or the HTML index/SEO metadata by hand. [`src/constant/index.js`](src/constant/index.js) derives page sections from the graph, and [`src/main.js`](src/main.js) renders them. The generator applies a public-copy safety policy before any surface is emitted. The graph canvas renderer and styles live in [`src/hero-graph.js`](src/hero-graph.js) and [`src/hero-graph.css`](src/hero-graph.css). Browser evidence, Lighthouse figures and the public-copy privacy review are in [`docs/profile-sync/verification.md`](docs/profile-sync/verification.md); earlier graph evidence remains in [`docs/graph-hero/`](docs/graph-hero/).
+Pass **your own absolute profile path** if it differs. `--check` exits nonzero if the committed graph no longer matches that source; `npm run test:graph` also checks the committed model, page projections and index/metadata without needing access to the external file. CI cannot compare against a private file it cannot read, so run the profile-path check whenever the source changes. Graph node IDs and edges are structural metadata in [`scripts/graph-layout.json`](scripts/graph-layout.json); update that mapping and the generator when profile headings or product relationships change. Verified project chips and their repository provenance are site-side metadata in [`scripts/project-tags.json`](scripts/project-tags.json), not profile-derived guesses; review repository manifests/languages before editing them. Projects without verified repository evidence intentionally have no chips; note them in the PR. Do not edit generated [`src/constant/graph.js`](src/constant/graph.js) or the HTML index/SEO metadata by hand. [`src/constant/index.js`](src/constant/index.js) derives page sections from the graph, and [`src/main.js`](src/main.js) renders them. The generator applies a public-copy safety policy before any surface is emitted. The graph canvas renderer and styles live in [`src/hero-graph.js`](src/hero-graph.js) and [`src/hero-graph.css`](src/hero-graph.css). Browser evidence, Lighthouse figures and the public-copy privacy review are in [`docs/profile-sync/verification.md`](docs/profile-sync/verification.md); earlier graph evidence remains in [`docs/graph-hero/`](docs/graph-hero/).
 
 ## Deployment
 
@@ -81,8 +81,7 @@ The live site is published at:
 
 ## Contact
 
-- [LinkedIn](https://www.linkedin.com/in/abdelrahman-ehab-87261a244/)
-- [GitHub](https://github.com/abdelrhmanehab10)
+See the [live portfolio's contact section](https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/#contact) for profile-backed contact links.
 
 ## Reuse
 

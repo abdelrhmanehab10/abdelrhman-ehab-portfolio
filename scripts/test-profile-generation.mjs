@@ -39,7 +39,7 @@ const profile = (roles, extra = {}) => [
   ...lines('Contact', bulletLines(Object.entries(profileDetails.contact).map(([key, value]) => `${key}: ${value}`))),
   ...lines('Summary', [extra.summary || profileDetails.summary]),
   ...lines('CI/CD & Deployment Automation', bulletLines([node('craft-cicd').summary, ...node('craft-cicd').bullets])),
-  ...lines(node('proj-bleu-blog').title, bulletLines([node('proj-bleu-blog').summary, ...(extra.bleuBullets || []), ...node('proj-bleu-blog').bullets])), 
+  ...lines(node('proj-bleu-blog').title, bulletLines([node('proj-bleu-blog').summary, ...(extra.bleuBullets || []), ...node('proj-bleu-blog').bullets])),
   ...lines('Clinic Flow', bulletLines([node('proj-clinic-flow').summary])),
   ...graphNodes.filter(n => n.group === 'skill').flatMap(n => [`### ${n.title}`, ...bulletLines(n.id === 'skill-devops' ? devopsSourceBullets : n.tags)]),
   ...lines('Additional Highlights', bulletLines(profileDetails.highlights)),
