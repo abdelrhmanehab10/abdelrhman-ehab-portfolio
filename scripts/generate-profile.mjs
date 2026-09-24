@@ -22,8 +22,8 @@ if (devopsStart < 0 || devopsLines.filter(line => line === sourceProxyBullet).le
   throw new Error('DevOps & Infrastructure source bullet changed; re-approve its public wording before generation');
 }
 rawLines[devopsStart + 1 + devopsLines.indexOf(sourceProxyBullet)] = '- Nginx reverse proxy, SSL/TLS, WebSocket proxying';
-// Central public-copy policy. Apply BEFORE parsing, so every output (including graph,
-// no-JS index, JSON-LD, Open Graph and runtime cards) sees the same safe wording.
+// Apply public-copy policy BEFORE parsing; the graph model and its generated
+// index, metadata and node details must all use the same reviewed wording.
 const publicText = rawLines.join('\n')
   .replace(/Implemented passwordless sudo rules for controlled deployment commands \(rm, copy, nginx reload\)/gi, 'Least-privilege sudo rules scoped to the deployment commands only')
   .replace(/VM console using WebSockets with SSL termination through Nginx; domain\/TLS management and Cloudflare proxy rules/gi, 'VM console with encrypted WebSocket connectivity and managed TLS')
