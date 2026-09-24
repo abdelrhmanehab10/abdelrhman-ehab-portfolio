@@ -190,6 +190,7 @@ class App {
       summary,
       stack,
       bullets = [],
+      visibilityNote,
       liveUrl,
       linkLabel,
     } = project;
@@ -199,6 +200,7 @@ class App {
         <h3 class="mt-4 break-words text-xl font-semibold leading-snug text-white md:text-2xl">${escapeHtml(title)}</h3>
         ${meta ? `<p class="mt-2 text-xs font-semibold text-cyan-200">${escapeHtml(meta)}</p>` : ''}
         <p class="mt-2 text-sm leading-relaxed text-slate-300 md:text-base">${escapeHtml(summary)}</p>
+        ${visibilityNote ? `<p class="mt-2 text-xs leading-relaxed text-slate-400">${escapeHtml(visibilityNote)}</p>` : ''}
         ${bullets.length ? `<details class="mt-3 text-sm text-slate-300"><summary class="min-h-11 cursor-pointer py-2 font-semibold text-cyan-200">Read contributions</summary><ul class="list-disc space-y-2 pl-5">${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></details>` : ''}
         <div class="mt-4 flex flex-wrap gap-2">
           ${stack.map(item => `<span class="max-w-full break-words rounded-full border border-sky-900 bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-100">${escapeHtml(item)}</span>`).join('')}

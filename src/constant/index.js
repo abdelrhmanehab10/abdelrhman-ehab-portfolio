@@ -3,6 +3,7 @@ import { graphNodes, profileDetails } from './graph.js';
 const ofGroup = (group) => graphNodes.filter((node) => node.group === group);
 const root = graphNodes.find((node) => node.id === 'me');
 const links = Object.fromEntries(ofGroup('link').map((node) => [node.id, node]));
+const featuredIds = new Set(['proj-virtuwa-hv', 'proj-qr-verify']);
 
 export const profileMeta = {
   name: root.title,
@@ -19,9 +20,11 @@ export const impactStats = [
 export const coreTechnologies = [...new Set(ofGroup('skill').flatMap((node) => (node.tags || []).slice(0, 4)).map(s => s.replace(/ \(.*/, '').trim()))];
 export const works = ofGroup('project').map((node) => ({
   ...node,
-  featured: ['proj-virtuwa-hv', 'proj-qr-verify'].includes(node.id),
+  featured: featuredIds.has(node.id),
   imageUrl: { 'proj-virtuwa-hv': 'assets/images/virtuwa-live.png', 'proj-qr-verify': 'assets/images/qr-verify-live.png' }[node.id],
   stack: node.tags || [],
+  visibilityNote: featuredIds.has(node.id) && !node.repoUrl
+    ? 'Source code is not publicly linked; contact me for a walkthrough.' : '',
   liveUrl: node.href,
 }));
 export const experiences = ofGroup('role').map((node) => {

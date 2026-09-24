@@ -83,6 +83,9 @@ export const graphNodes = [
     "bullets": [
       "Built a secure bidding-wallet flow with Node.js and Next.js, enforcing a minimum 10% balance requirement before bidding and placing funds on hold during active bids."
     ],
+    "tags": [
+      "Node.js"
+    ],
     "label": "Smartly Techs · Full Stack Engin"
   },
   {
@@ -95,6 +98,9 @@ export const graphNodes = [
     "bullets": [
       "Improved EFA UI/UX and web performance, increasing Lighthouse from 61 to 84 by optimizing LCP, FCP, and layout shifts.",
       "Enhanced UI/UX and performance in Boots & Ladders using Vue.js."
+    ],
+    "tags": [
+      "Vue"
     ],
     "label": "Smartly Techs · Frontend"
   },
@@ -109,6 +115,7 @@ export const graphNodes = [
       "Deliver product improvements across VM consoles, backup/recovery, host management, deployment workflows, bilingual UX, and operational interfaces.",
       "Continue hardening and productizing the frontend so the platform can be adapted and marketed for future clients."
     ],
+    "tags": [],
     "label": "Virtuwa · Freelance Fronte"
   },
   {
@@ -119,6 +126,7 @@ export const graphNodes = [
     "meta": "Oct 2025 - May 2026 | Saudi Arabia (Remote) · Part-time",
     "summary": "Delivered VirtuWa HV - Hypervisor Management Interface (Oct 2025 - Jan 2026, 3 months), VirtuWa Cloud Manager - Enterprise Hypervisor Control Plane (in development), Virtuwa Flow Bridge (in development).",
     "bullets": [],
+    "tags": [],
     "label": "Virtuwa · Frontend"
   },
   {
@@ -132,6 +140,9 @@ export const graphNodes = [
       "Implemented and validated recurring and overnight scheduling, date/time mapping, status-transition rules, disabled actions, and same-day check-in gating.",
       "Worked on Watu, a university platform, refactoring the Apply Now flow into a unified multi-step form and integrating location/information-request APIs.",
       "Performed end-to-end QA, identified functional and UX gaps, and prepared prioritized reports and team action plans for delivery."
+    ],
+    "tags": [
+      "Vue"
     ],
     "label": "Riyada Al Arabiya  · Frontend"
   },
@@ -148,6 +159,9 @@ export const graphNodes = [
       "Expanded content and marketing capabilities by implementing the blog and SEO-focused sections across key pages.",
       "Delivered campaign and trust updates, including homepage/store promotional banners and customer-logo social proof integration."
     ],
+    "tags": [
+      "Salla"
+    ],
     "label": "Pro Event · Software Enginee"
   },
   {
@@ -161,6 +175,10 @@ export const graphNodes = [
       "Hardened the service with rate limiting, session revocation, audit events, CORS/security controls, and automated unit/Playwright coverage for concurrency, security, and performance paths.",
       "Added GitHub Actions CI, Node.js 22 LTS support, accessibility and contrast improvements, local font delivery, and clearer separation of export services."
     ],
+    "tags": [
+      "Node.js",
+      "GitHub Actions"
+    ],
     "label": "QR Verification Pl · Independent Prod"
   },
   {
@@ -173,6 +191,7 @@ export const graphNodes = [
     "bullets": [
       "Developed websites from scratch, implementing tailored features, SEO best practices, and user-friendly navigation to enhance brand presence and client engagement."
     ],
+    "tags": [],
     "label": "Shortcutadv · WordPress Develo"
   },
   {
@@ -187,6 +206,16 @@ export const graphNodes = [
       "Implementing protected routes and role-based access for reception, queue, patients, patient detail, and staff management.",
       "Shipped to a real clinic where a doctor adopted it for daily use; feedback was very positive, praising how easy it was to use and how directly it solved his day-to-day workflow problem.",
       "Tech stack: React 19, TypeScript, TanStack Router, TanStack Query, Better Auth, Drizzle, Tailwind CSS, shadcn/ui."
+    ],
+    "tags": [
+      "React 19",
+      "TypeScript",
+      "TanStack Router",
+      "TanStack Query",
+      "Better Auth",
+      "Drizzle",
+      "Tailwind CSS",
+      "shadcn/ui"
     ],
     "label": "Clinic Flow"
   },
@@ -203,6 +232,7 @@ export const graphNodes = [
       "Improved frontend quality by fixing semantic blog datetime output and moving font loading from CSS import into the document head for better performance.",
       "Followed a Git/GitHub open-source workflow on a feature branch and maintained repo hygiene around the project's npm-based dependency setup."
     ],
+    "tags": [],
     "label": "BLEU Community Blog (Elevent"
   },
   {
@@ -215,6 +245,9 @@ export const graphNodes = [
       "Created reusable ControlValueAccessor and signal-based controls, then assembled conditional permission-request sections with FormArray-driven dynamic fields.",
       "Delivered bilingual Arabic/English UX with Transloco and RTL/LTR switching, plus in-app XLSX editing through Syncfusion Spreadsheet.",
       "Integrated login/session handling and mapped complex frontend form state into backend submission payloads."
+    ],
+    "tags": [
+      "Angular"
     ],
     "label": "GAS-REG Portal"
   },
@@ -230,6 +263,10 @@ export const graphNodes = [
       "Integrated TOTP/MFA, Arabic error handling, winner-rank validation up to 120, and required-score validation up to 300.",
       "Delivered bilingual RTL dashboards, reports, exports, and reusable data tables with TanStack Router/Query/Table, Zod, and Vitest."
     ],
+    "tags": [
+      "React",
+      "TypeScript"
+    ],
     "label": "Competition Management Admin"
   },
   {
@@ -244,6 +281,9 @@ export const graphNodes = [
       "Delivered RTL rich-text editing, media-library insertion, image cropping, galleries, and reusable dashboard components.",
       "Standardized API integration, shared lookup caching/prefetching, and error/toast handling across the dashboard."
     ],
+    "tags": [
+      "Angular"
+    ],
     "label": "Akhbar AlKhaleej Admin FE"
   },
   {
@@ -253,6 +293,9 @@ export const graphNodes = [
     "meta": "",
     "summary": "Built a secure bidding-wallet flow with Node.js and Next.js, enforcing a minimum 10% balance requirement before bidding and placing funds on hold during active bids.",
     "bullets": [],
+    "tags": [
+      "Node.js"
+    ],
     "label": "Bidding Wallet Flow"
   },
   {
@@ -262,6 +305,7 @@ export const graphNodes = [
     "meta": "",
     "summary": "Developed the Faster Meeting platform in Next.js with authenticated scheduling, editing, and management of Zoom meetings through custom .NET APIs.",
     "bullets": [],
+    "tags": [],
     "label": "Faster Meeting"
   },
   {
@@ -271,6 +315,7 @@ export const graphNodes = [
     "meta": "",
     "summary": "Improved EFA UI/UX and web performance, increasing Lighthouse from 61 to 84 by optimizing LCP, FCP, and layout shifts.",
     "bullets": [],
+    "tags": [],
     "label": "EFA"
   },
   {
@@ -280,6 +325,9 @@ export const graphNodes = [
     "meta": "",
     "summary": "Enhanced UI/UX and performance in Boots & Ladders using Vue.js.",
     "bullets": [],
+    "tags": [
+      "Vue"
+    ],
     "label": "Boots & Ladders"
   },
   {
@@ -295,6 +343,10 @@ export const graphNodes = [
       "Hardened the console session handling with session-based bootstrap and short-lived, opaque identifiers.",
       "Shipped the product to a startup environment with early users and mentored a new frontend developer through implementation and delivery."
     ],
+    "tags": [
+      "React",
+      "TypeScript"
+    ],
     "label": "VirtuWa HV"
   },
   {
@@ -307,6 +359,10 @@ export const graphNodes = [
       "Implemented VM lifecycle actions and a browser-based noVNC/WebSocket console, with monitoring dashboards for CPU, memory, network, and IOPS.",
       "Added searchable, filterable, paginated event/audit logs with CSV/JSON export and auth UX for token refresh and inactivity logout.",
       "Documented backend contract improvements that reduced frontend normalization and clarified API integration requirements."
+    ],
+    "tags": [
+      "React",
+      "TypeScript"
     ],
     "label": "VirtuWa Cloud Manager"
   },
@@ -321,6 +377,9 @@ export const graphNodes = [
       "Built target-host management, connection testing, process actions, user management, authentication, and activity/dashboard API integrations.",
       "Expanded bilingual localization and RTL support, and added a shared typed API client with a standardized Vite proxy configuration."
     ],
+    "tags": [
+      "GitHub Actions"
+    ],
     "label": "Virtuwa Flow Bridge"
   },
   {
@@ -330,6 +389,9 @@ export const graphNodes = [
     "meta": "",
     "summary": "Contributed to the Laravel-to-Vue 3 migration of Care Connect Dashboard, delivering appointment table/calendar workflows with Pinia-managed filters.",
     "bullets": [],
+    "tags": [
+      "Vue"
+    ],
     "label": "Care Connect Dashboard"
   },
   {
@@ -339,6 +401,7 @@ export const graphNodes = [
     "meta": "",
     "summary": "Worked on Watu, a university platform, refactoring the Apply Now flow into a unified multi-step form and integrating location/information-request APIs.",
     "bullets": [],
+    "tags": [],
     "label": "Watu"
   },
   {
@@ -348,6 +411,7 @@ export const graphNodes = [
     "meta": "",
     "summary": "Built and standardized the storefront UI across core pages (product, category, blog, and checkout) with a consistent design system and light/dark themes.",
     "bullets": [],
+    "tags": [],
     "label": "Pro Event Storefront"
   },
   {
@@ -361,6 +425,11 @@ export const graphNodes = [
     "bullets": [
       "Designed idempotent batch generation, CSV exports, printable QR-label sheets, and an Arabic/RTL admin dashboard for manufacturing workflows.",
       "Delivered a consumer scanner with camera/manual entry and verification rules for first use, repeat scans, revocation, and expiry."
+    ],
+    "tags": [
+      "Node.js",
+      "Express",
+      "MongoDB"
     ],
     "label": "QR-code verification platfor"
   },
@@ -530,6 +599,9 @@ export const graphNodes = [
       "Ensured zero-downtime frontend updates with configuration validation before reload.",
       "Reduced manual deployment effort to a single Git push -> live deployment."
     ],
+    "tags": [
+      "GitHub Actions"
+    ],
     "label": "CI/CD & Deployment Automatio"
   },
   {
@@ -544,6 +616,7 @@ export const graphNodes = [
       "Contributed Arabic-first internationalization work across the website, including locale data, localized routes/pages, RTL-aware UI behavior, and a language switcher.",
       "Added and refined Arabic/English translation files for home, blogs, blog details, shared UI copy, and contributing flows."
     ],
+    "tags": [],
     "label": "Bilingual & RTL Engineering"
   },
   {
@@ -554,6 +627,10 @@ export const graphNodes = [
     "summary": "Built a React/TypeScript hypervisor management console with live monitoring, RBAC, and bilingual English/Arabic UX.",
     "bullets": [
       "Hardened the console session handling with session-based bootstrap and short-lived, opaque identifiers."
+    ],
+    "tags": [
+      "React",
+      "TypeScript"
     ],
     "label": "Access Control & Security"
   },
@@ -566,6 +643,7 @@ export const graphNodes = [
     "bullets": [
       "Improved frontend quality by fixing semantic blog datetime output and moving font loading from CSS import into the document head for better performance."
     ],
+    "tags": [],
     "label": "Performance & Quality"
   },
   {
@@ -575,6 +653,7 @@ export const graphNodes = [
     "meta": "Practice",
     "summary": "Team leadership, requirements clarification, documentation, bilingual communication",
     "bullets": [],
+    "tags": [],
     "label": "Ways of Working"
   },
   {

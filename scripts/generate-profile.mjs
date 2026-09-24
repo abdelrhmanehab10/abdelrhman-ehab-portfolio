@@ -108,6 +108,10 @@ const skillBlocks = {
   'skill-other': 'Other', 'skill-tools': 'Tools',
 };
 const splitTags = (text) => text.flatMap(s => s.split(/, (?=(?:[^()]*\([^()]*\))*[^()]*$)/));
+const techTerms = [...new Set(['Programming & Frameworks', 'E-commerce & CMS', 'DevOps & Infrastructure', 'Databases & Analytics']
+  .flatMap(section => splitTags(bullets(get(section))))
+  .map(tag => tag.split(' (')[0].split(' / ')[0].replace(/ CI\/CD$/, '')))];
+const mentionedTech = (text) => techTerms.filter(term => new RegExp(`(?<![\\w])${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w])`).test(text));
 const contact = {};
 const contactFields = ['Email', 'Phone', 'LinkedIn', 'GitHub', 'Portfolio'];
 for (const entry of bullets(get('Contact'))) {
@@ -201,6 +205,11 @@ const nodes = layout.nodes.map((node) => {
   if (sourceBullets.length) {
     n.summary = sourceBullets[0];
     n.bullets = sourceBullets.slice(1);
+  }
+  if (['role', 'project', 'craft'].includes(n.group)) {
+    const stack = n.group === 'project' && sourceBullets.find(bullet => bullet.startsWith('Tech stack: '));
+    n.tags = stack ? stack.slice('Tech stack: '.length).replace(/\.$/, '').split(', ')
+      : mentionedTech([n.summary, ...(n.bullets || [])].join(' '));
   }
   if (!n.summary) throw new Error(`No summary for ${n.id}`);
   n.label = n.group === 'role'

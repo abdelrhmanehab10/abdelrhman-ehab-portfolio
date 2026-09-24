@@ -133,17 +133,34 @@ test('approved DevOps copy is published and a year elsewhere is accepted', () =>
   execFileSync(process.execPath, [join(dir, 'scripts/generate-profile.mjs'), join(dir, 'profile.md'), '--check']);
 }));
 
-test('experience timeline renders in start-date order including year-only roles', async () => {
+test('project and role technology tags follow profile evidence', () => sandbox(({ generate }) => {
+  const generated = generate(profile(roleIds)).graphNodes;
+  assert.ok(generated.find(n => n.id === 'proj-virtuwa-hv').tags.includes('React'));
+  assert.ok(generated.find(n => n.id === 'proj-virtuwa-hv').tags.includes('TypeScript'));
+  assert.ok(!generated.find(n => n.id === 'proj-virtuwa-hv').tags.includes('Bootstrap'));
+  assert.ok(generated.find(n => n.id === 'proj-qr-verify').tags.includes('MongoDB'));
+  assert.ok(generated.find(n => n.id === 'role-riyada').tags.includes('Vue'));
+  const updated = generate(profile(roleIds).replace('MongoDB QR-verification service', 'PostgreSQL QR-verification service')).graphNodes;
+  assert.ok(!updated.find(n => n.id === 'proj-qr-verify').tags.includes('MongoDB'));
+}));
+
+test('project cards show derived technologies and featured source notice', async () => {
   const timeline = { innerHTML: '' };
+  const featured = { innerHTML: '' };
+  const more = { innerHTML: '', classList: { toggle() {} } };
   let ready;
   globalThis.document = {
-    querySelector: selector => selector === '#experience-list' ? timeline : null,
+    querySelector: selector => ({ '#experience-list': timeline, '#featured-works': featured, '#more-works': more })[selector] || null,
     querySelectorAll: () => [],
     addEventListener: (name, listener) => { if (name === 'DOMContentLoaded') ready = listener; },
   };
   globalThis.window = { addEventListener() {}, scrollY: 0 };
   await import('../src/main.js');
   ready();
+  assert.match(featured.innerHTML, /Source code is not publicly linked; contact me for a walkthrough/);
+  assert.match(featured.innerHTML, /React<\/span>/);
+  assert.match(featured.innerHTML, /MongoDB<\/span>/);
+  assert.doesNotMatch(more.innerHTML, /Source code is not publicly linked/);
   const titles = [...timeline.innerHTML.matchAll(/<h3[^>]*>([^<]+)<\/h3>/g)].map(match => match[1]);
   assert.equal(titles.length, 8);
   assert.match(titles[0], /WordPress Developer/);
