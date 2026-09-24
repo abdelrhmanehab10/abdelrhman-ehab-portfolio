@@ -2,18 +2,15 @@
 
 Live portfolio for Abdelrhman Ehab, a Frontend Engineer building production web applications with React, Angular, Vue, TypeScript, and JavaScript.
 
-The site presents the full profile: projects, open-source contributions, professional experience, deployment achievements, technologies, industries, languages, tools, and soft skills.
+The whole site is one interactive profile graph. Visitors pan, zoom and select nodes to explore the full profile: projects, open-source contributions, professional experience, deployment achievements, technologies, industries, languages, tools, soft skills, and the Connect links for email, LinkedIn, GitHub and the resume PDF.
 
 **[Open the live portfolio](https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/)**
 
 ## What this project demonstrates
 
-- Responsive, accessible portfolio layout built without a frontend framework.
-- Data-driven rendering for projects, experience, impact metrics, skills, and social links.
-- Production-focused presentation of dashboards, admin systems, and operational workflows.
-- Responsive navigation with active-section state while scrolling.
-- Dark, interactive profile graph with pan, zoom, node details and shareable `#node/<id>` links; List view provides a keyboard-readable index with linked connections, also available without JavaScript or the graph library.
-- Reduced-motion support for the technology slider and graph (pre-warmed without animated ticks), with a manual graph pause control.
+- A graph-only page that fills the viewport on desktop and phone, built without a frontend framework.
+- Dark, interactive profile graph with pan, zoom, node details and shareable `#node/<id>` links; List view provides a keyboard-readable index with linked connections and Connect links, also available without JavaScript or the graph library.
+- Reduced-motion support (the graph is pre-warmed without animated ticks), with a manual graph pause control.
 - Search and social metadata, canonical URL, Open Graph/Twitter cards, and Person structured data.
 - Static deployment through GitHub Pages.
 
@@ -21,11 +18,9 @@ Some featured work is client-owned or private. The portfolio intentionally descr
 
 ## Tech stack
 
-- HTML5
-- Tailwind CSS via the browser CDN
+- HTML5 and plain CSS
 - Vanilla JavaScript modules
 - Vendored [force-graph 1.51.4](assets/vendor/force-graph-1.51.4.min.js) (MIT; [licence](assets/vendor/force-graph-LICENSE.txt)) for the canvas graph
-- Font Awesome
 - GitHub Pages
 
 ## Run locally
@@ -47,17 +42,16 @@ Alternatively, use any static HTTP server. No build step is required.
 ```text
 .
 ├── assets/
-│   ├── icons/       Technology icons
-│   ├── images/      Project and profile imagery
+│   ├── images/      Open Graph share image
 │   ├── vendor/      Vendored graph library and licence
 │   └── *.pdf        Downloadable resume
 ├── docs/             Browser verification and screenshots
 ├── scripts/          Profile/graph generators, graph topology and checks
 ├── src/
-│   ├── constant/    Portfolio and graph data
+│   ├── constant/    Graph data and site-side project notices
 │   ├── hero-graph.js Graph rendering and interactions
-│   ├── hero-graph.css Graph and fallback styles
-│   └── main.js      Page rendering and interactions
+│   ├── hero-graph.css Page, graph and fallback styles
+│   └── main.js      Page entry point
 ├── index.html       Page structure and metadata
 └── README.md
 ```
@@ -71,7 +65,7 @@ npm run test:graph
 node scripts/generate-profile.mjs /mnt/d/CVs/source/profile.md --check
 ```
 
-Pass **your own absolute profile path** if it differs. `--check` exits nonzero if the committed graph no longer matches that source; `npm run test:graph` also checks the committed model, page projections and index/metadata without needing access to the external file. CI cannot compare against a private file it cannot read, so run the profile-path check whenever the source changes. Graph node IDs and edges are structural metadata in [`scripts/graph-layout.json`](scripts/graph-layout.json); update that mapping and the generator when profile headings or product relationships change. Verified project chips and their repository provenance are site-side metadata in [`scripts/project-tags.json`](scripts/project-tags.json), not profile-derived guesses; review repository manifests/languages before editing them. Projects without verified repository evidence intentionally have no chips; note them in the PR. Do not edit generated [`src/constant/graph.js`](src/constant/graph.js) or the HTML index/SEO metadata by hand. [`src/constant/index.js`](src/constant/index.js) derives page sections from the graph, and [`src/main.js`](src/main.js) renders them. The generator applies a public-copy safety policy before any surface is emitted. The graph canvas renderer and styles live in [`src/hero-graph.js`](src/hero-graph.js) and [`src/hero-graph.css`](src/hero-graph.css). Browser evidence, Lighthouse figures and the public-copy privacy review are in [`docs/profile-sync/verification.md`](docs/profile-sync/verification.md); earlier graph evidence remains in [`docs/graph-hero/`](docs/graph-hero/).
+Pass **your own absolute profile path** if it differs. `--check` exits nonzero if the committed graph no longer matches that source; `npm run test:graph` also checks the committed model, the graph-only page and its index/metadata without needing access to the external file. CI cannot compare against a private file it cannot read, so run the profile-path check whenever the source changes. Graph node IDs and edges are structural metadata in [`scripts/graph-layout.json`](scripts/graph-layout.json); update that mapping and the generator when profile headings or product relationships change. Verified project chips and their repository provenance are site-side metadata in [`scripts/project-tags.json`](scripts/project-tags.json), not profile-derived guesses; review repository manifests/languages before editing them. Projects without verified repository evidence intentionally have no chips; note them in the PR. Do not edit generated [`src/constant/graph.js`](src/constant/graph.js) or the HTML index/SEO metadata by hand. [`src/constant/index.js`](src/constant/index.js) holds only the site-side source notices for client-owned projects, shown in their node details and index entries. The page has no sections outside the graph; everything a visitor needs must be reachable through a node. The generator applies a public-copy safety policy before any surface is emitted. The graph canvas renderer and styles live in [`src/hero-graph.js`](src/hero-graph.js) and [`src/hero-graph.css`](src/hero-graph.css). Browser evidence for the graph-only page is in [`docs/graph-only/verification.md`](docs/graph-only/verification.md); the public-copy privacy review is in [`docs/profile-sync/verification.md`](docs/profile-sync/verification.md), and earlier graph evidence remains in [`docs/graph-hero/`](docs/graph-hero/). `HERO_GRAPH_EVIDENCE_DIR=<dir> node scripts/test-hero-live.mjs` re-runs the headless Chrome checks and captures screenshots.
 
 ## Deployment
 
@@ -81,7 +75,7 @@ The live site is published at:
 
 ## Contact
 
-See the [live portfolio's contact section](https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/#contact) for profile-backed contact links.
+Open the [Connect node](https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/#node/hub-connect) in the live portfolio for profile-backed contact links.
 
 ## Reuse
 

@@ -1,5 +1,7 @@
 # Profile sync verification
 
+Historical evidence for the pre-graph-only page; for the current page see [graph-only verification](../graph-only/verification.md). The public-copy review below remains applicable to the graph model.
+
 Source checked: `/mnt/d/CVs/source/profile.md` (read-only). Regenerate/check commands are in the README. The generated model includes a SHA-256 of **the entire source**, so even edits to currently unmapped text fail `--check` until the model is regenerated/reviewed. A modified local copy of the profile was rejected by the check.
 
 ## Chrome (chrome-devtools-axi)
@@ -15,7 +17,7 @@ Served the real page on localhost at 1440 × 900 and 390 × 844 (DPR 3). Compare
 
 ## Public-copy privacy decisions (for PR description)
 
-The generator transforms these source details **before** graph, rendered cards, no-JS index, JSON-LD or Open Graph are generated:
+The generator transforms these source details **before** generating the graph model; the no-JS index, node details, JSON-LD and Open Graph descriptions use the reviewed copy:
 
 1. Reverse-proxy topology → approved `Nginx reverse proxy` wording. The generator pins the source bullet; changes require re-approval before generation.
 2. Privileged deployment commands → scoped least-privilege sudo wording.

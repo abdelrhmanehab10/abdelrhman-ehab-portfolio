@@ -6,18 +6,15 @@
     },
     {
       "id": "hub-experience",
-      "group": "hub",
-      "sectionId": "experience"
+      "group": "hub"
     },
     {
       "id": "hub-projects",
-      "group": "hub",
-      "sectionId": "projects"
+      "group": "hub"
     },
     {
       "id": "hub-skills",
-      "group": "hub",
-      "sectionId": "skills"
+      "group": "hub"
     },
     {
       "id": "hub-domains",
@@ -29,48 +26,39 @@
     },
     {
       "id": "hub-connect",
-      "group": "hub",
-      "sectionId": "contact"
+      "group": "hub"
     },
     {
       "id": "role-smartly-fse",
-      "group": "role",
-      "sectionId": "experience"
+      "group": "role"
     },
     {
       "id": "role-smartly-fe",
-      "group": "role",
-      "sectionId": "experience"
+      "group": "role"
     },
     {
       "id": "role-virtuwa-freelance",
-      "group": "role",
-      "sectionId": "experience"
+      "group": "role"
     },
     {
       "id": "role-virtuwa-pt",
-      "group": "role",
-      "sectionId": "experience"
+      "group": "role"
     },
     {
       "id": "role-riyada",
-      "group": "role",
-      "sectionId": "experience"
+      "group": "role"
     },
     {
       "id": "role-pro-event",
-      "group": "role",
-      "sectionId": "experience"
+      "group": "role"
     },
     {
       "id": "role-independent-qr",
-      "group": "role",
-      "sectionId": "experience"
+      "group": "role"
     },
     {
       "id": "role-shortcutadv",
-      "group": "role",
-      "sectionId": "experience"
+      "group": "role"
     },
     {
       "id": "proj-clinic-flow",

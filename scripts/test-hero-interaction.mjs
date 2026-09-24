@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { graphGroups, graphNodes } from "../src/constant/graph.js";
-import { coreTechnologies } from "../src/constant/index.js";
 import { initHeroGraph } from "../src/hero-graph.js";
 
 function element() {
@@ -52,7 +51,6 @@ function setup(mobile, libraryAvailable = true, initialHash = "", reduced = fals
   globalThis.document = {
     documentElement: { dataset: {} }, activeElement: selectors.get("#btn-list"),
     querySelector: (key) => selectors.get(key),
-    getElementById: () => null,
     addEventListener(name, handler) { documentHandlers[name] = handler; },
     fire(name, event) { documentHandlers[name]?.(event); },
   };
@@ -322,17 +320,25 @@ test("reset restores the same mobile and desktop view after zoom and pan", async
   }
 });
 
-test("the rendered hero keeps core technologies", async () => {
-  const meta = element();
-  const callbacks = {};
-  globalThis.document = {
-    querySelector: (selector) => selector === "#hero-meta" ? meta :
-      ["#experience-list", "#skills-groups", "#social-links"].includes(selector) ? element() : null,
-    querySelectorAll: () => [],
-    addEventListener(name, handler) { callbacks[name] = handler; },
-  };
-  globalThis.window = { addEventListener() {}, scrollY: 0 };
-  await import("../src/main.js");
-  callbacks.DOMContentLoaded();
-  for (const technology of coreTechnologies) assert.ok(meta.innerHTML.includes(technology.replaceAll('&', '&amp;')));
+test("Connect and project details keep their actions, technologies and source notices", () => {
+  const { panel, selectors } = setup(false);
+  const index = selectors.get("#graph-index-wrap");
+  const open = (id) => index.fire("click", { target: { closest: () => ({ dataset: { node: id } }) } });
+  open("link-resume");
+  assert.match(panel.innerHTML, /<a class="graph-action" href="\.\/assets\/abdelrhmanehab_resume\.pdf" download>Resume \(PDF\)<\/a>/);
+  open("link-email");
+  assert.match(panel.innerHTML, /<a class="graph-action" href="mailto:abdelrhmanehab047@gmail\.com">Email<\/a>/);
+  for (const id of ["link-linkedin", "link-github"]) {
+    open(id);
+    assert.match(panel.innerHTML, /class="graph-action" href="https:[^"]+" target="_blank" rel="noopener noreferrer"/);
+  }
+  open("proj-virtuwa-hv");
+  assert.match(panel.innerHTML, /Client-owned product; platform walkthrough available on request\./);
+  assert.match(panel.innerHTML, /<span>React<\/span>/);
+  open("proj-qr-verify");
+  assert.match(panel.innerHTML, /Client-owned product; source code is private\./);
+  assert.match(panel.innerHTML, /<span>MongoDB \(Mongoose\)<\/span>/);
+  open("proj-bleu-blog");
+  assert.match(panel.innerHTML, /<span>Eleventy<\/span>/);
+  assert.doesNotMatch(panel.innerHTML, /Client-owned product|See in/);
 });

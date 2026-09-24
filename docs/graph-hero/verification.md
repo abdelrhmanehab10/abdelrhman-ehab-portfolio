@@ -1,5 +1,7 @@
 # Graph hero verification
 
+Historical evidence from before the graph-only page; see [current graph-only verification](../graph-only/verification.md) for the present layout.
+
 Run against the real page, served at `http://127.0.0.1:5173/`, via `chrome-devtools-axi` (Chrome). Screenshots below are from the page, not the prototypes.
 
 | State | Desktop 1440 × 900 | Phone 390 × 844, DPR 3 |
@@ -19,7 +21,7 @@ At 390 px there was no horizontal overflow, with an aspect-ratio-reserved 358 ×
 | Real page mobile | 100 | 100 | 100 | 100 | 0.0207 |
 | Real page desktop | 100 | 100 | 100 | 100 | 0.0007 |
 
-Mobile CLS is **higher** than the isolated prototype baseline (0.0207 vs 0.003), though still under the 0.1 "good" threshold. The stage itself reserves space before canvas boot. These Lighthouse commands report accessibility, SEO, best practices and layout shift, not a performance category. The page still uses the original Tailwind browser CDN and external fonts; the hero adds no build step.
+Mobile CLS is **higher** than the isolated prototype baseline (0.0207 vs 0.003), though still under the 0.1 "good" threshold. The stage itself reserves space before canvas boot. These Lighthouse commands report accessibility, SEO, best practices and layout shift, not a performance category. At the time, the page used the Tailwind browser CDN and external fonts; the graph added no build step.
 
 ## Contrast (WCAG 2.2 relative luminance)
 
