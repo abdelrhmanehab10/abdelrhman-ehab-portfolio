@@ -1,0 +1,14 @@
+{
+  "proj-clinic-flow": { "source": "abdelrhmanehab10/clinic-flow (private)", "tags": ["React", "TypeScript", "TanStack Router", "Tailwind CSS", "Drizzle ORM"] },
+  "proj-bleu-blog": { "source": "abdelrhmanehab10/BLEU-Website (public)", "tags": ["Eleventy", "Nunjucks", "JavaScript", "Tailwind CSS"] },
+  "proj-gas-reg": { "source": "SmartlyTechnologies/GasReg (private)", "tags": ["Angular", "TypeScript", "Transloco", "Tailwind CSS"] },
+  "proj-competition-admin": { "source": "SmartlyTechnologies/competition-managment (private)", "tags": ["React", "TypeScript", "TanStack Router", "Tailwind CSS"] },
+  "proj-akhbar-admin": { "source": "SmartlyTechnologies/akhbaralkhaleej-admin-fe (private)", "tags": ["Angular", "TypeScript", "Bootstrap", "SCSS"] },
+  "proj-bidding-wallet": { "source": "SmartlyTechnologies/biddo and SmartlyTechnologies/biddo-api (private)", "tags": ["Next.js", "TypeScript", "Express", "SCSS"] },
+  "proj-faster-meeting": { "source": "abdelrhmanehab10/faster-meeting (private)", "tags": ["Next.js", "TypeScript", "React", "Tailwind CSS"] },
+  "proj-virtuwa-hv": { "source": "VirtuWa/virtuwa-admin-04815 (private)", "tags": ["React", "TypeScript", "TanStack Query", "Tailwind CSS"] },
+  "proj-virtuwa-cloud": { "source": "VirtuWa/virtuwa-vista (private)", "tags": ["React", "TypeScript", "TanStack Query", "Tailwind CSS"] },
+  "proj-flow-bridge": { "source": "VirtuWa/virt-flow-bridge (private)", "tags": ["React", "TypeScript", "TanStack Query", "Tailwind CSS"] },
+  "proj-care-connect": { "source": "abdelrhmanehab10/care-connect-dashboard (public)", "tags": ["Vue", "TypeScript", "Pinia", "Bootstrap"] },
+  "proj-qr-verify": { "source": "abdelrhmanehab10/qr-verifier (private)", "tags": ["JavaScript", "Node.js", "Express", "MongoDB (Mongoose)"] }
+}

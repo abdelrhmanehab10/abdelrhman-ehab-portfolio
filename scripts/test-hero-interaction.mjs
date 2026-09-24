@@ -334,5 +334,5 @@ test("the rendered hero keeps core technologies", async () => {
   globalThis.window = { addEventListener() {}, scrollY: 0 };
   await import("../src/main.js");
   callbacks.DOMContentLoaded();
-  for (const technology of coreTechnologies) assert.ok(meta.innerHTML.includes(technology));
+  for (const technology of coreTechnologies) assert.ok(meta.innerHTML.includes(technology.replaceAll('&', '&amp;')));
 });

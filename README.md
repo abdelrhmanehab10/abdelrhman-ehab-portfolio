@@ -2,7 +2,7 @@
 
 Live portfolio for Abdelrhman Ehab, a Frontend Engineer building production web applications with React, Angular, Vue, TypeScript, and JavaScript.
 
-The site presents selected product work, measurable frontend outcomes, professional experience, and the technologies used across shipped projects.
+The site presents the full profile: projects, open-source contributions, professional experience, deployment achievements, technologies, industries, languages, tools, and soft skills.
 
 **[Open the live portfolio](https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/)**
 
@@ -51,8 +51,8 @@ Alternatively, use any static HTTP server. No build step is required.
 │   ├── images/      Project and profile imagery
 │   ├── vendor/      Vendored graph library and licence
 │   └── *.pdf        Downloadable resume
-├── docs/graph-hero/  Browser verification and screenshots
-├── scripts/          Graph index generator and checks
+├── docs/             Browser verification and screenshots
+├── scripts/          Profile/graph generators, graph topology and checks
 ├── src/
 │   ├── constant/    Portfolio and graph data
 │   ├── hero-graph.js Graph rendering and interactions
@@ -62,7 +62,16 @@ Alternatively, use any static HTTP server. No build step is required.
 └── README.md
 ```
 
-Most portfolio content can be updated in [`src/constant/index.js`](src/constant/index.js). The page rendering and interactions live in [`src/main.js`](src/main.js). The graph has its own model in [`src/constant/graph.js`](src/constant/graph.js). After changing graph nodes or edges, run `node scripts/generate-graph-index.mjs` to regenerate the checked-in no-JavaScript HTML index (including connections) and Person JSON-LD from that model. The canvas renderer is in [`src/hero-graph.js`](src/hero-graph.js); its critical styles are in [`src/hero-graph.css`](src/hero-graph.css). Run `npm run test:graph` to check model/index integrity. Browser verification and screenshots are in [`docs/graph-hero/`](docs/graph-hero/).
+The authoritative profile content is external `profile.md`; the generator reads it without modifying it. After editing the source, regenerate the checked-in public model and crawlable HTML (no build step at deploy time):
+
+```bash
+node scripts/generate-profile.mjs /mnt/d/CVs/source/profile.md
+node scripts/generate-graph-index.mjs
+npm run test:graph
+node scripts/generate-profile.mjs /mnt/d/CVs/source/profile.md --check
+```
+
+Pass **your own absolute profile path** if it differs. `--check` exits nonzero if the committed graph no longer matches that source; `npm run test:graph` also checks the committed model, page projections and index/metadata without needing access to the external file. CI cannot compare against a private file it cannot read, so run the profile-path check whenever the source changes. Graph node IDs and edges are structural metadata in [`scripts/graph-layout.json`](scripts/graph-layout.json); update that mapping and the generator when profile headings or product relationships change. Verified project chips and their repository provenance are site-side metadata in [`scripts/project-tags.json`](scripts/project-tags.json), not profile-derived guesses; review repository manifests/languages before editing them. Projects without verified repository evidence intentionally have no chips; note them in the PR. Do not edit generated [`src/constant/graph.js`](src/constant/graph.js) or the HTML index/SEO metadata by hand. [`src/constant/index.js`](src/constant/index.js) derives page sections from the graph, and [`src/main.js`](src/main.js) renders them. The generator applies a public-copy safety policy before any surface is emitted. The graph canvas renderer and styles live in [`src/hero-graph.js`](src/hero-graph.js) and [`src/hero-graph.css`](src/hero-graph.css). Browser evidence, Lighthouse figures and the public-copy privacy review are in [`docs/profile-sync/verification.md`](docs/profile-sync/verification.md); earlier graph evidence remains in [`docs/graph-hero/`](docs/graph-hero/).
 
 ## Deployment
 
@@ -72,8 +81,7 @@ The live site is published at:
 
 ## Contact
 
-- [LinkedIn](https://www.linkedin.com/in/abdelrahman-ehab-87261a244/)
-- [GitHub](https://github.com/abdelrhmanehab10)
+See the [live portfolio's contact section](https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/#contact) for profile-backed contact links.
 
 ## Reuse
 

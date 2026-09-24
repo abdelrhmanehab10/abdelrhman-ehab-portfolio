@@ -1,12 +1,16 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { test } from "node:test";
-import { graphNodes, graphEdges, graphGroups } from "../src/constant/graph.js";
+import { graphNodes, graphEdges, graphGroups, profileDetails, profileSourceHash } from "../src/constant/graph.js";
+import { works, experiences, skills, impactStats } from "../src/constant/index.js";
 
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const ids = graphNodes.map(({ id }) => id);
 
 test("52 nodes and 104 edges with unique, connected endpoints", () => {
+  assert.match(profileSourceHash, /^[0-9a-f]{64}$/);
   assert.equal(ids.length, 52);
   assert.equal(graphEdges.length, 104);
   assert.equal(new Set(ids).size, ids.length);
@@ -49,4 +53,59 @@ test("the no-JS index and Person metadata stay in sync with graph.js", () => {
   assert.equal(person.knowsAbout.length, graphNodes.filter((node) => ["skill", "craft", "domain"].includes(node.group)).length);
   assert.equal(person.hasOccupation.length, graphNodes.filter((node) => node.group === "role").length);
   assert.equal(person.subjectOf.length, graphNodes.filter((node) => node.group === "project").length);
+  assert.equal(person.description, graphNodes.find(n => n.id === 'me').summary);
+  assert.ok(html.includes(`<p id="hero-summary" class="max-w-3xl text-base text-slate-300 md:text-lg">${person.description}</p>`), 'first paint hero matches model');
+  for (const attribute of ['name="description"', 'property="og:description"', 'name="twitter:description"']) {
+    assert.ok(html.includes(`${attribute}\n      content="${person.description.replaceAll('&', '&amp;').replaceAll('"', '&quot;')}"`), `${attribute} matches model`);
+  }
+});
+
+test('HTML generation follows changed profile contact and identity', () => {
+  const dir = mkdtempSync(join(import.meta.dirname, '.index-test-'));
+  try {
+    mkdirSync(join(dir, 'scripts'));
+    mkdirSync(join(dir, 'src/constant'), { recursive: true });
+    writeFileSync(join(dir, 'package.json'), '{"type":"module"}');
+    copyFileSync(new URL('./generate-graph-index.mjs', import.meta.url), join(dir, 'scripts/generate-graph-index.mjs'));
+    copyFileSync(new URL('../index.html', import.meta.url), join(dir, 'index.html'));
+    const changedNodes = structuredClone(graphNodes);
+    changedNodes.find(n => n.id === 'me').title = 'Updated Profile Name';
+    changedNodes.find(n => n.id === 'link-email').href = 'mailto:updated@example.com';
+    changedNodes.find(n => n.id === 'link-github').href = 'https://github.com/updated';
+    changedNodes.find(n => n.id === 'link-resume').href = './assets/new-resume.pdf';
+    const details = structuredClone(profileDetails);
+    details.contact.Portfolio = 'https://example.com/portfolio';
+    writeFileSync(join(dir, 'src/constant/graph.js'),
+      `export const graphNodes = ${JSON.stringify(changedNodes)};\nexport const graphEdges = ${JSON.stringify(graphEdges)};\nexport const profileDetails = ${JSON.stringify(details)};\n`);
+    const command = [join(dir, 'scripts/generate-graph-index.mjs')];
+    assert.throws(() => execFileSync(process.execPath, [...command, '--check'], { stdio: 'pipe' }),
+      error => /Committed HTML is stale/.test(error.stderr.toString()));
+    execFileSync(process.execPath, command);
+    const output = readFileSync(join(dir, 'index.html'), 'utf8');
+    assert.match(output, /href="mailto:updated@example.com"/);
+    assert.doesNotMatch(output, /mailto:abdelrhmanehab047@gmail.com/);
+    assert.match(output, /<title>Updated Profile Name \| Frontend Engineer<\/title>/);
+    assert.match(output, /&copy; <span id="year"><\/span> Updated Profile Name\. Built with/);
+    assert.equal((output.match(/href="\.\/assets\/new-resume\.pdf"/g) || []).length, 3);
+    assert.match(output, /content="https:\/\/example.com\/portfolio\/assets\/images\/pro.png"/);
+    assert.doesNotMatch(output, /content="https:\/\/example.com\/assets\/images\/pro.png"/);
+    const person = JSON.parse(output.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+    assert.equal(person.url, details.contact.Portfolio);
+    assert.equal(person.sameAs[0], 'https://github.com/updated');
+    execFileSync(process.execPath, [...command, '--check']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('every page section projects the committed graph and public copy stays safe', () => {
+  assert.equal(experiences.length, 8);
+  assert.equal(works.length, 16);
+  assert.deepEqual(works.map(w => w.id), graphNodes.filter(n => n.group === 'project').map(n => n.id));
+  assert.deepEqual(skills.slice(0, 6).map(s => s.group), graphNodes.filter(n => n.group === 'skill').map(n => n.title));
+  assert.match(impactStats[0].value, /4\+ Years/);
+  assert.deepEqual(profileDetails.industries, ['E-commerce', 'Journalism', 'Medical']);
+  assert.equal(profileDetails.languages.length, 2);
+  const publicSurfaces = [html, JSON.stringify(graphNodes), JSON.stringify(skills), JSON.stringify(experiences), JSON.stringify(works)].join('\n');
+  assert.doesNotMatch(publicSurfaces, /443\/6000|passwordless sudo|rm, copy|sensitive VM\/connection data|Jisir process|`current` Nginx symlink|2\+ years delivering production dashboards/i);
 });
