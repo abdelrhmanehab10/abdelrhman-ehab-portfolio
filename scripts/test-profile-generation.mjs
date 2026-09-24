@@ -120,11 +120,14 @@ test('missing roles, ambiguous evidence and unrecognized headline fail generatio
 }));
 
 test('approved DevOps copy is published and a year elsewhere is accepted', () => sandbox(({ dir, generate }) => {
-  const source = profile(roleIds).replace('## Additional Highlights', '## Additional Highlights\n- Nginx reverse proxy improved in 2025.');
+  const source = profile(roleIds)
+    .replace('- Cloudflare Pages / Workers', '- Terraform\n- Cloudflare Pages / Workers')
+    .replace('## Additional Highlights', '## Additional Highlights\n- Nginx reverse proxy improved in 2025.');
   const { graphNodes: generated } = generate(source);
   const devops = generated.find(n => n.id === 'skill-devops');
   assert.doesNotMatch(JSON.stringify(devops), /443|6000|5678|sudoers|private LAN/);
   assert.ok(devops.tags.includes('Nginx reverse proxy'));
+  assert.ok(devops.tags.includes('Terraform'));
   assert.ok(devops.tags.includes('least-privilege deployment permissions and Linux troubleshooting'));
   assert.ok(generated.find(n => n.id === 'me').bullets.includes('Nginx reverse proxy improved in 2025.'));
   execFileSync(process.execPath, [join(dir, 'scripts/generate-profile.mjs'), join(dir, 'profile.md'), '--check']);
