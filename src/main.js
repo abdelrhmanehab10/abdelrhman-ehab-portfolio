@@ -12,6 +12,11 @@ import {
 
 const ACTIVE_LINK_CLASSES = ["bg-sky-500/20", "text-white"];
 const INACTIVE_LINK_CLASSES = ["text-slate-300"];
+const MONTH_INDEX = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+const experienceStart = (period) => {
+  const [, month, year] = /^(?:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) )?(\d{4}) - /.exec(period);
+  return Number(year) * 12 + (month ? MONTH_INDEX[month] : 0);
+};
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 })[char]);
@@ -207,7 +212,8 @@ class App {
       return;
     }
 
-    this.experienceContainer.innerHTML = `<p class="mb-4 text-sm leading-relaxed text-slate-300">${escapeHtml(careerNote)}</p>` + experiences
+    this.experienceContainer.innerHTML = `<p class="mb-4 text-sm leading-relaxed text-slate-300">${escapeHtml(careerNote)}</p>` + [...experiences]
+      .sort((a, b) => experienceStart(a.period) - experienceStart(b.period))
       .map(
         ({ company, role, period, location, highlights }) => `
           <article class="relative rounded-2xl border border-slate-700 bg-slate-900/70 p-4 md:p-5">

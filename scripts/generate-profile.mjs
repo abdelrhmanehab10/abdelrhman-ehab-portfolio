@@ -25,7 +25,7 @@ const publicText = raw
   .replace(/private LAN deployments/gi, 'private deployments')
   .replace(/sudoers, file permissions, SCP, SSH troubleshooting/gi, 'least-privilege deployment permissions and Linux troubleshooting');
 // Fail closed on newly added deployment/security specifics, rather than silently shipping them.
-if (/\b(?:\d{2,5}\/){2}\d{2,5}\b|\b(?:passwordless sudo|sudoers|\brm, copy\b|sensitive VM\/connection data|browser URLs|Jisir process|`current` Nginx symlink)\b/i.test(publicText)) {
+if (/\b(?:\d{2,5}\/){2}\d{2,5}\b|\bNginx reverse proxy\s*\([^)]*\b\d{2,5}\b[^)]*\)|\b(?:passwordless sudo|sudoers|\brm, copy\b|sensitive VM\/connection data|browser URLs|Jisir process|`current` Nginx symlink)\b/i.test(publicText)) {
   throw new Error('Unreviewed deployment/security detail in public profile copy');
 }
 const lines = publicText.split('\n');
@@ -105,6 +105,7 @@ const summary = get('Summary').lines.join(' ');
 const headline = summary.match(/^(.+?) with (\d+\+ years of professional web-development experience)\b/i);
 if (!headline) throw new Error('Summary must begin with a job title and professional web-development experience figure');
 const [, jobTitle, experienceYears] = headline;
+if (jobTitle !== 'Frontend Engineer') throw new Error(`Unsupported job title: ${jobTitle}; review profile mapping`);
 const achievement = bullets(get('CI/CD & Deployment Automation'));
 const bleu = bullets(get('BLEU Community Blog (Eleventy/Tailwind open-source tech community website)'));
 const careerNote = get('Experience').lines.find(s => s.startsWith('> '))?.slice(2);
@@ -126,8 +127,12 @@ const nodes = layout.nodes.map((node) => {
     const block = roleMap.get(node.id);
     const [role, employer, arrangement] = block.title.split(' | ');
     if (!employer) throw new Error(`Malformed role: ${block.title}`);
+    const period = block.lines[0];
+    if (!/^(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) )?\d{4} - (?:(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) )?\d{4}|Present) \| [^|]+$/.test(period)) {
+      throw new Error(`Invalid role date and location for ${node.id}: ${period ?? '(missing)'}`);
+    }
     n.title = `${role} - ${employer}`;
-    n.meta = `${block.lines[0]} · ${arrangement || ''}`;
+    n.meta = `${period} · ${arrangement || ''}`;
     sourceBullets = bullets(block);
     if (!sourceBullets.length && node.id === 'role-virtuwa-pt') sourceBullets = [`Delivered ${layout.edges.filter(e => e.source === node.id || e.target === node.id).filter(e => e.type === 'delivered-in').map(e => projectMap.get(e.source)?.title.replace(/^Project: /, '')).filter(Boolean).join(', ')}.`];
     if (!sourceBullets.length) throw new Error(`Missing role evidence: ${node.id}`);

@@ -104,4 +104,33 @@ test('missing roles, ambiguous evidence and unrecognized headline fail generatio
   assert.match(run(profile(roleIds, { emptyRole: 'role-shortcutadv' })), /Missing role evidence: role-shortcutadv/);
   assert.match(run(profile(roleIds, { summary: profileDetails.summary.replace('web-development experience', 'web development') })), /Summary must begin with a job title and professional web-development experience figure/);
   assert.match(run(profile(roleIds, { summary: profileDetails.summary.replace('Frontend Engineer with', 'Frontend Engineer building') })), /Summary must begin with a job title and professional web-development experience figure/);
+  assert.match(run(profile(roleIds, { summary: profileDetails.summary.replace('Frontend Engineer with', 'I am a Frontend Engineer with') })), /Unsupported job title: I am a Frontend Engineer/);
+  assert.match(run(profile(roleIds).replace('Jan 2022 - Jan 2024 | Saudi Arabia (Remote)', '')), /Invalid role date and location for role-shortcutadv/);
+  assert.match(run(profile(roleIds).replace('Nginx reverse proxy', 'Nginx reverse proxy (443, 6000, 5678)')), /Unreviewed deployment\/security detail/);
 }));
+
+test('known port topology is removed from public model', () => sandbox(({ generate }) => {
+  const { graphNodes: generated } = generate(profile(roleIds).replace('Nginx reverse proxy', 'Nginx reverse proxy (443/6000/5678)'));
+  assert.doesNotMatch(JSON.stringify(generated), /443\/6000\/5678/);
+  assert.match(generated.find(n => n.id === 'skill-devops').summary, /Nginx reverse proxy/);
+}));
+
+test('experience timeline renders in start-date order including year-only roles', async () => {
+  const timeline = { innerHTML: '' };
+  let ready;
+  globalThis.document = {
+    querySelector: selector => selector === '#experience-list' ? timeline : null,
+    querySelectorAll: () => [],
+    addEventListener: (name, listener) => { if (name === 'DOMContentLoaded') ready = listener; },
+  };
+  globalThis.window = { addEventListener() {}, scrollY: 0 };
+  await import('../src/main.js');
+  ready();
+  const titles = [...timeline.innerHTML.matchAll(/<h3[^>]*>([^<]+)<\/h3>/g)].map(match => match[1]);
+  assert.equal(titles.length, 8);
+  assert.match(titles[0], /WordPress Developer/);
+  assert.ok(titles.indexOf('Frontend Web Developer') < titles.indexOf('Full Stack Engineer'));
+  assert.equal(titles.at(-1), 'Independent Product Development');
+  const periods = [...timeline.innerHTML.matchAll(/<p class="inline-flex shrink-0[^>]*>\s*([^<]+)<\/p>/g)].map(match => match[1].trim());
+  assert.deepEqual(periods, ['Jan 2022 - Jan 2024', 'Feb 2024 - Nov 2025', 'Jun 2025 - Present', 'Jul 2025 - Mar 2026', 'Oct 2025 - May 2026', '2026 - Present', 'Jan 2026 - Mar 2026', '2026 - Present']);
+});
