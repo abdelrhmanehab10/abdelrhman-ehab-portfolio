@@ -208,14 +208,11 @@ export const graphNodes = [
       "Tech stack: React 19, TypeScript, TanStack Router, TanStack Query, Better Auth, Drizzle, Tailwind CSS, shadcn/ui."
     ],
     "tags": [
-      "React 19",
+      "React",
       "TypeScript",
       "TanStack Router",
-      "TanStack Query",
-      "Better Auth",
-      "Drizzle",
       "Tailwind CSS",
-      "shadcn/ui"
+      "Drizzle ORM"
     ],
     "label": "Clinic Flow"
   },
@@ -232,7 +229,12 @@ export const graphNodes = [
       "Improved frontend quality by fixing semantic blog datetime output and moving font loading from CSS import into the document head for better performance.",
       "Followed a Git/GitHub open-source workflow on a feature branch and maintained repo hygiene around the project's npm-based dependency setup."
     ],
-    "tags": [],
+    "tags": [
+      "Eleventy",
+      "Nunjucks",
+      "JavaScript",
+      "Tailwind CSS"
+    ],
     "label": "BLEU Community Blog (Elevent"
   },
   {
@@ -247,7 +249,10 @@ export const graphNodes = [
       "Integrated login/session handling and mapped complex frontend form state into backend submission payloads."
     ],
     "tags": [
-      "Angular"
+      "Angular",
+      "TypeScript",
+      "Transloco",
+      "Tailwind CSS"
     ],
     "label": "GAS-REG Portal"
   },
@@ -265,7 +270,9 @@ export const graphNodes = [
     ],
     "tags": [
       "React",
-      "TypeScript"
+      "TypeScript",
+      "TanStack Router",
+      "Tailwind CSS"
     ],
     "label": "Competition Management Admin"
   },
@@ -282,7 +289,10 @@ export const graphNodes = [
       "Standardized API integration, shared lookup caching/prefetching, and error/toast handling across the dashboard."
     ],
     "tags": [
-      "Angular"
+      "Angular",
+      "TypeScript",
+      "Bootstrap",
+      "SCSS"
     ],
     "label": "Akhbar AlKhaleej Admin FE"
   },
@@ -294,7 +304,10 @@ export const graphNodes = [
     "summary": "Built a secure bidding-wallet flow with Node.js and Next.js, enforcing a minimum 10% balance requirement before bidding and placing funds on hold during active bids.",
     "bullets": [],
     "tags": [
-      "Node.js"
+      "Next.js",
+      "TypeScript",
+      "Express",
+      "SCSS"
     ],
     "label": "Bidding Wallet Flow"
   },
@@ -305,7 +318,12 @@ export const graphNodes = [
     "meta": "",
     "summary": "Developed the Faster Meeting platform in Next.js with authenticated scheduling, editing, and management of Zoom meetings through custom .NET APIs.",
     "bullets": [],
-    "tags": [],
+    "tags": [
+      "Next.js",
+      "TypeScript",
+      "React",
+      "Tailwind CSS"
+    ],
     "label": "Faster Meeting"
   },
   {
@@ -325,9 +343,7 @@ export const graphNodes = [
     "meta": "",
     "summary": "Enhanced UI/UX and performance in Boots & Ladders using Vue.js.",
     "bullets": [],
-    "tags": [
-      "Vue"
-    ],
+    "tags": [],
     "label": "Boots & Ladders"
   },
   {
@@ -345,7 +361,9 @@ export const graphNodes = [
     ],
     "tags": [
       "React",
-      "TypeScript"
+      "TypeScript",
+      "TanStack Query",
+      "Tailwind CSS"
     ],
     "label": "VirtuWa HV"
   },
@@ -362,7 +380,9 @@ export const graphNodes = [
     ],
     "tags": [
       "React",
-      "TypeScript"
+      "TypeScript",
+      "TanStack Query",
+      "Tailwind CSS"
     ],
     "label": "VirtuWa Cloud Manager"
   },
@@ -378,7 +398,10 @@ export const graphNodes = [
       "Expanded bilingual localization and RTL support, and added a shared typed API client with a standardized Vite proxy configuration."
     ],
     "tags": [
-      "GitHub Actions"
+      "React",
+      "TypeScript",
+      "TanStack Query",
+      "Tailwind CSS"
     ],
     "label": "Virtuwa Flow Bridge"
   },
@@ -390,7 +413,10 @@ export const graphNodes = [
     "summary": "Contributed to the Laravel-to-Vue 3 migration of Care Connect Dashboard, delivering appointment table/calendar workflows with Pinia-managed filters.",
     "bullets": [],
     "tags": [
-      "Vue"
+      "Vue",
+      "TypeScript",
+      "Pinia",
+      "Bootstrap"
     ],
     "label": "Care Connect Dashboard"
   },
@@ -427,9 +453,10 @@ export const graphNodes = [
       "Delivered a consumer scanner with camera/manual entry and verification rules for first use, repeat scans, revocation, and expiry."
     ],
     "tags": [
+      "JavaScript",
       "Node.js",
       "Express",
-      "MongoDB"
+      "MongoDB (Mongoose)"
     ],
     "label": "QR-code verification platfor"
   },

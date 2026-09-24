@@ -4,6 +4,10 @@ const ofGroup = (group) => graphNodes.filter((node) => node.group === group);
 const root = graphNodes.find((node) => node.id === 'me');
 const links = Object.fromEntries(ofGroup('link').map((node) => [node.id, node]));
 const featuredIds = new Set(['proj-virtuwa-hv', 'proj-qr-verify']);
+const visibilityNotes = {
+  'proj-virtuwa-hv': 'Client-owned product; platform walkthrough available on request.',
+  'proj-qr-verify': 'Client-owned product; source code is private.',
+};
 
 export const profileMeta = {
   name: root.title,
@@ -17,14 +21,13 @@ export const impactStats = [
   { label: 'Projects & Contributions', value: `${ofGroup('project').length} Products` },
   { label: 'Industries', value: profileDetails.industries.join(' · ') },
 ];
-export const coreTechnologies = [...new Set(ofGroup('skill').flatMap((node) => (node.tags || []).slice(0, 4)).map(s => s.replace(/ \(.*/, '').trim()))];
+export const coreTechnologies = [...new Set(ofGroup('skill').filter(node => node.id !== 'skill-other').flatMap((node) => (node.tags || []).slice(0, 4)).map(s => s.replace(/ \(.*/, '').trim()))];
 export const works = ofGroup('project').map((node) => ({
   ...node,
   featured: featuredIds.has(node.id),
   imageUrl: { 'proj-virtuwa-hv': 'assets/images/virtuwa-live.png', 'proj-qr-verify': 'assets/images/qr-verify-live.png' }[node.id],
   stack: node.tags || [],
-  visibilityNote: featuredIds.has(node.id) && !node.repoUrl
-    ? 'Source code is not publicly linked; contact me for a walkthrough.' : '',
+  visibilityNote: visibilityNotes[node.id] || '',
   liveUrl: node.href,
 }));
 export const experiences = ofGroup('role').map((node) => {

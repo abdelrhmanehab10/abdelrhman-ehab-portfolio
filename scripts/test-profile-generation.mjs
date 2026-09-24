@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { test } from 'node:test';
@@ -58,6 +58,7 @@ const sandbox = (action) => {
     mkdirSync(join(dir, 'src/constant'), { recursive: true });
     copyFileSync(new URL('./generate-profile.mjs', import.meta.url), join(dir, 'scripts/generate-profile.mjs'));
     copyFileSync(new URL('./graph-layout.json', import.meta.url), join(dir, 'scripts/graph-layout.json'));
+    copyFileSync(new URL('./project-tags.json', import.meta.url), join(dir, 'scripts/project-tags.json'));
     writeFileSync(join(dir, 'package.json'), '{"type":"module"}');
     const generate = (text) => {
       writeFileSync(join(dir, 'profile.md'), text);
@@ -133,15 +134,22 @@ test('approved DevOps copy is published and a year elsewhere is accepted', () =>
   execFileSync(process.execPath, [join(dir, 'scripts/generate-profile.mjs'), join(dir, 'profile.md'), '--check']);
 }));
 
-test('project and role technology tags follow profile evidence', () => sandbox(({ generate }) => {
+test('project technologies follow reviewed repository mapping, not profile word matches', () => sandbox(({ generate }) => {
   const generated = generate(profile(roleIds)).graphNodes;
-  assert.ok(generated.find(n => n.id === 'proj-virtuwa-hv').tags.includes('React'));
-  assert.ok(generated.find(n => n.id === 'proj-virtuwa-hv').tags.includes('TypeScript'));
-  assert.ok(!generated.find(n => n.id === 'proj-virtuwa-hv').tags.includes('Bootstrap'));
-  assert.ok(generated.find(n => n.id === 'proj-qr-verify').tags.includes('MongoDB'));
+  const reviewed = JSON.parse(readFileSync(new URL('./project-tags.json', import.meta.url), 'utf8'));
+  for (const project of generated.filter(n => n.group === 'project')) {
+    assert.deepEqual(project.tags, reviewed[project.id]?.tags || [], project.id);
+  }
+  assert.deepEqual(generated.find(n => n.id === 'proj-faster-meeting').tags, ['Next.js', 'TypeScript', 'React', 'Tailwind CSS']);
+  assert.deepEqual(generated.find(n => n.id === 'proj-bleu-blog').tags, ['Eleventy', 'Nunjucks', 'JavaScript', 'Tailwind CSS']);
+  assert.deepEqual(generated.find(n => n.id === 'proj-qr-verify').tags, ['JavaScript', 'Node.js', 'Express', 'MongoDB (Mongoose)']);
+  for (const id of ['proj-efa', 'proj-boots-ladders', 'proj-watu', 'proj-pro-event-storefront']) {
+    assert.deepEqual(generated.find(n => n.id === id).tags, [], id);
+  }
   assert.ok(generated.find(n => n.id === 'role-riyada').tags.includes('Vue'));
   const updated = generate(profile(roleIds).replace('MongoDB QR-verification service', 'PostgreSQL QR-verification service')).graphNodes;
-  assert.ok(!updated.find(n => n.id === 'proj-qr-verify').tags.includes('MongoDB'));
+  assert.deepEqual(updated.find(n => n.id === 'proj-qr-verify').tags, generated.find(n => n.id === 'proj-qr-verify').tags);
+  assert.doesNotMatch(JSON.stringify(generated), /SmartlyTechnologies\/biddo|VirtuWa\/virtuwa-admin-04815/);
 }));
 
 test('project cards show derived technologies and featured source notice', async () => {
@@ -157,10 +165,13 @@ test('project cards show derived technologies and featured source notice', async
   globalThis.window = { addEventListener() {}, scrollY: 0 };
   await import('../src/main.js');
   ready();
-  assert.match(featured.innerHTML, /Source code is not publicly linked; contact me for a walkthrough/);
+  assert.match(featured.innerHTML, /Client-owned product; platform walkthrough available on request\./);
+  assert.match(featured.innerHTML, /Client-owned product; source code is private\./);
   assert.match(featured.innerHTML, /React<\/span>/);
-  assert.match(featured.innerHTML, /MongoDB<\/span>/);
-  assert.doesNotMatch(more.innerHTML, /Source code is not publicly linked/);
+  assert.match(featured.innerHTML, /MongoDB \(Mongoose\)<\/span>/);
+  assert.match(more.innerHTML, /Eleventy<\/span>/);
+  assert.match(more.innerHTML, /Next\.js<\/span>/);
+  assert.doesNotMatch(more.innerHTML, /Client-owned product/);
   const titles = [...timeline.innerHTML.matchAll(/<h3[^>]*>([^<]+)<\/h3>/g)].map(match => match[1]);
   assert.equal(titles.length, 8);
   assert.match(titles[0], /WordPress Developer/);

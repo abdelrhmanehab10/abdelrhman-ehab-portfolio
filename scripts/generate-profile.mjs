@@ -11,6 +11,7 @@ if (!source || (option && option !== '--check')) {
   process.exit(2);
 }
 const layout = JSON.parse(readFileSync(new URL('./graph-layout.json', import.meta.url), 'utf8'));
+const projectTags = JSON.parse(readFileSync(new URL('./project-tags.json', import.meta.url), 'utf8'));
 const raw = readFileSync(resolve(source), 'utf8').replace(/\r\n/g, '\n');
 const rawLines = raw.split('\n');
 const devopsStart = rawLines.indexOf('### DevOps & Infrastructure');
@@ -102,6 +103,7 @@ for (const [id, [role, identity, name]] of inlineProjects) {
   projectMap.set(id, { title: name, lines: [`- ${text}`] });
 }
 if (projectMap.size !== 16 || [...projectMap.values()].some(b => !b)) throw new Error('Project headings changed; review mapping');
+if (Object.keys(projectTags).some(id => !projectMap.has(id))) throw new Error('Project tag source has an unknown project ID');
 const skillBlocks = {
   'skill-frameworks': 'Programming & Frameworks', 'skill-ecommerce': 'E-commerce & CMS',
   'skill-devops': 'DevOps & Infrastructure', 'skill-data': 'Databases & Analytics',
@@ -206,10 +208,9 @@ const nodes = layout.nodes.map((node) => {
     n.summary = sourceBullets[0];
     n.bullets = sourceBullets.slice(1);
   }
-  if (['role', 'project', 'craft'].includes(n.group)) {
-    const stack = n.group === 'project' && sourceBullets.find(bullet => bullet.startsWith('Tech stack: '));
-    n.tags = stack ? stack.slice('Tech stack: '.length).replace(/\.$/, '').split(', ')
-      : mentionedTech([n.summary, ...(n.bullets || [])].join(' '));
+  if (n.group === 'project') n.tags = projectTags[node.id]?.tags || [];
+  if (n.group === 'role' || n.group === 'craft') {
+    n.tags = mentionedTech([n.summary, ...(n.bullets || [])].join(' '));
   }
   if (!n.summary) throw new Error(`No summary for ${n.id}`);
   n.label = n.group === 'role'
