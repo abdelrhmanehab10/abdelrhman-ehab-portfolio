@@ -12,20 +12,44 @@ if (!source || (option && option !== '--check')) {
 }
 const layout = JSON.parse(readFileSync(new URL('./graph-layout.json', import.meta.url), 'utf8'));
 const raw = readFileSync(resolve(source), 'utf8').replace(/\r\n/g, '\n');
+const rawLines = raw.split('\n');
+const devopsStart = rawLines.indexOf('### DevOps & Infrastructure');
+const devopsEnd = rawLines.findIndex((line, index) => index > devopsStart && /^#{1,4} /.test(line));
+const devopsLines = rawLines.slice(devopsStart + 1, devopsEnd < 0 ? undefined : devopsEnd);
+const sourceDevopsBullets = [
+  '- AWS Lightsail, Docker, Docker Compose',
+  '- GitHub Actions CI/CD (self-hosted runners, private LAN deployments)',
+  '- Automated frontend build & deploy pipelines (pnpm -> dist -> Nginx)',
+  '- Nginx reverse proxy (443/6000/5678), SSL/TLS, WebSocket proxying',
+  '- Linux administration, sudoers, file permissions, SCP, SSH troubleshooting',
+  '- Cloudflare Pages / Workers',
+];
+const approvedDevopsBullets = [
+  sourceDevopsBullets[0],
+  '- GitHub Actions CI/CD (self-hosted runners, private deployments)',
+  sourceDevopsBullets[2],
+  '- Nginx reverse proxy, SSL/TLS, WebSocket proxying',
+  '- Linux administration, least-privilege deployment permissions and Linux troubleshooting',
+  sourceDevopsBullets[5],
+];
+if (devopsStart < 0 || devopsLines.filter(line => line.trim()).join('\n') !== sourceDevopsBullets.join('\n')) {
+  throw new Error('DevOps & Infrastructure source bullet changed; re-approve its public wording before generation');
+}
+let devopsIndex = 0;
+for (let offset = 0; offset < devopsLines.length; offset++) {
+  if (devopsLines[offset].trim()) rawLines[devopsStart + 1 + offset] = approvedDevopsBullets[devopsIndex++];
+}
 // Central public-copy policy. Apply BEFORE parsing, so every output (including graph,
 // no-JS index, JSON-LD, Open Graph and runtime cards) sees the same safe wording.
-const publicText = raw
+const publicText = rawLines.join('\n')
   .replace(/Implemented passwordless sudo rules for controlled deployment commands \(rm, copy, nginx reload\)/gi, 'Least-privilege sudo rules scoped to the deployment commands only')
-  .replace(/Nginx reverse proxy \(443\/6000\/5678\)/gi, 'Nginx reverse proxy')
   .replace(/VM console using WebSockets with SSL termination through Nginx; domain\/TLS management and Cloudflare proxy rules/gi, 'VM console with encrypted WebSocket connectivity and managed TLS')
   .replace(/Reworked the console flow after identifying sensitive VM\/connection data in browser URLs, replacing it with session-based bootstrap and opaque, short-lived identifiers/gi, 'Hardened the console session handling with session-based bootstrap and short-lived, opaque identifiers')
   .replace(/VM deployment over SSH to a self-hosted runner/gi, 'private-runner deployment')
   .replace(/a `current` Nginx symlink/gi, 'managed release switching')
-  .replace(/Jisir process actions/gi, 'process actions')
-  .replace(/private LAN deployments/gi, 'private deployments')
-  .replace(/sudoers, file permissions, SCP, SSH troubleshooting/gi, 'least-privilege deployment permissions and Linux troubleshooting');
+  .replace(/Jisir process actions/gi, 'process actions');
 // Fail closed on newly added deployment/security specifics, rather than silently shipping them.
-if (/\b(?:\d{2,5}\/){2}\d{2,5}\b|\bNginx reverse proxy[^\n]*?\b\d{2,5}\b|\b(?:passwordless sudo|sudoers|\brm, copy\b|sensitive VM\/connection data|browser URLs|Jisir process|`current` Nginx symlink)\b/i.test(publicText)) {
+if (/\b(?:passwordless sudo|sudoers|\brm, copy\b|sensitive VM\/connection data|browser URLs|Jisir process|`current` Nginx symlink)\b/i.test(publicText)) {
   throw new Error('Unreviewed deployment/security detail in public profile copy');
 }
 const lines = publicText.split('\n');
