@@ -134,7 +134,7 @@ const nodes = layout.nodes.map((node) => {
   } else if (node.group === 'project') {
     const block = projectMap.get(node.id);
     n.title = block.title.replace(/^Project: /, '').replace(/ \((?:in development|Oct 2025[^)]*)\)$/, '');
-    n.meta = block.title.match(/\((?:in development|Oct 2025[^)]*)\)/)?.[0] || 'Product work';
+    n.meta = block.title.match(/\((?:in development|Oct 2025[^)]*)\)/)?.[0] || '';
     sourceBullets = bullets(block);
     if (node.id === 'proj-bleu-blog') sourceBullets = bleu;
   } else if (node.group === 'skill') {

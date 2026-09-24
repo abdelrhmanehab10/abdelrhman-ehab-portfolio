@@ -179,7 +179,7 @@ export const graphNodes = [
     "id": "proj-clinic-flow",
     "group": "project",
     "title": "Clinic Flow",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Building an Arabic-first, RTL clinic operations app centered on same-day Visit Intake, doctor queue management, patient files, and staff access control.",
     "bullets": [
       "Implementing reception workflows for creating today’s queue entries, explicitly selecting returning Patient Files, and auto-creating new Patient Files for first-time patients.",
@@ -194,7 +194,7 @@ export const graphNodes = [
     "id": "proj-bleu-blog",
     "group": "project",
     "title": "BLEU Community Blog (Eleventy/Tailwind open-source tech community website)",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Contributed Arabic-first internationalization work across the website, including locale data, localized routes/pages, RTL-aware UI behavior, and a language switcher.",
     "bullets": [
       "Added and refined Arabic/English translation files for home, blogs, blog details, shared UI copy, and contributing flows.",
@@ -222,7 +222,7 @@ export const graphNodes = [
     "id": "proj-competition-admin",
     "group": "project",
     "title": "Competition Management Admin",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Built a role-based React/TypeScript administration platform for system admins, supervisors, judges, and reviewers.",
     "bullets": [
       "Implemented the competition lifecycle from creation and judge assignment through participant/submission review and winner tracking.",
@@ -236,7 +236,7 @@ export const graphNodes = [
     "id": "proj-akhbar-admin",
     "group": "project",
     "title": "Akhbar AlKhaleej Admin FE",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Led frontend delivery of a modular Angular SPA with standalone components and lazy-loaded routes for editorial administration.",
     "bullets": [
       "Designed JWT login/refresh, persistent session hydration, route guards, and RBAC scoping by role, section, and category.",
@@ -250,7 +250,7 @@ export const graphNodes = [
     "id": "proj-bidding-wallet",
     "group": "project",
     "title": "Bidding Wallet Flow",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Built a secure bidding-wallet flow with Node.js and Next.js, enforcing a minimum 10% balance requirement before bidding and placing funds on hold during active bids.",
     "bullets": [],
     "label": "Bidding Wallet Flow"
@@ -259,7 +259,7 @@ export const graphNodes = [
     "id": "proj-faster-meeting",
     "group": "project",
     "title": "Faster Meeting",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Developed the Faster Meeting platform in Next.js with authenticated scheduling, editing, and management of Zoom meetings through custom .NET APIs.",
     "bullets": [],
     "label": "Faster Meeting"
@@ -268,7 +268,7 @@ export const graphNodes = [
     "id": "proj-efa",
     "group": "project",
     "title": "EFA",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Improved EFA UI/UX and web performance, increasing Lighthouse from 61 to 84 by optimizing LCP, FCP, and layout shifts.",
     "bullets": [],
     "label": "EFA"
@@ -277,7 +277,7 @@ export const graphNodes = [
     "id": "proj-boots-ladders",
     "group": "project",
     "title": "Boots & Ladders",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Enhanced UI/UX and performance in Boots & Ladders using Vue.js.",
     "bullets": [],
     "label": "Boots & Ladders"
@@ -327,7 +327,7 @@ export const graphNodes = [
     "id": "proj-care-connect",
     "group": "project",
     "title": "Care Connect Dashboard",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Contributed to the Laravel-to-Vue 3 migration of Care Connect Dashboard, delivering appointment table/calendar workflows with Pinia-managed filters.",
     "bullets": [],
     "label": "Care Connect Dashboard"
@@ -336,7 +336,7 @@ export const graphNodes = [
     "id": "proj-watu",
     "group": "project",
     "title": "Watu",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Worked on Watu, a university platform, refactoring the Apply Now flow into a unified multi-step form and integrating location/information-request APIs.",
     "bullets": [],
     "label": "Watu"
@@ -345,7 +345,7 @@ export const graphNodes = [
     "id": "proj-pro-event-storefront",
     "group": "project",
     "title": "Pro Event Storefront",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Built and standardized the storefront UI across core pages (product, category, blog, and checkout) with a consistent design system and light/dark themes.",
     "bullets": [],
     "label": "Pro Event Storefront"
@@ -356,7 +356,7 @@ export const graphNodes = [
     "href": "https://verify.sarabeauty.net/scan",
     "linkLabel": "Open live scanner",
     "title": "QR-code verification platform (Sara Beauty)",
-    "meta": "Product work",
+    "meta": "",
     "summary": "Built a full-stack Node.js/Express and MongoDB QR-verification service used internally to generate and manage 1,000,000+ unique product codes.",
     "bullets": [
       "Designed idempotent batch generation, CSV exports, printable QR-label sheets, and an Arabic/RTL admin dashboard for manufacturing workflows.",

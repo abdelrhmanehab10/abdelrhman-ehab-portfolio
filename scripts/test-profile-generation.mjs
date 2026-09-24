@@ -79,6 +79,8 @@ test('role identities and bilingual and performance evidence survive reordered a
   assert.match(roles.find(n => n.id === 'craft-performance').summary, /EFA.*Lighthouse/);
   assert.match(roles.find(n => n.id === 'craft-performance').bullets[0], /semantic blog datetime/);
   assert.match(roles.find(n => n.id === 'role-virtuwa-pt').summary, /VirtuWa HV/);
+  assert.equal(roles.find(n => n.id === 'proj-clinic-flow').meta, '', 'a project without profile status has no meta line');
+  assert.equal(roles.find(n => n.id === 'proj-gas-reg').meta, '(in development)');
   const bilingual = roles.find(n => n.id === 'craft-bilingual');
   assert.match(bilingual.bullets.join(' '), /Arabic\/English translation files/);
   assert.doesNotMatch(bilingual.bullets.join(' '), /Assisted contributors with open-source onboarding/);

@@ -192,7 +192,7 @@ class App {
       <article class="flex h-full min-w-0 flex-col rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
         ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)} project preview" loading="lazy" class="h-56 w-full rounded-xl border border-slate-700 object-cover" />` : ''}
         <h3 class="mt-4 break-words text-xl font-semibold leading-snug text-white md:text-2xl">${escapeHtml(title)}</h3>
-        ${meta && meta !== 'Product work' ? `<p class="mt-2 text-xs font-semibold text-cyan-200">${escapeHtml(meta)}</p>` : ''}
+        ${meta ? `<p class="mt-2 text-xs font-semibold text-cyan-200">${escapeHtml(meta)}</p>` : ''}
         <p class="mt-2 text-sm leading-relaxed text-slate-300 md:text-base">${escapeHtml(summary)}</p>
         ${bullets.length ? `<details class="mt-3 text-sm text-slate-300"><summary class="min-h-11 cursor-pointer py-2 font-semibold text-cyan-200">Read contributions</summary><ul class="list-disc space-y-2 pl-5">${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></details>` : ''}
         <div class="mt-4 flex flex-wrap gap-2">
