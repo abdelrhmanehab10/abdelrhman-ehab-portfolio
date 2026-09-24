@@ -151,32 +151,3 @@ test('project technologies follow reviewed repository mapping, not profile word 
   assert.deepEqual(updated.find(n => n.id === 'proj-qr-verify').tags, generated.find(n => n.id === 'proj-qr-verify').tags);
   assert.doesNotMatch(JSON.stringify(generated), /SmartlyTechnologies\/biddo|VirtuWa\/virtuwa-admin-04815/);
 }));
-
-test('project cards show derived technologies and featured source notice', async () => {
-  const timeline = { innerHTML: '' };
-  const featured = { innerHTML: '' };
-  const more = { innerHTML: '', classList: { toggle() {} } };
-  let ready;
-  globalThis.document = {
-    querySelector: selector => ({ '#experience-list': timeline, '#featured-works': featured, '#more-works': more })[selector] || null,
-    querySelectorAll: () => [],
-    addEventListener: (name, listener) => { if (name === 'DOMContentLoaded') ready = listener; },
-  };
-  globalThis.window = { addEventListener() {}, scrollY: 0 };
-  await import('../src/main.js');
-  ready();
-  assert.match(featured.innerHTML, /Client-owned product; platform walkthrough available on request\./);
-  assert.match(featured.innerHTML, /Client-owned product; source code is private\./);
-  assert.match(featured.innerHTML, /React<\/span>/);
-  assert.match(featured.innerHTML, /MongoDB \(Mongoose\)<\/span>/);
-  assert.match(more.innerHTML, /Eleventy<\/span>/);
-  assert.match(more.innerHTML, /Next\.js<\/span>/);
-  assert.doesNotMatch(more.innerHTML, /Client-owned product/);
-  const titles = [...timeline.innerHTML.matchAll(/<h3[^>]*>([^<]+)<\/h3>/g)].map(match => match[1]);
-  assert.equal(titles.length, 8);
-  assert.match(titles[0], /WordPress Developer/);
-  assert.ok(titles.indexOf('Frontend Web Developer') < titles.indexOf('Full Stack Engineer'));
-  assert.equal(titles.at(-1), 'Independent Product Development');
-  const periods = [...timeline.innerHTML.matchAll(/<p class="inline-flex shrink-0[^>]*>\s*([^<]+)<\/p>/g)].map(match => match[1].trim());
-  assert.deepEqual(periods, ['Jan 2022 - Jan 2024', 'Feb 2024 - Nov 2025', 'Jun 2025 - Present', 'Jul 2025 - Mar 2026', 'Oct 2025 - May 2026', '2026 - Present', 'Jan 2026 - Mar 2026', '2026 - Present']);
-});

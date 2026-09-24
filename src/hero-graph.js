@@ -1,4 +1,5 @@
 import { graphNodes, graphEdges, graphGroups } from "./constant/graph.js";
+import { projectNotices } from "./constant/index.js";
 
 const byId = new Map(graphNodes.map((node) => [node.id, node]));
 const adjacency = new Map(graphNodes.map((node) => [node.id, new Set()]));
@@ -10,6 +11,14 @@ const idOf = (endpoint) => typeof endpoint === "object" ? endpoint.id : endpoint
 const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
 })[character]);
+// Shared with the generated index: external links open a new tab, bundled files
+// such as the resume download, and any other scheme is never rendered.
+export function nodeLinkHTML(node, className) {
+  if (!node.href || !/^(https?:\/\/|mailto:|\.\/assets\/)/.test(node.href)) return "";
+  const attributes = /^https?:/.test(node.href) ? ' target="_blank" rel="noopener noreferrer"'
+    : node.href.startsWith("./assets/") ? " download" : "";
+  return `<a class="${className}" href="${escapeHTML(node.href)}"${attributes}>${escapeHTML(node.linkLabel || "Open link")}</a>`;
+}
 
 export function initHeroGraph() {
   const stage = document.querySelector("#graph-stage");
@@ -92,22 +101,18 @@ export function initHeroGraph() {
     hovered = null;
     selected = id;
     const group = graphGroups[node.group].label;
-    const link = node.href && /^(https?:\/\/|mailto:|\.\/assets\/)/.test(node.href)
-      ? `<a class="graph-action" href="${escapeHTML(node.href)}" ${/^https?:/.test(node.href) ? 'target="_blank" rel="noopener noreferrer"' : ""}>${escapeHTML(node.linkLabel || "Open link")}</a>` : "";
-    const sectionTitle = node.sectionId && document.getElementById(node.sectionId)?.querySelector("h2")?.textContent.trim();
-    const section = sectionTitle
-      ? `<a class="graph-secondary" href="#${escapeHTML(node.sectionId)}">See in ${escapeHTML(sectionTitle)}</a>` : "";
+    const link = nodeLinkHTML(node, "graph-action");
+    const notice = projectNotices[id] ? `<p class="graph-meta">${escapeHTML(projectNotices[id])}</p>` : "";
     panel.innerHTML = `<div class="graph-panel-heading"><div><p class="graph-group-name">${escapeHTML(group)}</p>
       <h2 id="graph-panel-title">${escapeHTML(node.title)}</h2>
       ${node.meta ? `<p class="graph-meta">${escapeHTML(node.meta)}</p>` : ""}</div>
       <button type="button" id="graph-panel-close" aria-label="Close node details">&times;</button></div>
-      <p class="graph-summary">${escapeHTML(node.summary)}</p>
+      <p class="graph-summary">${escapeHTML(node.summary)}</p>${notice}
       ${node.bullets?.length ? `<ul class="graph-bullets">${node.bullets.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>` : ""}
       ${node.tags?.length ? `<div class="graph-tags">${node.tags.map((tag) => `<span>${escapeHTML(tag)}</span>`).join("")}</div>` : ""}
-      ${link}${section}<p class="graph-meta">${adjacency.get(id)?.size || 0} connections</p>`;
+      ${link}<p class="graph-meta">${adjacency.get(id)?.size || 0} connections</p>`;
     panel.hidden = false;
     panel.querySelector("#graph-panel-close").addEventListener("click", () => closePanel());
-    panel.querySelector(".graph-secondary")?.addEventListener("click", () => closePanel({ restoreFocus: false }));
     panel.focus();
     repaint();
     history.replaceState(null, "", `#node/${id}`);

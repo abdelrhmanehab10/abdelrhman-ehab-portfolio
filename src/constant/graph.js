@@ -24,7 +24,6 @@ export const graphNodes = [
   {
     "id": "hub-experience",
     "group": "hub",
-    "sectionId": "experience",
     "title": "Experience",
     "meta": "8 engagements",
     "summary": "Career note: The Riyada, Virtuwa, and Pro Event roles were part-time engagements held concurrently with my full-time position at Smartly Techs. Dates below reflect the actual engagement periods.",
@@ -33,7 +32,6 @@ export const graphNodes = [
   {
     "id": "hub-projects",
     "group": "hub",
-    "sectionId": "projects",
     "title": "Projects",
     "meta": "16 products",
     "summary": "Product and open-source work across the profile.",
@@ -42,7 +40,6 @@ export const graphNodes = [
   {
     "id": "hub-skills",
     "group": "hub",
-    "sectionId": "skills",
     "title": "Core Skills",
     "meta": "",
     "summary": "Core Skills from the professional profile.",
@@ -67,7 +64,6 @@ export const graphNodes = [
   {
     "id": "hub-connect",
     "group": "hub",
-    "sectionId": "contact",
     "title": "Connect",
     "meta": "",
     "summary": "Connect from the professional profile.",
@@ -76,7 +72,6 @@ export const graphNodes = [
   {
     "id": "role-smartly-fse",
     "group": "role",
-    "sectionId": "experience",
     "title": "Full Stack Engineer - Smartly Techs",
     "meta": "Jun 2025 - Present | Hybrid · Full-time",
     "summary": "Promoted to Full Stack Engineer after joining Smartly as a Frontend Web Developer in Feb 2024; delivered features across regulatory, competition, editorial, and collaboration products.",
@@ -91,7 +86,6 @@ export const graphNodes = [
   {
     "id": "role-smartly-fe",
     "group": "role",
-    "sectionId": "experience",
     "title": "Frontend Web Developer - Smartly Techs",
     "meta": "Feb 2024 - Nov 2025 | On-site · Full-time",
     "summary": "Developed the Faster Meeting platform in Next.js with authenticated scheduling, editing, and management of Zoom meetings through custom .NET APIs.",
@@ -107,7 +101,6 @@ export const graphNodes = [
   {
     "id": "role-virtuwa-freelance",
     "group": "role",
-    "sectionId": "experience",
     "title": "Freelance Frontend Engineer - Virtuwa",
     "meta": "2026 - Present | Remote · Contract follow-up",
     "summary": "Continue follow-up frontend development after the part-time engagement, maintaining and extending virtualization management products for client needs.",
@@ -121,7 +114,6 @@ export const graphNodes = [
   {
     "id": "role-virtuwa-pt",
     "group": "role",
-    "sectionId": "experience",
     "title": "Frontend Web Developer - Virtuwa",
     "meta": "Oct 2025 - May 2026 | Saudi Arabia (Remote) · Part-time",
     "summary": "Delivered VirtuWa HV - Hypervisor Management Interface (Oct 2025 - Jan 2026, 3 months), VirtuWa Cloud Manager - Enterprise Hypervisor Control Plane (in development), Virtuwa Flow Bridge (in development).",
@@ -132,7 +124,6 @@ export const graphNodes = [
   {
     "id": "role-riyada",
     "group": "role",
-    "sectionId": "experience",
     "title": "Frontend Web Developer - Riyada Al Arabiya For Information Technology",
     "meta": "Jan 2026 - Mar 2026 | Saudi Arabia (Remote) · Part-time",
     "summary": "Contributed to the Laravel-to-Vue 3 migration of Care Connect Dashboard, delivering appointment table/calendar workflows with Pinia-managed filters.",
@@ -149,7 +140,6 @@ export const graphNodes = [
   {
     "id": "role-pro-event",
     "group": "role",
-    "sectionId": "experience",
     "title": "Software Engineer - Pro Event",
     "meta": "Jul 2025 - Mar 2026 | Cairo (Remote) · Part-time",
     "summary": "Proposed creating a dedicated software section in the company and led the migration direction from Salla/Zid to WordPress + WooCommerce.",
@@ -167,7 +157,6 @@ export const graphNodes = [
   {
     "id": "role-independent-qr",
     "group": "role",
-    "sectionId": "experience",
     "title": "Independent Product Development - QR Verification Platform",
     "meta": "2026 - Present | Productization · ",
     "summary": "Continued improving the QR-verification platform beyond the initial Sara Beauty delivery so it can be reused and marketed for future clients.",
@@ -184,7 +173,6 @@ export const graphNodes = [
   {
     "id": "role-shortcutadv",
     "group": "role",
-    "sectionId": "experience",
     "title": "WordPress Developer - Shortcutadv",
     "meta": "Jan 2022 - Jan 2024 | Saudi Arabia (Remote) · Full-time",
     "summary": "Customized WordPress themes and integrated plugins to meet diverse client requirements, ensuring responsive design, cross-browser compatibility, and optimized performance.",

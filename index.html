@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -25,7 +25,7 @@
     />
     <meta
       property="og:image"
-      content="https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/assets/images/pro.png"
+      content="https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/assets/images/og-graph.png"
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
@@ -38,12 +38,13 @@
     />
     <meta
       name="twitter:image"
-      content="https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/assets/images/pro.png"
+      content="https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/assets/images/og-graph.png"
     />
     <link
       rel="canonical"
       href="https://abdelrhmanehab10.github.io/abdelrhman-ehab-portfolio/"
     />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23060c17'/%3E%3Cpath d='M16 16 7 9M16 16l10-6M16 16l-2 10' stroke='%2367e8f9' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23f8fafc'/%3E%3Ccircle cx='7' cy='9' r='3' fill='%2367e8f9'/%3E%3Ccircle cx='26' cy='10' r='3' fill='%2367e8f9'/%3E%3Ccircle cx='14' cy='26' r='3' fill='%2367e8f9'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -62,55 +63,6 @@
       });
     </script>
     <script src="assets/vendor/force-graph-1.51.4.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style type="text/tailwindcss">
-      @theme {
-        --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
-        --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
-      }
-
-      @layer base {
-        body {
-          font-family: var(--font-body);
-        }
-
-        h1,
-        h2,
-        h3 {
-          font-family: var(--font-display);
-        }
-      }
-
-      @layer utilities {
-        @keyframes tech-slider {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(-50%);
-          }
-        }
-
-        .tech-slider-track {
-          animation: tech-slider 22s linear infinite;
-          will-change: transform;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .tech-slider-track {
-            animation: none;
-            transform: translateX(0);
-          }
-        }
-      }
-    </style>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -269,114 +221,27 @@
 }
     </script>
   </head>
-  <body
-    class="min-h-screen bg-[#060c17] text-slate-100 antialiased [background-image:radial-gradient(circle_at_10%_10%,#13213b,transparent_40%),radial-gradient(circle_at_90%_0%,#10223e,transparent_28%)]"
-  >
-    <a
-      href="#main-content"
-      class="sr-only z-[200] inline-flex min-h-11 items-center rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
-    >
-      Skip to content
-    </a>
-
-    <header class="sticky top-0 z-50 py-4 backdrop-blur-md">
-      <nav
-        class="mx-auto flex w-[min(1120px,calc(100%-2rem))] flex-col gap-3 md:flex-row md:items-center md:justify-between"
-      >
-        <ul
-          class="menu flex w-full flex-nowrap gap-2 overflow-x-auto rounded-full border border-slate-700 bg-slate-900/90 p-1.5 [mask-image:linear-gradient(to_right,black_0%,black_90%,transparent_100%)] md:w-auto md:overflow-visible md:[mask-image:none]"
-        >
-          <li>
-            <a
-              href="#home"
-              class="nav-link active inline-flex min-h-11 flex-none items-center justify-center rounded-full bg-sky-500/20 px-4 text-sm font-semibold text-white transition hover:bg-sky-500/20 hover:text-white"
-              >Home</a
-            >
-          </li>
-          <li>
-            <a
-              href="#projects"
-              class="nav-link inline-flex min-h-11 flex-none items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-300 transition hover:bg-sky-500/20 hover:text-white"
-              >Projects</a
-            >
-          </li>
-          <li>
-            <a
-              href="#experience"
-              class="nav-link inline-flex min-h-11 flex-none items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-300 transition hover:bg-sky-500/20 hover:text-white"
-              >Experience</a
-            >
-          </li>
-          <li>
-            <a
-              href="#skills"
-              class="nav-link inline-flex min-h-11 flex-none items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-300 transition hover:bg-sky-500/20 hover:text-white"
-              >Skills</a
-            >
-          </li>
-          <li>
-            <a
-              href="#contact"
-              class="nav-link inline-flex min-h-11 flex-none items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-300 transition hover:bg-sky-500/20 hover:text-white"
-              >Contact</a
-            >
-          </li>
-        </ul>
-
-        <a
-          href="./assets/abdelrhmanehab_resume.pdf"
-          class="resume-link inline-flex min-h-11 items-center justify-center rounded-full border border-slate-700 bg-slate-900 px-4 text-sm font-bold text-white transition hover:border-slate-500 hover:bg-slate-800"
-        >
-          Download Resume (PDF)
-        </a>
-      </nav>
-    </header>
-
-    <main id="main-content" class="mx-auto w-[min(1120px,calc(100%-2rem))]">
-      <section id="home" class="scroll-mt-40 py-16 md:scroll-mt-28 md:py-20">
-        <p
-          id="hero-badge"
-          class="mb-4 inline-flex rounded-full border border-cyan-400/40 px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-cyan-300"
-        >Abdelrhman Ehab - Frontend Engineer</p>
-        <h1 id="hero-headline" class="mb-5 max-w-[18ch] text-4xl leading-tight md:text-6xl">Abdelrhman Ehab · <span class="text-cyan-300">Frontend Engineer</span></h1>
-        <p id="hero-summary" class="max-w-3xl text-base text-slate-300 md:text-lg">Frontend Engineer with 4+ years of professional web-development experience, including 2+ years building production React, Angular, and Vue applications with TypeScript. Specializes in Arabic-first and bilingual RTL interfaces, complex forms, role-based access control, dashboards, and workflow-heavy products across healthcare, virtualization, regulatory, editorial, and e-commerce domains. Experienced in building Node.js/Express services and delivering applications through GitHub Actions, Docker, Nginx, Linux, and Cloudflare. Strong at turning complex requirements into maintainable, accessible, and production-ready user experiences.</p>
-        <div
-          id="hero-meta"
-          style="min-height: 38px"
-          class="mt-4 w-full overflow-hidden rounded-full border border-slate-700 bg-slate-900/70 py-1.5 sm:w-3/4 md:w-1/2"
-          aria-label="Core technologies auto slider"
-        ></div>
-        <div class="mt-6 flex flex-wrap gap-3">
-          <a
-            href="./assets/abdelrhmanehab_resume.pdf"
-            class="resume-link inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-300 to-sky-500 px-5 text-sm font-bold text-slate-950 transition hover:brightness-110"
-          >
-            Download Resume (PDF)
-          </a>
-          <a
-            href="#contact"
-            class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/70 px-5 text-sm font-bold text-white transition hover:border-slate-500"
-            >Contact Me</a
-          >
+  <body>
+    <main id="main-content" class="graph-app">
+      <h1 id="graph-title" class="visually-hidden">Abdelrhman Ehab · Frontend Engineer</h1>
+      <div id="graph-controls" aria-label="Graph controls">
+        <span id="graph-status" role="status">Explore the profile graph</span>
+        <div class="graph-buttons">
+          <button id="btn-list" type="button" aria-controls="graph-index-wrap" aria-expanded="false">List view</button>
+          <button id="btn-reset" type="button">Reset view</button>
+          <button id="btn-motion" type="button" aria-pressed="false">Pause motion</button>
         </div>
-        <div id="graph-controls" aria-label="Graph controls">
-          <span id="graph-status" role="status">Explore the profile graph</span>
-          <div class="graph-buttons">
-            <button id="btn-list" type="button" aria-controls="graph-index-wrap" aria-expanded="false">List view</button>
-            <button id="btn-reset" type="button">Reset view</button>
-            <button id="btn-motion" type="button" aria-pressed="false">Pause motion</button>
-          </div>
-        </div>
-        <div id="graph-stage" role="group" aria-label="Interactive graph of Abdelrhman Ehab's work">
-          <div id="graph-canvas-host" aria-hidden="true"></div>
-          <div id="graph-panel" role="dialog" aria-modal="false" aria-labelledby="graph-panel-title" hidden tabindex="-1"></div>
-        </div>
-        <p id="graph-caption">Large outlined nodes are sections; smaller nodes are work, skills and connections. Drag to pan, scroll or pinch to zoom, select a node to see its neighbours. Use List view or Tab to explore by keyboard.</p>
-        <div id="graph-index-wrap" class="graph-index-hidden" aria-label="Profile graph as a list">
-          <h2>Profile index</h2>
-          <p>All 52 nodes in the graph, grouped by section. Select a node for its details and connections.</p>
-          <!-- graph-index:start -->
-          <ul id="graph-index">
+      </div>
+      <div id="graph-stage" role="group" aria-label="Interactive graph of Abdelrhman Ehab's work">
+        <div id="graph-canvas-host" aria-hidden="true"></div>
+        <div id="graph-panel" role="dialog" aria-modal="false" aria-labelledby="graph-panel-title" hidden tabindex="-1"></div>
+      </div>
+      <p id="graph-caption">Large outlined nodes are sections; smaller nodes are work, skills and connections. Drag to pan, scroll or pinch to zoom, select a node to see its neighbours. Use List view or Tab to explore by keyboard.</p>
+      <div id="graph-index-wrap" class="graph-index-hidden" aria-label="Profile graph as a list">
+        <h2>Profile index</h2>
+        <p>All 52 nodes in the graph, grouped by section. Select a node for its details and connections.</p>
+        <!-- graph-index:start -->
+        <ul id="graph-index">
   <li id="graph-node-me" tabindex="-1"><button type="button" data-node="me">Abdelrhman Ehab</button><span class="graph-index-summary">Frontend Engineer with 4+ years of professional web-development experience, including 2+ years building production React, Angular, and Vue applications with TypeScript. Specializes in Arabic-first and bilingual RTL interfaces, complex forms, role-based access control, dashboards, and workflow-heavy products across healthcare, virtualization, regulatory, editorial, and e-commerce domains. Experienced in building Node.js/Express services and delivering applications through GitHub Actions, Docker, Nginx, Linux, and Cloudflare. Strong at turning complex requirements into maintainable, accessible, and production-ready user experiences.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-experience">Experience</a>, <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-hub-skills">Core Skills</a>, <a href="#graph-node-hub-domains">Domains</a>, <a href="#graph-node-hub-craft">How I Work</a>, <a href="#graph-node-hub-connect">Connect</a></p></li>
   <li id="graph-node-hub-experience" tabindex="-1"><h3><button type="button" data-node="hub-experience">Experience</button></h3><p>Career note: The Riyada, Virtuwa, and Pro Event roles were part-time engagements held concurrently with my full-time position at Smartly Techs. Dates below reflect the actual engagement periods.</p><p class="graph-index-connections">Connected to: <a href="#graph-node-me">Abdelrhman Ehab</a>, <a href="#graph-node-role-smartly-fse">Full Stack Engineer - Smartly Techs</a>, <a href="#graph-node-role-smartly-fe">Frontend Web Developer - Smartly Techs</a>, <a href="#graph-node-role-virtuwa-freelance">Freelance Frontend Engineer - Virtuwa</a>, <a href="#graph-node-role-virtuwa-pt">Frontend Web Developer - Virtuwa</a>, <a href="#graph-node-role-riyada">Frontend Web Developer - Riyada Al Arabiya For Information Technology</a>, <a href="#graph-node-role-pro-event">Software Engineer - Pro Event</a>, <a href="#graph-node-role-independent-qr">Independent Product Development - QR Verification Platform</a>, <a href="#graph-node-role-shortcutadv">WordPress Developer - Shortcutadv</a></p><ul><li id="graph-node-role-smartly-fse" tabindex="-1"><button type="button" data-node="role-smartly-fse">Full Stack Engineer - Smartly Techs</button><span class="graph-index-summary">Promoted to Full Stack Engineer after joining Smartly as a Frontend Web Developer in Feb 2024; delivered features across regulatory, competition, editorial, and collaboration products.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-experience">Experience</a>, <a href="#graph-node-proj-gas-reg">GAS-REG Portal</a>, <a href="#graph-node-proj-competition-admin">Competition Management Admin</a>, <a href="#graph-node-proj-akhbar-admin">Akhbar AlKhaleej Admin FE</a>, <a href="#graph-node-proj-bidding-wallet">Bidding Wallet Flow</a>, <a href="#graph-node-role-virtuwa-pt">Frontend Web Developer - Virtuwa</a>, <a href="#graph-node-role-riyada">Frontend Web Developer - Riyada Al Arabiya For Information Technology</a>, <a href="#graph-node-role-pro-event">Software Engineer - Pro Event</a>, <a href="#graph-node-role-smartly-fe">Frontend Web Developer - Smartly Techs</a></p></li>
 <li id="graph-node-role-smartly-fe" tabindex="-1"><button type="button" data-node="role-smartly-fe">Frontend Web Developer - Smartly Techs</button><span class="graph-index-summary">Developed the Faster Meeting platform in Next.js with authenticated scheduling, editing, and management of Zoom meetings through custom .NET APIs.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-experience">Experience</a>, <a href="#graph-node-proj-faster-meeting">Faster Meeting</a>, <a href="#graph-node-proj-efa">EFA</a>, <a href="#graph-node-proj-boots-ladders">Boots &amp; Ladders</a>, <a href="#graph-node-role-smartly-fse">Full Stack Engineer - Smartly Techs</a></p></li>
@@ -395,13 +260,13 @@
 <li id="graph-node-proj-faster-meeting" tabindex="-1"><button type="button" data-node="proj-faster-meeting">Faster Meeting</button><span class="graph-index-summary">Developed the Faster Meeting platform in Next.js with authenticated scheduling, editing, and management of Zoom meetings through custom .NET APIs.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-smartly-fe">Frontend Web Developer - Smartly Techs</a></p></li>
 <li id="graph-node-proj-efa" tabindex="-1"><button type="button" data-node="proj-efa">EFA</button><span class="graph-index-summary">Improved EFA UI/UX and web performance, increasing Lighthouse from 61 to 84 by optimizing LCP, FCP, and layout shifts.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-smartly-fe">Frontend Web Developer - Smartly Techs</a>, <a href="#graph-node-craft-performance">Performance &amp; Quality</a></p></li>
 <li id="graph-node-proj-boots-ladders" tabindex="-1"><button type="button" data-node="proj-boots-ladders">Boots &amp; Ladders</button><span class="graph-index-summary">Enhanced UI/UX and performance in Boots &amp; Ladders using Vue.js.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-smartly-fe">Frontend Web Developer - Smartly Techs</a>, <a href="#graph-node-craft-performance">Performance &amp; Quality</a></p></li>
-<li id="graph-node-proj-virtuwa-hv" tabindex="-1"><button type="button" data-node="proj-virtuwa-hv">VirtuWa HV - Hypervisor Management Interface</button><span class="graph-index-summary">Built a React/TypeScript hypervisor management console with live monitoring, RBAC, and bilingual English/Arabic UX.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-virtuwa-pt">Frontend Web Developer - Virtuwa</a>, <a href="#graph-node-domain-virtualization">Virtualization</a>, <a href="#graph-node-craft-security">Access Control &amp; Security</a>, <a href="#graph-node-craft-ways-of-working">Ways of Working</a></p></li>
+<li id="graph-node-proj-virtuwa-hv" tabindex="-1"><button type="button" data-node="proj-virtuwa-hv">VirtuWa HV - Hypervisor Management Interface</button><span class="graph-index-summary">Built a React/TypeScript hypervisor management console with live monitoring, RBAC, and bilingual English/Arabic UX.</span><span class="graph-index-summary">Client-owned product; platform walkthrough available on request.</span><a class="graph-index-link" href="https://virtuwa.com/" target="_blank" rel="noopener noreferrer">Visit VirtuWa</a><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-virtuwa-pt">Frontend Web Developer - Virtuwa</a>, <a href="#graph-node-domain-virtualization">Virtualization</a>, <a href="#graph-node-craft-security">Access Control &amp; Security</a>, <a href="#graph-node-craft-ways-of-working">Ways of Working</a></p></li>
 <li id="graph-node-proj-virtuwa-cloud" tabindex="-1"><button type="button" data-node="proj-virtuwa-cloud">VirtuWa Cloud Manager - Enterprise Hypervisor Control Plane</button><span class="graph-index-summary">Building a React/TypeScript control plane for VMs, hosts, clusters, storage, networking, licensing, and events.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-virtuwa-pt">Frontend Web Developer - Virtuwa</a>, <a href="#graph-node-role-virtuwa-freelance">Freelance Frontend Engineer - Virtuwa</a>, <a href="#graph-node-domain-virtualization">Virtualization</a>, <a href="#graph-node-craft-security">Access Control &amp; Security</a></p></li>
 <li id="graph-node-proj-flow-bridge" tabindex="-1"><button type="button" data-node="proj-flow-bridge">Virtuwa Flow Bridge</button><span class="graph-index-summary">Implemented CI/CD with GitHub Actions for install, typecheck, tests, build verification, and private-runner deployment.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-virtuwa-pt">Frontend Web Developer - Virtuwa</a>, <a href="#graph-node-domain-virtualization">Virtualization</a>, <a href="#graph-node-craft-cicd">CI/CD &amp; Deployment Automation</a></p></li>
 <li id="graph-node-proj-care-connect" tabindex="-1"><button type="button" data-node="proj-care-connect">Care Connect Dashboard</button><span class="graph-index-summary">Contributed to the Laravel-to-Vue 3 migration of Care Connect Dashboard, delivering appointment table/calendar workflows with Pinia-managed filters.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-riyada">Frontend Web Developer - Riyada Al Arabiya For Information Technology</a>, <a href="#graph-node-domain-healthcare">Medical</a>, <a href="#graph-node-craft-ways-of-working">Ways of Working</a></p></li>
 <li id="graph-node-proj-watu" tabindex="-1"><button type="button" data-node="proj-watu">Watu</button><span class="graph-index-summary">Worked on Watu, a university platform, refactoring the Apply Now flow into a unified multi-step form and integrating location/information-request APIs.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-riyada">Frontend Web Developer - Riyada Al Arabiya For Information Technology</a>, <a href="#graph-node-domain-public">Education</a></p></li>
 <li id="graph-node-proj-pro-event-storefront" tabindex="-1"><button type="button" data-node="proj-pro-event-storefront">Pro Event Storefront</button><span class="graph-index-summary">Built and standardized the storefront UI across core pages (product, category, blog, and checkout) with a consistent design system and light/dark themes.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-pro-event">Software Engineer - Pro Event</a>, <a href="#graph-node-domain-ecommerce">E-commerce</a></p></li>
-<li id="graph-node-proj-qr-verify" tabindex="-1"><button type="button" data-node="proj-qr-verify">QR-code verification platform (Sara Beauty)</button><span class="graph-index-summary">Built a full-stack Node.js/Express and MongoDB QR-verification service used internally to generate and manage 1,000,000+ unique product codes.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-pro-event">Software Engineer - Pro Event</a>, <a href="#graph-node-role-independent-qr">Independent Product Development - QR Verification Platform</a>, <a href="#graph-node-domain-ecommerce">E-commerce</a>, <a href="#graph-node-craft-cicd">CI/CD &amp; Deployment Automation</a>, <a href="#graph-node-craft-bilingual">Bilingual &amp; RTL Engineering</a></p></li></ul></li>
+<li id="graph-node-proj-qr-verify" tabindex="-1"><button type="button" data-node="proj-qr-verify">QR-code verification platform (Sara Beauty)</button><span class="graph-index-summary">Built a full-stack Node.js/Express and MongoDB QR-verification service used internally to generate and manage 1,000,000+ unique product codes.</span><span class="graph-index-summary">Client-owned product; source code is private.</span><a class="graph-index-link" href="https://verify.sarabeauty.net/scan" target="_blank" rel="noopener noreferrer">Open live scanner</a><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-role-pro-event">Software Engineer - Pro Event</a>, <a href="#graph-node-role-independent-qr">Independent Product Development - QR Verification Platform</a>, <a href="#graph-node-domain-ecommerce">E-commerce</a>, <a href="#graph-node-craft-cicd">CI/CD &amp; Deployment Automation</a>, <a href="#graph-node-craft-bilingual">Bilingual &amp; RTL Engineering</a></p></li></ul></li>
   <li id="graph-node-hub-skills" tabindex="-1"><h3><button type="button" data-node="hub-skills">Core Skills</button></h3><p>Core Skills from the professional profile.</p><p class="graph-index-connections">Connected to: <a href="#graph-node-me">Abdelrhman Ehab</a>, <a href="#graph-node-skill-frameworks">Programming &amp; Frameworks</a>, <a href="#graph-node-skill-ecommerce">E-commerce &amp; CMS</a>, <a href="#graph-node-skill-devops">DevOps &amp; Infrastructure</a>, <a href="#graph-node-skill-data">Databases &amp; Analytics</a>, <a href="#graph-node-skill-other">Other</a>, <a href="#graph-node-skill-tools">Tools</a></p><ul><li id="graph-node-skill-frameworks" tabindex="-1"><button type="button" data-node="skill-frameworks">Programming &amp; Frameworks</button><span class="graph-index-summary">React (Vite, TanStack Router, React Query, shadcn/ui) · Angular (v17-18 migrations, Nx, Metronic) · Vue (Pinia, vue-router) · Node.js · Express · JavaScript · TypeScript · HTML5 · CSS3 · Bootstrap · Tailwind</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-skills">Core Skills</a></p></li>
 <li id="graph-node-skill-ecommerce" tabindex="-1"><button type="button" data-node="skill-ecommerce">E-commerce &amp; CMS</button><span class="graph-index-summary">OpenCart customizations · Salla · Zid &amp; Shopify enhancements</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-skills">Core Skills</a></p></li>
 <li id="graph-node-skill-devops" tabindex="-1"><button type="button" data-node="skill-devops">DevOps &amp; Infrastructure</button><span class="graph-index-summary">AWS Lightsail · Docker · Docker Compose · GitHub Actions CI/CD (self-hosted runners, private deployments) · Automated frontend build &amp; deploy pipelines (pnpm -&gt; dist -&gt; Nginx) · Nginx reverse proxy · SSL/TLS · WebSocket proxying · Linux administration · least-privilege deployment permissions and Linux troubleshooting · Cloudflare Pages / Workers</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-skills">Core Skills</a>, <a href="#graph-node-craft-cicd">CI/CD &amp; Deployment Automation</a></p></li>
@@ -419,110 +284,14 @@
 <li id="graph-node-craft-security" tabindex="-1"><button type="button" data-node="craft-security">Access Control &amp; Security</button><span class="graph-index-summary">Built a React/TypeScript hypervisor management console with live monitoring, RBAC, and bilingual English/Arabic UX.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-craft">How I Work</a>, <a href="#graph-node-proj-virtuwa-hv">VirtuWa HV - Hypervisor Management Interface</a>, <a href="#graph-node-proj-akhbar-admin">Akhbar AlKhaleej Admin FE</a>, <a href="#graph-node-proj-competition-admin">Competition Management Admin</a>, <a href="#graph-node-proj-clinic-flow">Clinic Flow</a>, <a href="#graph-node-proj-virtuwa-cloud">VirtuWa Cloud Manager - Enterprise Hypervisor Control Plane</a></p></li>
 <li id="graph-node-craft-performance" tabindex="-1"><button type="button" data-node="craft-performance">Performance &amp; Quality</button><span class="graph-index-summary">Improved EFA UI/UX and web performance, increasing Lighthouse from 61 to 84 by optimizing LCP, FCP, and layout shifts.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-craft">How I Work</a>, <a href="#graph-node-proj-efa">EFA</a>, <a href="#graph-node-proj-bleu-blog">BLEU Community Blog (Eleventy/Tailwind open-source tech community website)</a>, <a href="#graph-node-proj-boots-ladders">Boots &amp; Ladders</a></p></li>
 <li id="graph-node-craft-ways-of-working" tabindex="-1"><button type="button" data-node="craft-ways-of-working">Ways of Working</button><span class="graph-index-summary">Team leadership, requirements clarification, documentation, bilingual communication</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-craft">How I Work</a>, <a href="#graph-node-proj-care-connect">Care Connect Dashboard</a>, <a href="#graph-node-proj-virtuwa-hv">VirtuWa HV - Hypervisor Management Interface</a></p></li></ul></li>
-  <li id="graph-node-hub-connect" tabindex="-1"><h3><button type="button" data-node="hub-connect">Connect</button></h3><p>Connect from the professional profile.</p><p class="graph-index-connections">Connected to: <a href="#graph-node-me">Abdelrhman Ehab</a>, <a href="#graph-node-link-email">Email</a>, <a href="#graph-node-link-linkedin">LinkedIn</a>, <a href="#graph-node-link-github">GitHub</a>, <a href="#graph-node-link-resume">Resume (PDF)</a></p><ul><li id="graph-node-link-email" tabindex="-1"><button type="button" data-node="link-email">Email</button><span class="graph-index-summary">abdelrhmanehab047@gmail.com</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-connect">Connect</a></p></li>
-<li id="graph-node-link-linkedin" tabindex="-1"><button type="button" data-node="link-linkedin">LinkedIn</button><span class="graph-index-summary">https://www.linkedin.com/in/abdelrahman-ehab-87261a244/</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-connect">Connect</a></p></li>
-<li id="graph-node-link-github" tabindex="-1"><button type="button" data-node="link-github">GitHub</button><span class="graph-index-summary">https://github.com/abdelrhmanehab10</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-connect">Connect</a></p></li>
-<li id="graph-node-link-resume" tabindex="-1"><button type="button" data-node="link-resume">Resume (PDF)</button><span class="graph-index-summary">Download the full resume.</span><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-connect">Connect</a></p></li></ul></li>
+  <li id="graph-node-hub-connect" tabindex="-1"><h3><button type="button" data-node="hub-connect">Connect</button></h3><p>Connect from the professional profile.</p><p class="graph-index-connections">Connected to: <a href="#graph-node-me">Abdelrhman Ehab</a>, <a href="#graph-node-link-email">Email</a>, <a href="#graph-node-link-linkedin">LinkedIn</a>, <a href="#graph-node-link-github">GitHub</a>, <a href="#graph-node-link-resume">Resume (PDF)</a></p><ul><li id="graph-node-link-email" tabindex="-1"><button type="button" data-node="link-email">Email</button><span class="graph-index-summary">abdelrhmanehab047@gmail.com</span><a class="graph-index-link" href="mailto:abdelrhmanehab047@gmail.com">Email</a><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-connect">Connect</a></p></li>
+<li id="graph-node-link-linkedin" tabindex="-1"><button type="button" data-node="link-linkedin">LinkedIn</button><span class="graph-index-summary">https://www.linkedin.com/in/abdelrahman-ehab-87261a244/</span><a class="graph-index-link" href="https://www.linkedin.com/in/abdelrahman-ehab-87261a244/" target="_blank" rel="noopener noreferrer">LinkedIn</a><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-connect">Connect</a></p></li>
+<li id="graph-node-link-github" tabindex="-1"><button type="button" data-node="link-github">GitHub</button><span class="graph-index-summary">https://github.com/abdelrhmanehab10</span><a class="graph-index-link" href="https://github.com/abdelrhmanehab10" target="_blank" rel="noopener noreferrer">GitHub</a><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-connect">Connect</a></p></li>
+<li id="graph-node-link-resume" tabindex="-1"><button type="button" data-node="link-resume">Resume (PDF)</button><span class="graph-index-summary">Download the full resume.</span><a class="graph-index-link" href="./assets/abdelrhmanehab_resume.pdf" download>Resume (PDF)</a><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-connect">Connect</a></p></li></ul></li>
 </ul>
-          <!-- graph-index:end -->
-        </div>
-      </section>
-
-      <section
-        id="impact"
-        aria-label="Impact Snapshot"
-        class="scroll-mt-40 py-16 md:scroll-mt-28 md:py-20"
-      >
-        <h2 class="mb-6 text-3xl md:text-4xl">
-          Impact <span class="text-cyan-300">Snapshot</span>
-        </h2>
-        <p class="mb-6 max-w-2xl text-sm text-slate-300 md:text-base">
-          Professional experience, projects, and industries at a glance.
-        </p>
-        <div
-          class="impact-grid grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
-        ></div>
-      </section>
-
-      <section
-        id="projects"
-        class="scroll-mt-40 py-16 md:scroll-mt-28 md:py-20"
-      >
-        <h2 class="mb-6 text-3xl md:text-4xl">
-          Featured <span class="text-cyan-300">Projects</span>
-        </h2>
-        <div
-          id="featured-works"
-          class="grid gap-4 md:grid-cols-2 md:[grid-auto-rows:1fr]"
-        ></div>
-        <h3 id="more-projects-heading" class="mt-8 mb-4 text-xl text-white">
-          More Projects
-        </h3>
-        <div
-          id="more-works"
-          class="grid gap-4 md:grid-cols-2 md:[grid-auto-rows:1fr]"
-        ></div>
-      </section>
-
-      <section
-        id="experience"
-        class="scroll-mt-40 py-16 md:scroll-mt-28 md:py-20"
-      >
-        <h2 class="mb-6 text-3xl md:text-4xl">
-          Professional <span class="text-cyan-300">Experience</span>
-        </h2>
-        <div class="relative pl-8">
-          <span
-            aria-hidden="true"
-            class="pointer-events-none absolute left-[7px] top-0 h-full w-px bg-slate-700"
-          ></span>
-          <div id="experience-list" class="space-y-4"></div>
-        </div>
-      </section>
-
-      <section id="skills" class="scroll-mt-40 py-16 md:scroll-mt-28 md:py-20">
-        <h2 class="mb-6 text-3xl md:text-4xl">
-          Skills <span class="text-cyan-300">Matrix</span>
-        </h2>
-        <div id="skills-groups" class="grid gap-4 md:grid-cols-2"></div>
-      </section>
-
-      <section
-        id="contact"
-        class="scroll-mt-40 py-16 text-center md:scroll-mt-28 md:py-20"
-      >
-        <h2 class="mb-4 text-3xl md:text-4xl">
-          Let's <span class="text-cyan-300">Work Together</span>
-        </h2>
-        <p class="mx-auto max-w-2xl text-base text-slate-300 md:text-lg">
-          Connect about frontend engineering work and collaboration.
-        </p>
-        <div class="mt-6 flex flex-wrap justify-center gap-3">
-          <a
-            href="mailto:abdelrhmanehab047@gmail.com"
-            class="inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-300 to-sky-500 px-5 text-sm font-bold text-slate-950 transition hover:brightness-110"
-          >
-            Send Email
-          </a>
-          <a
-            href="./assets/abdelrhmanehab_resume.pdf"
-            class="resume-link inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/70 px-5 text-sm font-bold text-white transition hover:border-slate-500"
-          >
-            Download Resume (PDF)
-          </a>
-        </div>
-        <div id="social-links" class="mt-6 flex flex-wrap justify-center gap-3"></div>
-      </section>
+        <!-- graph-index:end -->
+      </div>
     </main>
-
-    <footer
-      class="mx-auto w-[min(1120px,calc(100%-2rem))] border-t border-slate-700 py-8 text-center"
-    >
-      <p class="text-sm text-slate-300">
-        &copy; <span id="year"></span> Abdelrhman Ehab. Built with HTML, CSS,
-        and JavaScript.
-      </p>
-    </footer>
 
     <script src="src/main.js" type="module"></script>
   </body>
