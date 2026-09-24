@@ -107,6 +107,8 @@ test('missing roles, ambiguous evidence and unrecognized headline fail generatio
   assert.match(run(profile(roleIds, { summary: profileDetails.summary.replace('Frontend Engineer with', 'I am a Frontend Engineer with') })), /Unsupported job title: I am a Frontend Engineer/);
   assert.match(run(profile(roleIds).replace('Jan 2022 - Jan 2024 | Saudi Arabia (Remote)', '')), /Invalid role date and location for role-shortcutadv/);
   assert.match(run(profile(roleIds).replace('Nginx reverse proxy', 'Nginx reverse proxy (443, 6000, 5678)')), /Unreviewed deployment\/security detail/);
+  assert.match(run(profile(roleIds).replace('Nginx reverse proxy', 'Nginx reverse proxy: 443, 6000, 5678')), /Unreviewed deployment\/security detail/);
+  assert.match(run(profile(roleIds).replace('## Contact', '## Contact\n- Home address: private street')), /Unreviewed or duplicate contact field: Home address/);
 }));
 
 test('known port topology is removed from public model', () => sandbox(({ generate }) => {

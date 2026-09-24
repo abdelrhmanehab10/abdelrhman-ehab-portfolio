@@ -49,7 +49,7 @@ const jobTitle = esc(profileDetails.jobTitle);
 const name = esc(root.title);
 const pageTitle = `${name} | ${jobTitle}`;
 const keywords = esc([root.title, profileDetails.jobTitle, ...nodesById.get('skill-frameworks').tags.slice(0, 4).map(tag => tag.split(' (')[0]), 'Portfolio'].join(', '));
-const image = esc(new URL('assets/images/pro.png', base).href);
+const image = esc(new URL('assets/images/pro.png', base.endsWith('/') ? base : `${base}/`).href);
 for (const [pattern, value] of [
   [/(<p\s+id="hero-badge"[^>]*>)[\s\S]*?(<\/p>)/, `${name} - ${jobTitle}`],
   [/(<h1\s+id="hero-headline"[^>]*>)[\s\S]*?(<\/h1>)/, `${name} · <span class="text-cyan-300">${jobTitle}</span>`],

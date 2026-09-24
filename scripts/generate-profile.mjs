@@ -25,7 +25,7 @@ const publicText = raw
   .replace(/private LAN deployments/gi, 'private deployments')
   .replace(/sudoers, file permissions, SCP, SSH troubleshooting/gi, 'least-privilege deployment permissions and Linux troubleshooting');
 // Fail closed on newly added deployment/security specifics, rather than silently shipping them.
-if (/\b(?:\d{2,5}\/){2}\d{2,5}\b|\bNginx reverse proxy\s*\([^)]*\b\d{2,5}\b[^)]*\)|\b(?:passwordless sudo|sudoers|\brm, copy\b|sensitive VM\/connection data|browser URLs|Jisir process|`current` Nginx symlink)\b/i.test(publicText)) {
+if (/\b(?:\d{2,5}\/){2}\d{2,5}\b|\bNginx reverse proxy[^\n]*?\b\d{2,5}\b|\b(?:passwordless sudo|sudoers|\brm, copy\b|sensitive VM\/connection data|browser URLs|Jisir process|`current` Nginx symlink)\b/i.test(publicText)) {
   throw new Error('Unreviewed deployment/security detail in public profile copy');
 }
 const lines = publicText.split('\n');
@@ -100,7 +100,17 @@ const skillBlocks = {
   'skill-other': 'Other', 'skill-tools': 'Tools',
 };
 const splitTags = (text) => text.flatMap(s => s.split(/, (?=(?:[^()]*\([^()]*\))*[^()]*$)/));
-const contact = Object.fromEntries(bullets(get('Contact')).map(s => { const i = s.indexOf(': '); return [s.slice(0, i), s.slice(i + 2)]; }));
+const contact = {};
+const contactFields = ['Email', 'Phone', 'LinkedIn', 'GitHub', 'Portfolio'];
+for (const entry of bullets(get('Contact'))) {
+  const i = entry.indexOf(': ');
+  const key = entry.slice(0, i);
+  if (i < 0 || !contactFields.includes(key) || Object.hasOwn(contact, key)) throw new Error(`Unreviewed or duplicate contact field: ${key}`);
+  contact[key] = entry.slice(i + 2);
+}
+for (const key of contactFields) {
+  if (!contact[key]) throw new Error(`Missing contact field: ${key}`);
+}
 const summary = get('Summary').lines.join(' ');
 const headline = summary.match(/^(.+?) with (\d+\+ years of professional web-development experience)\b/i);
 if (!headline) throw new Error('Summary must begin with a job title and professional web-development experience figure');

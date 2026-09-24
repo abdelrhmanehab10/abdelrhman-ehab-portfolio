@@ -74,7 +74,7 @@ test('HTML generation follows changed profile contact and identity', () => {
     changedNodes.find(n => n.id === 'link-github').href = 'https://github.com/updated';
     changedNodes.find(n => n.id === 'link-resume').href = './assets/new-resume.pdf';
     const details = structuredClone(profileDetails);
-    details.contact.Portfolio = 'https://example.com/portfolio/';
+    details.contact.Portfolio = 'https://example.com/portfolio';
     writeFileSync(join(dir, 'src/constant/graph.js'),
       `export const graphNodes = ${JSON.stringify(changedNodes)};\nexport const graphEdges = ${JSON.stringify(graphEdges)};\nexport const profileDetails = ${JSON.stringify(details)};\n`);
     const command = [join(dir, 'scripts/generate-graph-index.mjs')];
@@ -88,6 +88,7 @@ test('HTML generation follows changed profile contact and identity', () => {
     assert.match(output, /&copy; <span id="year"><\/span> Updated Profile Name\. Built with/);
     assert.equal((output.match(/href="\.\/assets\/new-resume\.pdf"/g) || []).length, 3);
     assert.match(output, /content="https:\/\/example.com\/portfolio\/assets\/images\/pro.png"/);
+    assert.doesNotMatch(output, /content="https:\/\/example.com\/assets\/images\/pro.png"/);
     const person = JSON.parse(output.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
     assert.equal(person.url, details.contact.Portfolio);
     assert.equal(person.sameAs[0], 'https://github.com/updated');
