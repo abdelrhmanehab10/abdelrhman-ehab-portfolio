@@ -23,9 +23,10 @@ for (const { source, target } of graphEdges) {
 }
 const connections = (node) => `<p class="graph-index-connections">Connected to: ${neighbours.get(node.id)
   .map((id) => `<a href="#graph-node-${esc(id)}">${esc(nodesById.get(id).title)}</a>`).join(", ")}</p>`;
-const row = (node) => `<li id="graph-node-${esc(node.id)}" tabindex="-1"><button type="button" data-node="${esc(node.id)}">${esc(node.title)}</button><span class="graph-index-summary">${esc(node.summary)}</span>${projectNotices[node.id] ? `<span class="graph-index-summary">${esc(projectNotices[node.id])}</span>` : ""}${nodeLinkHTML(node, "graph-index-link")}${connections(node)}</li>`;
+const details = (node) => `${node.meta ? `<span class="graph-index-meta">${esc(node.meta)}</span>` : ""}<span class="graph-index-summary">${esc(node.summary)}</span>${node.bullets?.length ? `<ul class="graph-index-bullets">${node.bullets.map((bullet) => `<li>${esc(bullet)}</li>`).join("")}</ul>` : ""}${node.tags?.length ? `<div class="graph-index-tags">${node.tags.map((tag) => `<span>${esc(tag)}</span>`).join("")}</div>` : ""}${projectNotices[node.id] ? `<span class="graph-index-summary">${esc(projectNotices[node.id])}</span>` : ""}${nodeLinkHTML(node, "graph-index-link")}`;
+const row = (node) => `<li id="graph-node-${esc(node.id)}" tabindex="-1"><button type="button" data-node="${esc(node.id)}">${esc(node.title)}</button>${details(node)}${connections(node)}</li>`;
 const root = graphNodes.find((node) => node.id === "me");
-const index = `<ul id="graph-index">\n  ${row(root)}\n  ${children("me").map((hub) => `<li id="graph-node-${esc(hub.id)}" tabindex="-1"><h3><button type="button" data-node="${esc(hub.id)}">${esc(hub.title)}</button></h3><p>${esc(hub.summary)}</p>${connections(hub)}<ul>${children(hub.id).map(row).join("\n")}</ul></li>`).join("\n  ")}\n</ul>`;
+const index = `<ul id="graph-index">\n  ${row(root)}\n  ${children("me").map((hub) => `<li id="graph-node-${esc(hub.id)}" tabindex="-1"><h3><button type="button" data-node="${esc(hub.id)}">${esc(hub.title)}</button></h3>${details(hub)}${connections(hub)}<ul>${children(hub.id).map(row).join("\n")}</ul></li>`).join("\n  ")}\n</ul>`;
 const base = profileDetails.contact.Portfolio;
 const links = Object.fromEntries(graphNodes.filter(node => node.group === 'link').map(node => [node.id, node]));
 const person = {

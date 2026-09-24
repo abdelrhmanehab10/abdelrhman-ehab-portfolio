@@ -35,6 +35,11 @@ html.graph-js #graph-index-wrap.graph-index-hidden:focus-within { position: stat
 #graph-index-wrap button { color: #a5f3fc; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
 #graph-index-wrap li[id] { scroll-margin-top: .5rem; }
 #graph-index-wrap .graph-index-summary { display: block; margin: .25rem 0 0; color: #cbd5e1; font-size: .8rem; line-height: 1.5; }
+#graph-index-wrap .graph-index-meta { display: block; margin: .25rem 0 0; color: #94a3b8; font-size: .8rem; line-height: 1.5; }
+#graph-index-wrap .graph-index-bullets { list-style: disc; padding-left: 1.2rem; margin: .35rem 0; font-size: .8rem; line-height: 1.5; }
+#graph-index-wrap .graph-index-bullets li { padding: .1rem 0; border: 0; }
+#graph-index-wrap .graph-index-tags { display: flex; flex-wrap: wrap; gap: .35rem; margin: .5rem 0; }
+#graph-index-wrap .graph-index-tags span { border: 1px solid #475569; border-radius: 1rem; padding: .2rem .45rem; color: #e2e8f0; font-size: .75rem; }
 #graph-index-wrap .graph-index-connections { font-size: .8rem; }
 #graph-index-wrap .graph-index-connections a, #graph-index-wrap .graph-index-link { color: #a5f3fc; text-decoration: underline; text-underline-offset: 3px; }
 #graph-index-wrap .graph-index-link { display: inline-flex; min-height: 44px; align-items: center; font-size: .85rem; font-weight: 700; }

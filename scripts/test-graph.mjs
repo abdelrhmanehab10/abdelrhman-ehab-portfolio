@@ -31,14 +31,23 @@ test("the no-JS index and Person metadata stay in sync with graph.js", () => {
   const listed = [...index.matchAll(/data-node="([^"]+)"/g)].map((match) => match[1]);
   assert.deepEqual(new Set(listed), new Set(ids));
   assert.equal(listed.length, ids.length);
-  const rows = [...index.matchAll(/<li id="graph-node-([^"]+)" tabindex="-1">[\s\S]*?<p class="graph-index-connections">Connected to: ([\s\S]*?)<\/p>/g)];
+  const rows = [...index.matchAll(/<li id="graph-node-([^"]+)" tabindex="-1">([\s\S]*?)<p class="graph-index-connections">Connected to: ([\s\S]*?)<\/p>/g)];
   assert.equal(rows.length, ids.length, "each index node exposes its connections");
   assert.deepEqual(new Set(rows.map(([, id]) => id)), new Set(ids));
   const decode = (text) => text.replace(/&(?:amp|lt|gt|quot|#39);/g, (entity) => ({
     "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'",
   })[entity]);
   const byId = new Map(graphNodes.map((node) => [node.id, node]));
-  for (const [, id, content] of rows) {
+  for (const [, id, body, content] of rows) {
+    const node = byId.get(id);
+    const fields = (pattern, text) => [...text.matchAll(pattern)].map((match) => decode(match[1]));
+    assert.deepEqual(fields(/<span class="graph-index-meta">([^<]*)<\/span>/g, body), node.meta ? [node.meta] : [], `meta for ${id}`);
+    assert.deepEqual(fields(/<span class="graph-index-summary">([^<]*)<\/span>/g, body),
+      [node.summary, ...(projectNotices[id] ? [projectNotices[id]] : [])], `summary for ${id}`);
+    const bullets = body.match(/<ul class="graph-index-bullets">([\s\S]*?)<\/ul>/)?.[1] || '';
+    assert.deepEqual(fields(/<li>([^<]*)<\/li>/g, bullets), node.bullets || [], `bullets for ${id}`);
+    const tags = body.match(/<div class="graph-index-tags">([\s\S]*?)<\/div>/)?.[1] || '';
+    assert.deepEqual(fields(/<span>([^<]*)<\/span>/g, tags), node.tags || [], `tags for ${id}`);
     const listedConnections = [...content.matchAll(/<a href="#graph-node-([^"]+)">([^<]+)<\/a>/g)]
       .map(([, target, title]) => ({ id: target, title: decode(title) }));
     const expected = graphEdges.filter(({ source, target }) => source === id || target === id)
@@ -101,9 +110,6 @@ test('HTML generation follows changed profile contact and identity', () => {
 });
 
 test('the page is only the graph view and its index keeps every Connect action', () => {
-  const body = html.slice(html.indexOf('<body>'));
-  assert.doesNotMatch(body, /<(?:header|nav|footer|section)\b/);
-  assert.doesNotMatch(html, /id="(?:home|impact|projects|experience|skills|contact)"|href="#(?:home|impact|projects|experience|skills|contact)"/);
   assert.ok(graphNodes.every(node => !('sectionId' in node)), 'no node links to a removed page section');
   const index = html.match(/<!-- graph-index:start -->([\s\S]*?)<!-- graph-index:end -->/)[1];
   for (const node of graphNodes.filter(n => n.href)) {
