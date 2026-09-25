@@ -43,22 +43,52 @@ html.graph-js #graph-index-wrap.graph-index-hidden:focus-within { position: stat
 #graph-index-wrap .graph-index-connections { font-size: .8rem; }
 #graph-index-wrap .graph-index-connections a, #graph-index-wrap .graph-index-link { color: #a5f3fc; text-decoration: underline; text-underline-offset: 3px; }
 #graph-index-wrap .graph-index-link { display: inline-flex; min-height: 44px; align-items: center; font-size: .85rem; font-weight: 700; }
-#graph-panel { position: absolute; z-index: 20; inset: auto 0 0; max-height: 72%; overflow-y: auto; padding: 1rem; border-top: 1px solid #475569; background: #020617; color: #e2e8f0; box-shadow: 0 -8px 30px #02061799; }
-#graph-index-wrap #graph-panel { position: static; inset: auto; width: auto; max-height: none; margin: 1rem 0; border: 1px solid #475569; border-radius: .75rem; box-shadow: none; }
-#graph-panel h2 { color: #fff; font: 600 1.1rem/1.4 Sora, sans-serif; margin: .25rem 0; }
-.graph-panel-heading { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
-.graph-group-name { margin: 0; color: #67e8f9; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.graph-meta { color: #94a3b8; font-size: .8rem; line-height: 1.6; }
+/* The details panel is a callout card pinned to the selected node; hero-graph.js sets its
+   left/top, side and arrow every frame. In the list-index fallback it is a static card. */
+#graph-panel { position: absolute; z-index: 20; left: 12px; top: 12px; width: min(330px, calc(100% - 24px)); border: 1px solid #475569; border-radius: 16px; background: #020617; color: #e2e8f0; box-shadow: 0 18px 50px #000000aa, 0 0 0 1px rgba(103,232,249,.08); animation: graph-panel-in .2s cubic-bezier(.2,.8,.2,1); }
+@keyframes graph-panel-in { from { opacity: 0; transform: scale(.96); } }
+#graph-panel:focus { outline: none; }
+#graph-panel:focus-visible { outline: 3px solid #67e8f9; outline-offset: 3px; }
+.graph-panel-scroll { position: relative; overflow-y: auto; overscroll-behavior: contain; padding: 10px 12px 12px 14px; border-radius: 16px; scrollbar-width: thin; scrollbar-color: #475569 transparent; }
+.graph-panel-arrow { position: absolute; width: 16px; height: 16px; margin: -8px; background: #020617; border: 0 solid #475569; transform: rotate(45deg); }
+#graph-panel:not([data-side]) .graph-panel-arrow, .graph-panel-arrow[hidden] { display: none; }
+#graph-panel[data-side="right"] .graph-panel-arrow { left: 0; border-width: 0 0 1px 1px; }
+#graph-panel[data-side="left"] .graph-panel-arrow { left: 100%; border-width: 1px 1px 0 0; }
+#graph-panel[data-side="below"] .graph-panel-arrow { top: 0; border-width: 1px 0 0 1px; }
+#graph-panel[data-side="above"] .graph-panel-arrow { top: 100%; border-width: 0 1px 1px 0; }
+#graph-index-wrap #graph-panel { position: static; width: auto; margin: 1rem 0; border-radius: .75rem; box-shadow: none; animation: none; }
+#graph-index-wrap #graph-panel .graph-panel-scroll { max-height: none !important; overflow: visible; }
+#graph-index-wrap #graph-panel p { margin: 0; }
+#graph-index-wrap #graph-panel .graph-body > * + * { margin-top: 12px; }
+#graph-index-wrap #graph-panel .graph-copy { color: #f1f5f9; text-align: center; text-decoration: none; }
+#graph-panel h2 { color: #fff; font: 600 1.1rem/1.35 Sora, sans-serif; margin: 0; overflow-wrap: anywhere; }
+.graph-panel-heading { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2px; }
+.graph-group-name { display: flex; align-items: center; gap: 6px; margin: 0; color: #67e8f9; font-size: .7rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+.graph-group-name::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 3px rgba(103,232,249,.14); }
+#graph-panel #graph-panel-close { display: inline-grid; place-items: center; width: 44px; padding: 0; }
+#graph-panel-close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.graph-facts { display: flex; flex-wrap: wrap; gap: 2px 6px; margin-top: 6px; }
+.graph-facts li { color: #94a3b8; font-size: .78rem; line-height: 1.5; }
+.graph-facts li:not(:last-child)::after { content: "·"; margin-left: 6px; color: #64748b; }
+.graph-meta { color: #94a3b8; font-size: .78rem; line-height: 1.6; }
+.graph-body { margin-top: 10px; }
+.graph-body > * + * { margin-top: 12px; }
+.graph-body.is-clamped { max-height: 7.4em; overflow: hidden; -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
 .graph-summary { font-size: .9rem; line-height: 1.6; }
-.graph-bullets { padding-left: 1.2rem; font-size: .82rem; line-height: 1.6; }
-.graph-bullets li { margin: .35rem 0; }
-.graph-tags { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0; }
-.graph-tags span { border: 1px solid #475569; border-radius: 1rem; padding: .25rem .5rem; color: #e2e8f0; font-size: .75rem; }
-#graph-panel .graph-action { display: flex; min-height: 44px; align-items: center; justify-content: center; border-radius: .75rem; margin: .6rem 0; font-weight: 700; font-size: .85rem; }
+.graph-url { color: #cbd5e1; font: 500 .8rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+.graph-notice { padding: 8px 10px; border: 1px dashed #475569; border-radius: 10px; color: #cbd5e1; font-size: .78rem; line-height: 1.5; }
+.graph-bullets { display: grid; gap: 8px; font-size: .84rem; line-height: 1.6; }
+.graph-bullets li { position: relative; padding-left: 16px; }
+.graph-bullets li::before { content: ""; position: absolute; left: 2px; top: .6em; width: 6px; height: 6px; border-radius: 2px; background: #67e8f9; opacity: .8; }
+.graph-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+.graph-tags span { border: 1px solid #475569; border-radius: 1rem; padding: .2rem .55rem; color: #e2e8f0; font-size: .75rem; line-height: 1.45; overflow-wrap: anywhere; }
+#graph-panel .graph-more { display: inline-flex; align-items: center; padding: 0 2px; border: 0; background: none; color: #a5f3fc; font-weight: 700; font-size: .82rem; text-decoration: underline; text-underline-offset: 3px; }
+#graph-panel .graph-more:hover { border: 0; background: none; color: #fff; }
+.graph-panel-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 10px; margin-top: 8px; padding-top: 10px; border-top: 1px solid #334155; }
+#graph-panel .graph-action { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; padding: 0 16px; border-radius: .75rem; font-weight: 700; font-size: .85rem; }
 .graph-action { background: #67e8f9; color: #082f49; }
 .graph-tooltip { font: 600 12px Manrope,sans-serif; color: #f8fafc; background: #020617; border: 1px solid #64748b; border-radius: 8px; padding: 6px 8px; max-width: 240px; }
-/* Beside a visible stage the list docks left, leaving the desktop detail panel (above it) on the right. */
+/* Beside a visible stage the list docks left; the detail callout floats above it beside its node. */
 @media (min-width: 1024px) { html.graph-js #graph-stage:not([hidden]) ~ #graph-index-wrap, html.graph-js #graph-stage:not([hidden]) ~ #graph-index-wrap.graph-index-hidden:focus-within { justify-self: start; width: min(28rem, 100%); box-shadow: 8px 0 30px #02061799; } }
-@media (min-width: 640px) { #graph-panel { inset: 0 0 0 auto; width: min(340px, 70%); max-height: none; border-top: 0; border-left: 1px solid #475569; } }
-@media (max-width: 639px) { #graph-controls .graph-buttons { width: 100%; } #graph-controls button { flex: 1; padding-inline: .4rem; } }
-@media (prefers-reduced-motion: reduce) { #graph-stage *, #graph-controls * { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
+@media (max-width: 639px) { #graph-panel { width: calc(100% - 24px); } #graph-controls .graph-buttons { width: 100%; } #graph-controls button { flex: 1; padding-inline: .4rem; } }
+@media (prefers-reduced-motion: reduce) { #graph-stage *, #graph-controls *, #graph-panel, #graph-panel * { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }

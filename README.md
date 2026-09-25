@@ -9,7 +9,7 @@ The whole site is one interactive profile graph. Visitors pan, zoom and select n
 ## What this project demonstrates
 
 - A graph-only page that fills the viewport on desktop and phone, built without a frontend framework.
-- Dark, interactive profile graph with pan, zoom, node details and shareable `#node/<id>` links; List view provides a keyboard-readable index with linked connections and Connect links, also available without JavaScript or the graph library.
+- Dark, interactive profile graph with pan, zoom and shareable `#node/<id>` links. Selecting a node opens a callout beside it (below or above it on phones); long details expand with Read more and scroll within the card. List view provides a keyboard-readable index with linked connections and Connect links, also available without JavaScript or the graph library.
 - Reduced-motion support (the graph is pre-warmed without animated ticks), with a manual graph pause control.
 - Search and social metadata, canonical URL, Open Graph/Twitter cards, and Person structured data.
 - Static deployment through GitHub Pages.

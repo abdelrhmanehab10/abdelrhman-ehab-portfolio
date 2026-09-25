@@ -44,6 +44,10 @@ try {
     await delay(500);
   }
   async function screenshot(name) { const {data}=await c('Page.captureScreenshot',{format:'png',captureBeyondViewport:false}); const file=join(evidence,name); writeFileSync(file,Buffer.from(data,'base64')); console.log('SCREENSHOT',file); }
+  // Where the callout's arrow points (30px from the card edge), whether the selected node's
+  // cyan fill is actually drawn there on the canvas, and whether the card fits the stage.
+  const callout = `(()=>{const p=document.querySelector('#graph-panel'),a=p.querySelector('.graph-panel-arrow'),side=p.dataset.side;if(!side||p.hidden||a.hidden)return {side,hidden:p.hidden,arrow:!a.hidden,title:document.querySelector('#graph-panel-title')?.textContent};const L=parseFloat(p.style.left),T=parseFloat(p.style.top),w=p.offsetWidth,h=p.offsetHeight,off=parseFloat(side==='right'||side==='left'?a.style.top:a.style.left);const x=side==='right'?L-30:side==='left'?L+w+30:L+off,y=side==='below'?T-30:side==='above'?T+h+30:T+off;const c=document.querySelector('#graph-canvas-host canvas'),k=c.width/c.clientWidth,d=c.getContext('2d').getImageData(Math.round(x*k)-3,Math.round(y*k)-3,7,7).data;let cyan=0;for(let i=0;i<d.length;i+=4)if(d[i]<150&&d[i+1]>200&&d[i+2]>220)cyan++;const s=document.querySelector('#graph-stage').getBoundingClientRect(),r=p.getBoundingClientRect();return {side,x:Math.round(x),y:Math.round(y),cyan,arrow:!a.hidden,inside:r.left>=s.left-1&&r.right<=s.right+1&&r.top>=s.top-1&&r.bottom<=s.bottom+1}})()`;
+  const onNode = r => ['right','left','below','above'].includes(r.side) && r.arrow && r.inside && r.cyan >= 30;
   async function check(label, expression, pred) { const result=await evalJs(expression); assert.ok(pred(result), `${label}: ${JSON.stringify(result)}`); console.log(label,JSON.stringify(result)); return result; }
   await c('Page.enable'); await c('Runtime.enable'); await c('Network.enable'); await c('Network.setCacheDisabled',{cacheDisabled:true});
   await go();
@@ -98,17 +102,34 @@ try {
   await check('keyboard Escape restores origin',`({hidden:document.querySelector('#graph-panel').hidden,focus:document.activeElement?.dataset.node})`,r=>r.hidden&&r.focus==='proj-efa');
   await evalJs(`document.querySelector('[data-node="proj-virtuwa-hv"]').click()`);
   await check('list details and privacy', `({title:document.querySelector('#graph-panel-title').textContent,visible:!document.querySelector('#graph-panel').hidden,private:document.querySelector('#graph-panel').textContent,hash:location.hash})`,r=>r.title.includes('VirtuWa HV')&&r.visible&&r.private.includes('session-based bootstrap')&&!/sensitive VM\/connection data|browser URLs/i.test(r.private)&&r.hash==='#node/proj-virtuwa-hv');
-  await screenshot('live-desktop-detail.png');
+  await delay(300); await screenshot('live-desktop-detail.png');
   await evalJs(`document.querySelector('[data-node="link-email"]').click()`);
   await check('Connect email detail provides mail action', `({title:document.querySelector('#graph-panel-title').textContent,href:document.querySelector('#graph-panel .graph-action')?.getAttribute('href')})`,r=>r.title==='Email'&&r.href==='mailto:abdelrhmanehab047@gmail.com');
-  await screenshot('live-connect-email.png');
+  await delay(300); await screenshot('live-connect-email.png');
   await evalJs(`document.querySelector('[data-node="link-resume"]').click()`);
   await check('Connect resume detail serves PDF download', `(async()=>{const a=document.querySelector('#graph-panel .graph-action');const response=await fetch(a.href);const bytes=new Uint8Array(await response.arrayBuffer());return {title:document.querySelector('#graph-panel-title').textContent,download:a.hasAttribute('download'),status:response.status,signature:String.fromCharCode(...bytes.slice(0,5)),length:bytes.length}})()`,r=>r.title==='Resume (PDF)'&&r.download&&r.status===200&&r.signature==='%PDF-'&&r.length>1000);
-  await screenshot('live-connect-resume.png');
+  await delay(300); await screenshot('live-connect-resume.png');
   await evalJs(`document.querySelector('[data-node="proj-virtuwa-hv"]').click();document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`);
   await check('Escape returns focus', `({hidden:document.querySelector('#graph-panel').hidden,focused:document.activeElement?.dataset.node,hash:location.hash})`,r=>r.hidden&&r.focused==='proj-virtuwa-hv'&&r.hash==='');
   await evalJs(`document.querySelector('#btn-list').click()`);
   await check('Hide list conceals index without hiding the graph', `({hidden:document.querySelector('#graph-index-wrap').classList.contains('graph-index-hidden'),expanded:document.querySelector('#btn-list').getAttribute('aria-expanded'),canvas:!!document.querySelector('#graph-canvas-host canvas')})`, r=>r.hidden&&r.expanded==='false'&&r.canvas);
+  await evalJs(`location.hash='#node/proj-virtuwa-hv'`); await delay(1500);
+  const pointed = await check('desktop callout arrow points at the selected node', callout, onNode);
+  await screenshot('live-callout-desktop.png');
+  const frames = await evalJs(`new Promise(done=>{const p=document.querySelector('#graph-panel'),seen=[];const step=()=>{seen.push([parseFloat(p.style.left),parseFloat(p.style.top)]);seen.length<40?requestAnimationFrame(step):done(seen)};requestAnimationFrame(step)})`);
+  const jump = Math.max(...frames.slice(1).map(([x, y], i) => Math.hypot(x - frames[i][0], y - frames[i][1])));
+  assert.ok(jump <= 3, `callout jitters with motion on: ${jump}px between frames`); console.log('CALLOUT FRAMES', { frames: frames.length, largestStep: jump });
+  const stageRect = await evalJs(`document.querySelector('#graph-stage').getBoundingClientRect().toJSON()`);
+  await c('Input.dispatchMouseEvent',{type:'mouseWheel',x:stageRect.left+pointed.x-150,y:stageRect.top+pointed.y+100,deltaX:0,deltaY:-240}); await delay(700);
+  await check('callout follows its node after zoom', callout, onNode);
+  const dragFrom = { x: stageRect.left + 40, y: stageRect.bottom - 40 };
+  await c('Input.dispatchMouseEvent',{type:'mouseMoved',...dragFrom});
+  await c('Input.dispatchMouseEvent',{type:'mousePressed',...dragFrom,button:'left',clickCount:1});
+  for (let step=1;step<=8;step++) await c('Input.dispatchMouseEvent',{type:'mouseMoved',x:dragFrom.x+step*12,y:dragFrom.y-step*6,button:'left',buttons:1});
+  await c('Input.dispatchMouseEvent',{type:'mouseReleased',x:dragFrom.x+96,y:dragFrom.y-48,button:'left',clickCount:1}); await delay(500);
+  await check('callout follows its node after pan', `({open:!document.querySelector('#graph-panel').hidden,...${callout}})`, r => r.open && onNode(r));
+  await screenshot('live-callout-desktop-panned.png');
+  await check('Read more expands the clamped card', `(()=>{const b=document.querySelector('#graph-panel-more'),before=b.getAttribute('aria-expanded');b.click();const after=b.getAttribute('aria-expanded'),clamped=document.querySelector('#graph-panel-body').classList.contains('is-clamped');b.click();return {before,after,clamped,back:b.getAttribute('aria-expanded'),text:b.textContent}})()`, r => r.before==='false'&&r.after==='true'&&!r.clamped&&r.back==='false'&&r.text==='Read more');
   await go('/#node/proj-efa');
   await check('deep link opens on load', `({title:document.querySelector('#graph-panel-title')?.textContent,hidden:document.querySelector('#graph-panel').hidden})`,r=>r.title==='EFA'&&!r.hidden);
   await evalJs(`location.hash='#node/proj-virtuwa-hv'`); await delay(200);
@@ -132,6 +153,11 @@ try {
   assert.ok(fraction<0.08,`Reset view left too much of the opening canvas changed: ${fraction}`);
   console.log('MOBILE RESET', {zoomChanged:zoomed!==before, pixelsRestored:restored===before, changedPixelFraction:fraction});
   await screenshot('live-mobile-reset.png');
+  await evalJs(`location.hash='#node/me'`); await delay(800);
+  await check('phone callout sits above or below its node inside the stage', callout, r => onNode(r) && (r.side === 'below' || r.side === 'above'));
+  await screenshot('live-callout-phone.png');
+  for (const id of ['role-pro-event', 'link-resume']) { await evalJs(`location.hash='#node/${id}'`); await delay(500); await screenshot(`live-callout-phone-${id}.png`); }
+  await evalJs(`document.querySelector('#graph-panel-close').click()`);
   await go('/',true,390,844,true);
   await check('reduced motion settled graph', `({pressed:document.querySelector('#btn-motion').getAttribute('aria-pressed'),canvas:!!document.querySelector('canvas'),status:document.querySelector('#graph-status').textContent})`,r=>r.pressed==='true'&&r.canvas&&r.status.includes('52 nodes'));
   const stillCanvas=await evalJs(`document.querySelector('#graph-canvas-host canvas').toDataURL()`);
@@ -151,6 +177,7 @@ try {
   await c('Input.dispatchMouseEvent',{type:'mousePressed',x:reducedHit.x,y:reducedHit.y,button:'left',clickCount:1});
   await c('Input.dispatchMouseEvent',{type:'mouseReleased',x:reducedHit.x,y:reducedHit.y,button:'left',clickCount:1});
   await check('reduced-motion canvas click opens exactly hovered node',`({title:document.querySelector('#graph-panel-title')?.textContent,hidden:document.querySelector('#graph-panel').hidden})`,r=>!r.hidden&&r.title===reducedHit.title);
+  await check('reduced-motion callout points at its node without animating', `({animation:getComputedStyle(document.querySelector('#graph-panel')).animationName,...${callout}})`, r => r.animation === 'none' && onNode(r));
   await screenshot('live-mobile-reduced-detail.png');
   failVendor=true; await go('/?fail=1#node/proj-efa',true,390,844);
   await check('vendor failure deep link visible', `({stage:document.querySelector('#graph-stage').hidden,index:getComputedStyle(document.querySelector('#graph-index-wrap')).display,panel:document.querySelector('#graph-panel').textContent,title:document.querySelector('#graph-panel-title')?.textContent,hidden:document.querySelector('#graph-panel').hidden})`,r=>r.stage&&r.title==='EFA'&&!r.hidden);
