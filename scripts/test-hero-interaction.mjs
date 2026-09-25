@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { graphGroups, graphNodes } from "../src/constant/graph.js";
-import { initHeroGraph } from "../src/hero-graph.js";
+import { initHeroGraph, placeCallout } from "../src/hero-graph.js";
 
 function element() {
   const handlers = {};
@@ -12,8 +12,8 @@ function element() {
       add(name) { classes.add(name); },
       remove(name) { classes.delete(name); },
       contains(name) { return classes.has(name); },
-      toggle(name) {
-        if (classes.has(name)) { classes.delete(name); return false; }
+      toggle(name, force) {
+        if (force === false || (force === undefined && classes.has(name))) { classes.delete(name); return false; }
         classes.add(name);
         return true;
       },
@@ -38,6 +38,12 @@ function setup(mobile, libraryAvailable = true, initialHash = "", reduced = fals
   const stage = selectors.get("#graph-stage");
   const panel = selectors.get("#graph-panel");
   panel.hidden = true;
+  panel.offsetWidth = 330;
+  const parts = new Map();
+  panel.querySelector = (selector) => {
+    if (!parts.has(selector)) parts.set(selector, element());
+    return parts.get(selector);
+  };
   panel.parent = stage;
   const index = selectors.get("#graph-index-wrap");
   index.classList.add("graph-index-hidden");
@@ -70,6 +76,7 @@ function setup(mobile, libraryAvailable = true, initialHash = "", reduced = fals
     onNodeHover(callback) { this.callbacks.hover = callback; return this; },
     onNodeClick(callback) { this.callbacks.click = callback; return this; },
     onBackgroundClick(callback) { this.callbacks.background = callback; return this; },
+    onRenderFramePost(callback) { this.callbacks.frame = callback; return this; },
     onEngineTick() { return this; }, onEngineStop() { return this; },
     d3Force() { return { strength: () => ({ distanceMax() {} }), distance() {} }; },
     d3VelocityDecay() { return this; }, warmupTicks() { return this; },
@@ -341,4 +348,91 @@ test("Connect and project details keep their actions, technologies and source no
   open("proj-bleu-blog");
   assert.match(panel.innerHTML, /<span>Eleventy<\/span>/);
   assert.doesNotMatch(panel.innerHTML, /Client-owned product|See in/);
+});
+
+test("callout sits beside the node, flips at the edge and drops below on phones", () => {
+  const stage = { width: 1000, height: 600, cardWidth: 330, cardHeight: 300 };
+  const right = placeCallout({ ...stage, x: 300, y: 300, mobile: false });
+  assert.deepEqual([right.side, right.left], ["right", 330]);
+  assert.equal(right.top + right.arrow, 300, "arrow points at the node row");
+  const left = placeCallout({ ...stage, x: 900, y: 300, mobile: false });
+  assert.deepEqual([left.side, left.left + 330 + 30], ["left", 900]);
+  const narrow = placeCallout({ ...stage, width: 660, x: 330, y: 150, mobile: false });
+  assert.equal(narrow.side, "below");
+  assert.equal(narrow.left + narrow.arrow, 330, "arrow points at the node column");
+  const phone = placeCallout({ ...stage, width: 358, x: 180, y: 120, mobile: true });
+  assert.deepEqual([phone.side, phone.left, phone.top], ["below", 12, 150]);
+  assert.ok(phone.top + Math.min(300, phone.maxHeight) <= 600 - 12, "card stays inside the stage");
+  const low = placeCallout({ ...stage, width: 358, x: 180, y: 560, mobile: true });
+  assert.equal(low.side, "above");
+  assert.ok(low.top >= 12 && low.top + Math.min(300, low.maxHeight) <= 560 - 30);
+  assert.equal(placeCallout({ ...stage, x: -40, y: 300, mobile: false }).arrow, null, "no arrow for an off-stage node");
+});
+
+test("each rendered frame keeps the callout and its arrow on the selected node", () => {
+  for (const mobile of [false, true]) {
+    const { graph, panel, selectors, stage } = setup(mobile);
+    const node = graph.nodes.find((entry) => entry.id === "proj-virtuwa-hv");
+    node.y = 400;
+    panel.querySelector(".graph-panel-scroll").scrollHeight = 240;
+    graph.scale = 0.5;
+    graph.offset = 60 - node.x * graph.scale;
+    selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: node.id } }) } });
+    graph.callbacks.frame();
+    const arrow = panel.querySelector(".graph-panel-arrow");
+    const x = node.x * graph.scale + graph.offset;
+    if (mobile) {
+      assert.equal(panel.dataset.side, "below");
+      assert.equal(parseFloat(panel.style.left) + parseFloat(arrow.style.left), Math.round(x));
+    } else {
+      assert.equal(panel.dataset.side, "below", "a 390px-wide desktop stage has no room beside the node");
+      stage.clientWidth = 1000;
+      graph.callbacks.frame();
+      assert.equal(panel.dataset.side, "right");
+      assert.equal(parseFloat(panel.style.left), Math.round(x) + 30);
+      assert.equal(parseFloat(panel.style.top) + parseFloat(arrow.style.top), 200, "the arrow points at the node row");
+      stage.clientWidth = 390;
+    }
+    graph.offset += 40;
+    graph.callbacks.frame();
+    assert.equal(parseFloat(panel.style.left) + parseFloat(arrow.style.left), Math.round(x + 40), "the arrow follows a pan");
+    assert.equal(arrow.hidden, false);
+    graph.offset = -5000;
+    graph.callbacks.frame();
+    assert.equal(arrow.hidden, true, "an off-stage node hides the arrow");
+  }
+});
+
+test("callout copy: Read more, singular labels, no repeated skill tags, muted Connect URL", () => {
+  const { panel, selectors } = setup(false);
+  const open = (id) => selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: id } }) } });
+  open("role-pro-event");
+  assert.match(panel.innerHTML, /<p class="graph-group-name">Experience<\/p>/);
+  assert.match(panel.innerHTML, /class="graph-body is-clamped"/);
+  const more = panel.querySelector("#graph-panel-more");
+  more.fire("click");
+  assert.equal(more.getAttribute("aria-expanded"), "true");
+  assert.equal(more.textContent, "Show less");
+  assert.equal(panel.querySelector("#graph-panel-body").classList.contains("is-clamped"), false);
+  more.fire("click");
+  assert.equal(more.getAttribute("aria-expanded"), "false");
+  assert.equal(panel.querySelector("#graph-panel-body").classList.contains("is-clamped"), true);
+  open("skill-devops");
+  assert.match(panel.innerHTML, /<p class="graph-group-name">Skill set<\/p>/);
+  assert.doesNotMatch(panel.innerHTML, /graph-summary/);
+  assert.equal(panel.innerHTML.match(/Nginx reverse proxy/g).length, 1);
+  open("link-linkedin");
+  assert.match(panel.innerHTML, /<p class="graph-url">https:\/\/www\.linkedin\.com\//);
+  assert.doesNotMatch(panel.innerHTML, /graph-panel-more/);
+  open("link-resume");
+  assert.match(panel.innerHTML, /<p class="graph-summary">Download the full resume\.<\/p>/);
+  open("domain-healthcare");
+  assert.match(panel.innerHTML, /id="graph-panel-copy"/);
+});
+
+test("list-index fallback shows the whole card without the clamp", () => {
+  const { panel, selectors } = setup(false, false);
+  selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: "role-pro-event" } }) } });
+  assert.doesNotMatch(panel.innerHTML, /is-clamped|graph-panel-more/);
+  assert.equal(panel.dataset.side, undefined);
 });

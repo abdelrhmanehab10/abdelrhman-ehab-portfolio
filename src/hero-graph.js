@@ -20,6 +20,46 @@ export function nodeLinkHTML(node, className) {
   return `<a class="${className}" href="${escapeHTML(node.href)}"${attributes}>${escapeHTML(node.linkLabel || "Open link")}</a>`;
 }
 
+// The details panel is a callout card: its group label names one node, not the section.
+const groupNames = { root: "Profile", hub: "Section", role: "Experience", project: "Project", skill: "Skill set", domain: "Domain", craft: "Practice", link: "Connect" };
+const facts = (meta) => (meta || "").replace(/^\(|\)$/g, "").split(/\s\|\s|\s·\s|,\s(?=\d+ months)/).map((fact) => fact.trim()).filter(Boolean);
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const CALLOUT_GAP = 30;
+const CALLOUT_MARGIN = 12;
+
+// Places the callout beside the node (right, else left) when it fits on a wide stage,
+// otherwise below or above it; phones always use the vertical placement. Returns stage
+// pixels, and a null arrow when the node itself is off the stage.
+export function placeCallout({ x, y, width, height, cardWidth, cardHeight, mobile }) {
+  const onStage = x >= 0 && x <= width && y >= 0 && y <= height;
+  const ax = clamp(x, 0, width);
+  const ay = clamp(y, 0, height);
+  if (!mobile) {
+    const right = ax + CALLOUT_GAP + cardWidth <= width - CALLOUT_MARGIN;
+    const left = ax - CALLOUT_GAP - cardWidth >= CALLOUT_MARGIN;
+    if (right || left) {
+      const maxHeight = height - 2 * CALLOUT_MARGIN;
+      const shown = Math.min(cardHeight, maxHeight);
+      const top = clamp(ay - 60, CALLOUT_MARGIN, height - shown - CALLOUT_MARGIN);
+      return {
+        side: right ? "right" : "left", left: Math.round(right ? ax + CALLOUT_GAP : ax - CALLOUT_GAP - cardWidth),
+        top: Math.round(top), maxHeight: Math.round(maxHeight), arrow: onStage ? Math.round(clamp(ay - top, 18, shown - 18)) : null,
+      };
+    }
+  }
+  const below = height - ay - CALLOUT_GAP - CALLOUT_MARGIN;
+  const above = ay - CALLOUT_GAP - CALLOUT_MARGIN;
+  const down = below >= Math.min(cardHeight, 220) || below >= above;
+  const maxHeight = Math.max(down ? below : above, 120);
+  const shown = Math.min(cardHeight, maxHeight);
+  const left = mobile ? CALLOUT_MARGIN : clamp(ax - cardWidth / 2, CALLOUT_MARGIN, width - cardWidth - CALLOUT_MARGIN);
+  const top = clamp(down ? ay + CALLOUT_GAP : ay - CALLOUT_GAP - shown, CALLOUT_MARGIN, height - shown - CALLOUT_MARGIN);
+  return {
+    side: down ? "below" : "above", left: Math.round(left), top: Math.round(top), maxHeight: Math.round(maxHeight),
+    arrow: onStage ? Math.round(clamp(ax - left, 18, cardWidth - 18)) : null,
+  };
+}
+
 export function initHeroGraph() {
   const stage = document.querySelector("#graph-stage");
   if (!stage) return;
@@ -37,6 +77,8 @@ export function initHeroGraph() {
   let hovered = null;
   let selected = null;
   let lastFocus = null;
+  let placed = "";
+  let panelVersion = 0;
   let press = null;
   let moved = false;
   let ticks = 0;
@@ -85,6 +127,32 @@ export function initHeroGraph() {
     return null;
   }
 
+  // Runs every rendered frame, so the card follows its node through ticks, pan and zoom;
+  // the key skips layout work when nothing moved by a whole pixel.
+  function positionPanel() {
+    if (!graph || !selected || panel.hidden || stage.hidden) return;
+    const node = graph.graphData().nodes.find((entry) => entry.id === selected);
+    if (!node || !Number.isFinite(node.x) || !Number.isFinite(node.y)) return;
+    const screen = graph.graph2ScreenCoords(node.x, node.y);
+    const scroll = panel.querySelector(".graph-panel-scroll");
+    const key = [Math.round(screen.x), Math.round(screen.y), stage.clientWidth, stage.clientHeight, mobile.matches, panelVersion].join();
+    if (key === placed) return;
+    placed = key;
+    const spot = placeCallout({
+      x: screen.x, y: screen.y, width: stage.clientWidth, height: stage.clientHeight,
+      cardWidth: panel.offsetWidth || 330, cardHeight: (scroll.scrollHeight || 0) + 2, mobile: mobile.matches,
+    });
+    panel.dataset.side = spot.side;
+    panel.style.left = `${spot.left}px`;
+    panel.style.top = `${spot.top}px`;
+    scroll.style.maxHeight = `${spot.maxHeight}px`;
+    const arrow = panel.querySelector(".graph-panel-arrow");
+    arrow.hidden = spot.arrow === null;
+    const vertical = spot.side === "below" || spot.side === "above";
+    arrow.style.top = vertical || spot.arrow === null ? "" : `${spot.arrow}px`;
+    arrow.style.left = !vertical || spot.arrow === null ? "" : `${spot.arrow}px`;
+  }
+
   function closePanel({ restoreFocus = true } = {}) {
     if (panel.hidden) return;
     panel.hidden = true;
@@ -100,20 +168,51 @@ export function initHeroGraph() {
     lastFocus = origin || document.activeElement;
     hovered = null;
     selected = id;
-    const group = graphGroups[node.group].label;
     const link = nodeLinkHTML(node, "graph-action");
-    const notice = projectNotices[id] ? `<p class="graph-meta">${escapeHTML(projectNotices[id])}</p>` : "";
-    panel.innerHTML = `<div class="graph-panel-heading"><div><p class="graph-group-name">${escapeHTML(group)}</p>
+    const notice = projectNotices[id] ? `<p class="graph-notice">${escapeHTML(projectNotices[id])}</p>` : "";
+    const detail = facts(node.meta);
+    // Skill summaries repeat their tags; a Connect node's address reads as a muted line.
+    const text = node.tags?.length && node.summary === node.tags.join(" · ") ? "" : node.summary || "";
+    const address = node.group === "link" && /^(https?:\/\/\S+|\S+@\S+)$/.test(text);
+    const summary = !text ? "" : `<p class="${address ? "graph-url" : "graph-summary"}">${escapeHTML(text)}</p>`;
+    // The clamp is for the floating card; the list-index fallback shows everything.
+    const long = !stage.hidden && (text.length > 150 || node.bullets?.length > 0 || node.tags?.length > 4);
+    panel.innerHTML = `<span class="graph-panel-arrow" aria-hidden="true"></span><div class="graph-panel-scroll">
+      <div class="graph-panel-heading"><p class="graph-group-name">${escapeHTML(groupNames[node.group] || graphGroups[node.group].label)}</p>
+      <button type="button" id="graph-panel-close" aria-label="Close node details"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
       <h2 id="graph-panel-title">${escapeHTML(node.title)}</h2>
-      ${node.meta ? `<p class="graph-meta">${escapeHTML(node.meta)}</p>` : ""}</div>
-      <button type="button" id="graph-panel-close" aria-label="Close node details">&times;</button></div>
-      <p class="graph-summary">${escapeHTML(node.summary)}</p>${notice}
+      ${detail.length ? `<ul class="graph-facts">${detail.map((fact) => `<li>${escapeHTML(fact)}</li>`).join("")}</ul>` : ""}
+      <div class="graph-body${long ? " is-clamped" : ""}" id="graph-panel-body">${summary}${notice}
       ${node.bullets?.length ? `<ul class="graph-bullets">${node.bullets.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>` : ""}
-      ${node.tags?.length ? `<div class="graph-tags">${node.tags.map((tag) => `<span>${escapeHTML(tag)}</span>`).join("")}</div>` : ""}
-      ${link}<p class="graph-meta">${adjacency.get(id)?.size || 0} connections</p>`;
+      ${node.tags?.length ? `<div class="graph-tags">${node.tags.map((tag) => `<span>${escapeHTML(tag)}</span>`).join("")}</div>` : ""}</div>
+      ${long ? `<button type="button" id="graph-panel-more" class="graph-more" aria-expanded="false" aria-controls="graph-panel-body">Read more</button>` : ""}
+      <div class="graph-panel-foot">${link || '<button type="button" id="graph-panel-copy" class="graph-copy">Copy link</button>'}
+      <p class="graph-meta">${adjacency.get(id)?.size || 0} connections</p></div></div>`;
     panel.hidden = false;
+    delete panel.dataset.side;
     panel.querySelector("#graph-panel-close").addEventListener("click", () => closePanel());
-    panel.focus();
+    if (long) {
+      const more = panel.querySelector("#graph-panel-more");
+      more.addEventListener("click", () => {
+        const open = more.getAttribute("aria-expanded") !== "true";
+        panel.querySelector("#graph-panel-body").classList.toggle("is-clamped", !open);
+        more.setAttribute("aria-expanded", String(open));
+        more.textContent = open ? "Show less" : "Read more";
+        panelVersion++;
+        positionPanel();
+      });
+    }
+    if (!link) {
+      const copy = panel.querySelector("#graph-panel-copy");
+      copy.addEventListener("click", () => {
+        const done = (text) => { copy.textContent = text; setTimeout(() => { copy.textContent = "Copy link"; }, 1600); };
+        const url = `${location.origin}${location.pathname}#node/${id}`;
+        (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => done("Link copied"), () => done("Copy failed"));
+      });
+    }
+    panelVersion++;
+    positionPanel();
+    panel.focus({ preventScroll: true });
     repaint();
     history.replaceState(null, "", `#node/${id}`);
   }
@@ -230,6 +329,7 @@ export function initHeroGraph() {
       .onBackgroundClick(() => {
         if (motionButton.getAttribute("aria-pressed") !== "true") closePanel();
       })
+      .onRenderFramePost(() => positionPanel())
       .onEngineTick(() => { if (!moved && ++ticks % 12 === 0) fit(0); })
       .onEngineStop(() => { if (!moved) fit(reduced ? 0 : 400); });
 
