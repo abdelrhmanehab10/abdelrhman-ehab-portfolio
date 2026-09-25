@@ -29,7 +29,7 @@ const CALLOUT_MARGIN = 12;
 
 // Places the callout beside the node (right, else left) when it fits on a wide stage,
 // otherwise below or above it; phones always use the vertical placement. Returns stage
-// pixels, and a null arrow when the node itself is off the stage.
+// pixels, and a null arrow when the node is off-stage or the card cannot align with it.
 export function placeCallout({ x, y, width, height, cardWidth, cardHeight, mobile }) {
   const onStage = x >= 0 && x <= width && y >= 0 && y <= height;
   const ax = clamp(x, 0, width);
