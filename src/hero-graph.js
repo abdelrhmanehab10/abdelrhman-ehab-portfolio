@@ -41,22 +41,25 @@ export function placeCallout({ x, y, width, height, cardWidth, cardHeight, mobil
       const maxHeight = height - 2 * CALLOUT_MARGIN;
       const shown = Math.min(cardHeight, maxHeight);
       const top = clamp(ay - 60, CALLOUT_MARGIN, height - shown - CALLOUT_MARGIN);
+      const arrow = ay - top;
       return {
         side: right ? "right" : "left", left: Math.round(right ? ax + CALLOUT_GAP : ax - CALLOUT_GAP - cardWidth),
-        top: Math.round(top), maxHeight: Math.round(maxHeight), arrow: onStage ? Math.round(clamp(ay - top, 18, shown - 18)) : null,
+        top: Math.round(top), maxHeight: Math.round(maxHeight), arrow: onStage && arrow >= 18 && arrow <= shown - 18 ? Math.round(arrow) : null,
       };
     }
   }
   const below = height - ay - CALLOUT_GAP - CALLOUT_MARGIN;
   const above = ay - CALLOUT_GAP - CALLOUT_MARGIN;
   const down = below >= Math.min(cardHeight, 220) || below >= above;
-  const maxHeight = Math.max(down ? below : above, 120);
-  const shown = Math.min(cardHeight, maxHeight);
+  const maxHeight = Math.max(0, (down ? below : above) - 2);
+  const shown = Math.min(cardHeight, Math.max(24, maxHeight + 2));
   const left = mobile ? CALLOUT_MARGIN : clamp(ax - cardWidth / 2, CALLOUT_MARGIN, width - cardWidth - CALLOUT_MARGIN);
-  const top = clamp(down ? ay + CALLOUT_GAP : ay - CALLOUT_GAP - shown, CALLOUT_MARGIN, height - shown - CALLOUT_MARGIN);
+  const targetTop = down ? ay + CALLOUT_GAP : ay - CALLOUT_GAP - shown;
+  const top = clamp(targetTop, CALLOUT_MARGIN, Math.max(CALLOUT_MARGIN, height - shown - CALLOUT_MARGIN));
+  const arrow = ax - left;
   return {
     side: down ? "below" : "above", left: Math.round(left), top: Math.round(top), maxHeight: Math.round(maxHeight),
-    arrow: onStage ? Math.round(clamp(ax - left, 18, cardWidth - 18)) : null,
+    arrow: onStage && Math.abs(top - targetTop) < 1 && arrow >= 18 && arrow <= cardWidth - 18 ? Math.round(arrow) : null,
   };
 }
 

@@ -369,6 +369,27 @@ test("callout sits beside the node, flips at the edge and drops below on phones"
   assert.equal(placeCallout({ ...stage, x: -40, y: 300, mobile: false }).arrow, null, "no arrow for an off-stage node");
 });
 
+test("short stages size the callout to available space and hide misaligned arrows", () => {
+  const card = { width: 358, cardWidth: 334, cardHeight: 400, mobile: true };
+  const below = placeCallout({ ...card, height: 200, x: 180, y: 100 });
+  assert.equal(below.side, "below");
+  assert.equal(below.maxHeight, 56);
+  assert.equal(below.top, 130);
+  assert.equal(below.top + below.maxHeight + 2, 188);
+  assert.equal(below.left + below.arrow, 180);
+
+  const above = placeCallout({ ...card, height: 200, x: 180, y: 180 });
+  assert.equal(above.side, "above");
+  assert.equal(above.top + above.maxHeight + 2 + 30, 180);
+  assert.equal(above.left + above.arrow, 180);
+
+  const cramped = placeCallout({ ...card, height: 60, x: 180, y: 30 });
+  assert.equal(cramped.arrow, null);
+  assert.equal(cramped.maxHeight, 0);
+  assert.equal(placeCallout({ ...card, height: 200, x: 4, y: 100 }).arrow, null);
+  assert.equal(placeCallout({ width: 1000, height: 60, cardWidth: 330, cardHeight: 400, mobile: false, x: 300, y: 0 }).arrow, null);
+});
+
 test("each rendered frame keeps the callout and its arrow on the selected node", () => {
   for (const mobile of [false, true]) {
     const { graph, panel, selectors, stage } = setup(mobile);
