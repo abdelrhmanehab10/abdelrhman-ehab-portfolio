@@ -30,6 +30,8 @@ html[data-graph-ready="true"] #graph-stage:not([hidden]) ~ #graph-index-wrap .gr
 #graph-index-wrap button { text-align: left; text-decoration: underline; text-underline-offset: 3px; }
 #graph-index-wrap button:hover, #graph-panel button:hover { color: #fff; }
 #graph-index-wrap button:focus-visible, #graph-index-wrap a:focus-visible, #graph-panel :focus-visible, #graph-stage:focus-visible, .skip-link:focus-visible { outline: 3px solid #67e8f9; outline-offset: 3px; }
+/* The stage touches every viewport edge, so its keyboard ring must be inset. */
+#graph-stage:focus-visible { outline-offset: -3px; }
 #graph-index-wrap li[id] { scroll-margin-top: .5rem; }
 #graph-index-wrap .graph-index-summary { display: block; margin: .25rem 0 0; color: #cbd5e1; font-size: .8rem; line-height: 1.5; }
 #graph-index-wrap .graph-index-meta { display: block; margin: .25rem 0 0; color: #94a3b8; font-size: .8rem; line-height: 1.5; }

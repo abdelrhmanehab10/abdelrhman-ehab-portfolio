@@ -79,13 +79,15 @@ try {
   await c('Page.bringToFront');
   await key('Tab', 'Tab', 9);
   await check('keyboard skip link appears with visible focus', `(()=>{const a=document.activeElement,s=getComputedStyle(a),r=a.getBoundingClientRect();return {class:a.className,text:a.textContent.trim(),top:r.top,outline:s.outlineStyle,outlineWidth:s.outlineWidth,outlineColor:s.outlineColor}})()`, r => r.class === 'skip-link' && r.text === 'Skip to profile list' && r.top >= 0 && r.outlineStyle !== 'none' && r.outlineWidth === '3px');
+  await screenshot('desktop-keyboard-focus.png');
   await key('Enter', 'Enter', 13);
   await check('keyboard opens the list and focuses its return link first', `({focus:document.activeElement.id,visible:getComputedStyle(document.querySelector('#graph-index-wrap')).clip==='auto',nodes:document.querySelectorAll('#graph-index [data-node]').length,returnLink:document.querySelector('#graph-index-return').textContent.trim()})`, r => r.focus === 'graph-index-wrap' && r.visible && r.nodes === 52 && r.returnLink === 'Return to graph');
   await screenshot('desktop-list-view.png');
   await key('Tab', 'Tab', 9);
   await check('list has keyboard path back to graph', `({focus:document.activeElement.id,text:document.activeElement.textContent.trim(),outline:getComputedStyle(document.activeElement).outlineStyle})`, r => r.focus === 'graph-index-return' && r.text === 'Return to graph');
   await key('Enter', 'Enter', 13);
-  await check('return link restores graph focus', `({focus:document.activeElement.id,listClip:getComputedStyle(document.querySelector('#graph-index-wrap')).clip})`, r => r.focus === 'graph-stage' && r.listClip !== 'auto');
+  await check('return link restores graph focus with an inset visible outline', `({focus:document.activeElement.id,listClip:getComputedStyle(document.querySelector('#graph-index-wrap')).clip,outline:getComputedStyle(document.activeElement).outlineStyle,offset:getComputedStyle(document.activeElement).outlineOffset})`, r => r.focus === 'graph-stage' && r.listClip !== 'auto' && r.outline === 'solid' && r.offset === '-3px');
+  await screenshot('desktop-return-focus.png');
   await key('Tab', 'Tab', 9, 8);
   await key('Enter', 'Enter', 13);
   await key('Tab', 'Tab', 9);
@@ -107,6 +109,15 @@ try {
   await key('Escape', 'Escape', 27); await delay(500);
   assert.ok(await compareCanvas(desktopStart) < 0.08, 'Escape should reset the graph view');
   console.log('keyboard Escape resets the graph view');
+  await c('Input.dispatchMouseEvent', { type: 'mouseWheel', x: desktopRect.width / 2, y: desktopRect.height / 2, deltaX: 0, deltaY: -240 }); await delay(400);
+  assert.notEqual(await evaluate(`document.querySelector('#graph-canvas-host canvas').toDataURL()`), desktopStart, 'wheel zoom should change canvas before double-click');
+  for (const clickCount of [1, 2]) {
+    await c('Input.dispatchMouseEvent', { type: 'mousePressed', x: desktopRect.width / 2, y: desktopRect.height / 2, button: 'left', clickCount });
+    await c('Input.dispatchMouseEvent', { type: 'mouseReleased', x: desktopRect.width / 2, y: desktopRect.height / 2, button: 'left', clickCount });
+  }
+  await delay(500);
+  assert.ok(await compareCanvas(desktopStart) < 0.08, 'double-click should reset the graph view');
+  console.log('double-click resets the graph view');
   await check('reduced-motion graph is settled without manual controls', `({preference:matchMedia('(prefers-reduced-motion: reduce)').matches,controls:!!document.querySelector('#graph-controls,#btn-motion'),status:document.querySelector('#graph-status').textContent})`, r => r.preference && !r.controls && r.status === 'Explore the profile graph');
   const stable = await evaluate(`document.querySelector('#graph-canvas-host canvas').toDataURL()`); await delay(1100);
   assert.equal(await evaluate(`document.querySelector('#graph-canvas-host canvas').toDataURL()`), stable, 'reduced-motion canvas should remain still while idle');
@@ -127,6 +138,7 @@ try {
     await go('/', false, width, height);
     await check(`${width}px no-JavaScript list fallback fills the viewport`, `(()=>{const stage=document.querySelector('#graph-stage'),index=document.querySelector('#graph-index-wrap'),r=index.getBoundingClientRect();return {stage:getComputedStyle(stage).display,rect:{x:r.x,y:r.y,width:r.width,height:r.height},viewport:{width:innerWidth,height:innerHeight},pageOverflow:document.documentElement.scrollWidth>innerWidth||document.documentElement.scrollHeight>innerHeight,bg:getComputedStyle(document.body).backgroundColor,bgImage:getComputedStyle(document.body).backgroundImage,indexBg:getComputedStyle(index).backgroundColor,indexBorder:getComputedStyle(index).borderWidth,controls:!!document.querySelector('#graph-controls,.graph-buttons,#btn-list,#btn-reset,#btn-motion'),nodes:document.querySelectorAll('#graph-index [data-node]').length,links:document.querySelectorAll('#graph-index .graph-index-connections a').length,interactiveHint:getComputedStyle(document.querySelector('.graph-index-interactive-hint')).display}})()`, r => r.stage === 'none' && r.rect.x === 0 && r.rect.y === 0 && r.rect.width === width && r.rect.height === height && r.viewport.width === width && r.viewport.height === height && !r.pageOverflow && r.bg === 'rgb(6, 12, 23)' && r.bgImage === 'none' && r.indexBg === 'rgb(6, 12, 23)' && r.indexBorder === '0px' && !r.controls && r.nodes === 52 && r.links === 208 && r.interactiveHint === 'none');
     await screenshot(name);
+    await check(`${width}px no-JavaScript connection reaches resume and Connect actions`, `(()=>{document.querySelector('#graph-node-hub-connect a[href="#graph-node-link-resume"]').click();const index=document.querySelector('#graph-index-wrap');return {hash:location.hash,scroll:index.scrollTop,pageScroll:document.documentElement.scrollTop,resume:document.querySelector('#graph-node-link-resume a.graph-index-link')?.getAttribute('href'),email:document.querySelector('#graph-node-link-email a.graph-index-link')?.getAttribute('href')}})()`, r => r.hash === '#graph-node-link-resume' && r.scroll > 0 && r.pageScroll === 0 && r.resume?.endsWith('.pdf') && r.email?.startsWith('mailto:'));
   }
 
   failVendor = true;

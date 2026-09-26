@@ -4,7 +4,7 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 
 - This is a static GitHub Pages site; serve it locally via the command in `README.md` (no bundler or install step).
 - `README.md` owns graph maintenance guidance and links to browser evidence; follow its generation step when changing the graph model.
-- The page is the graph view alone (no header, sections or footer); new content belongs in the graph model, and the generated List view index is its complete no-JS equivalent.
+- The page is the graph view alone (no header, sections or footer); new content belongs in the graph model, and the generated profile index is its complete no-JS equivalent.
 
 ## Maintaining this file
 
