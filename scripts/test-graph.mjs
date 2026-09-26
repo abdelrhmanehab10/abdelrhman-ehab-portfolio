@@ -7,6 +7,8 @@ import { graphNodes, graphEdges, graphGroups, profileDetails, profileSourceHash 
 import { projectNotices } from "../src/constant/index.js";
 
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const styles = readFileSync(new URL("../src/hero-graph.css", import.meta.url), "utf8");
+const hero = readFileSync(new URL("../src/hero-graph.js", import.meta.url), "utf8");
 const ids = graphNodes.map(({ id }) => id);
 
 test("52 nodes and 104 edges with unique, connected endpoints", () => {
@@ -109,7 +111,23 @@ test('HTML generation follows changed profile contact and identity', () => {
   }
 });
 
-test('the page is only the graph view and its index keeps every Connect action', () => {
+test('the graph shell removes chrome while retaining accessible instructions and status', () => {
+  assert.doesNotMatch(html, /graph-caption/);
+  assert.match(html, /id="graph-stage"[^>]*aria-describedby="graph-instructions"/);
+  assert.match(html, /id="graph-instructions" class="visually-hidden"/);
+  assert.match(html, /Drag to pan, scroll or pinch to zoom\. Select a node to see its neighbours\. Use List view or Tab to explore the profile by keyboard\./);
+  assert.match(html, /id="graph-status" class="visually-hidden" role="status">Explore the profile graph<\/span>/);
+  assert.match(html, /Use Tab to explore the list and Enter to open a node\./);
+  assert.doesNotMatch(html.match(/<span id="graph-status"[\s\S]*?<\/span>/)?.[0] || '', /\d+\s+nodes\s*·\s*\d+\s+connections/);
+  assert.match(styles, /grid-template-rows:\s*auto minmax\(0, 1fr\)/);
+  const stage = styles.match(/#graph-stage\s*\{([^}]*)\}/)?.[1];
+  assert.ok(stage, 'graph stage styles exist');
+  assert.doesNotMatch(stage, /\bborder(?:-(?:width|style|color))?\s*:/, 'graph stage has no visible border');
+  assert.match(styles, /#graph-index-wrap\s*\{[^}]*border:\s*1px solid/);
+  assert.match(styles, /#graph-panel\s*\{[^}]*border:\s*1px solid/);
+  assert.match(styles, /#graph-controls \.graph-buttons\s*\{[^}]*margin-left:\s*auto/);
+  assert.match(hero, /status\.textContent = "Graph unavailable — showing profile list"/);
+
   assert.ok(graphNodes.every(node => !('sectionId' in node)), 'no node links to a removed page section');
   const index = html.match(/<!-- graph-index:start -->([\s\S]*?)<!-- graph-index:end -->/)[1];
   for (const node of graphNodes.filter(n => n.href)) {
