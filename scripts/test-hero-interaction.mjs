@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { graphGroups, graphNodes } from "../src/constant/graph.js";
-import { initHeroGraph, placeCallout } from "../src/hero-graph.js";
+import { graphInk, initHeroGraph, mixInk, placeCallout } from "../src/hero-graph.js";
 
 function element() {
   const handlers = {};
@@ -18,7 +18,7 @@ function element() {
         return true;
       },
     },
-    innerHTML: "", textContent: "", clientWidth: 390, clientHeight: 480,
+    innerHTML: "", textContent: "", clientWidth: 390, clientHeight: 480, children: [],
     addEventListener(name, handler) { (handlers[name] ||= []).push(handler); },
     fire(name, event = {}) { handlers[name]?.forEach((handler) => handler(event)); },
     insertBefore(child) { child.parent = this; },
@@ -26,12 +26,21 @@ function element() {
     setAttribute(name, value) { attributes[name] = value; },
     focus() { document.activeElement = this; },
     contains(child) { return child === this || child?.parent === this; },
-    querySelector(selector) { return selector === "canvas" ? canvas : element(); }
+    querySelector(selector) { return selector === "canvas" ? canvas : element(); },
+    // Web Animations stand-in, present only when a test opts in; finish() settles it.
+    ...(animations ? { animate(keyframes, options) {
+      const animation = { element: this, keyframes, options, cancelled: false, cancel() { this.cancelled = true; } };
+      animation.finished = new Promise((resolve) => { animation.finish = resolve; });
+      animations.push(animation);
+      return animation;
+    } } : {}),
   };
 }
+let animations = null;
 const canvas = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 390, height: 480 }) };
 
-function setup(mobile, libraryAvailable = true, initialHash = "", reduced = false) {
+function setup(mobile, libraryAvailable = true, initialHash = "", reduced = false, animated = false) {
+  animations = animated ? [] : null;
   const selectors = new Map([
     "#graph-stage", "#graph-canvas-host", "#graph-index-wrap", "#graph-panel", "#graph-status",
     ".skip-link", "#graph-index-return",
@@ -81,13 +90,15 @@ function setup(mobile, libraryAvailable = true, initialHash = "", reduced = fals
     onNodeHover(callback) { this.callbacks.hover = callback; return this; },
     onNodeClick(callback) { this.callbacks.click = callback; return this; },
     onBackgroundClick(callback) { this.callbacks.background = callback; return this; },
+    onRenderFramePre(callback) { this.callbacks.pre = callback; return this; },
     onRenderFramePost(callback) { this.callbacks.frame = callback; return this; },
+    autoPauseRedraw(value) { this.autoPause = value; return this; },
     onEngineTick() { return this; }, onEngineStop() { return this; },
     d3Force() { return { strength: () => ({ distanceMax() {} }), distance() {} }; },
     d3VelocityDecay() { return this; }, warmupTicks() { return this; },
     cooldownTicks(value) { this.cooldown = value; return this; }, cooldownTime() { return this; },
     d3ReheatSimulation() { this.reheated = true; return this; },
-    graphData(value) { if (value) return this; return { nodes: this.nodes }; },
+    graphData(value) { if (value) { this.links = value.links; return this; } return { nodes: this.nodes, links: this.links }; },
     getGraphBbox() { return { x: [-100, 5300], y: [-100, 100] }; },
     graph2ScreenCoords(x, y) { return { x: x * this.scale + this.offset, y: y * this.scale }; },
     zoom(value) { if (value === undefined) return this.scale; this.scale = value; return this; },
@@ -127,7 +138,7 @@ function setup(mobile, libraryAvailable = true, initialHash = "", reduced = fals
     graph.render();
   });
   graph.render();
-  return { graph, stage, panel, selectors };
+  return { graph, stage, panel, selectors, animations };
 }
 
 test("hash navigation opens the newly linked node and closes on another section", () => {
@@ -212,7 +223,7 @@ test("prefers-reduced-motion automatically warms the graph without animated tick
   for (const id of ["proj-efa", "proj-virtuwa-hv"]) {
     const node = graph.nodes.find((entry) => entry.id === id);
     host.fire("pointermove", { pointerId: 1, clientX: node.x * graph.zoom(), clientY: 0 });
-    assert.equal(graph.color(node), "#67e8f9");
+    assert.equal(graph.color(node), graphInk.selected);
     assert.equal(graph.cooldown, 0);
   }
 });
@@ -224,9 +235,9 @@ test("list selection reactivates a previously hovered node on canvas return", ()
   const virtu = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
   host.fire("pointermove", { pointerId: 1, clientX: efa.x * graph.zoom(), clientY: 0 });
   selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: virtu.id } }) } });
-  assert.equal(graph.color(virtu), "#67e8f9");
+  assert.equal(graph.color(virtu), graphInk.selected);
   host.fire("pointermove", { pointerId: 1, clientX: efa.x * graph.zoom(), clientY: 0 });
-  assert.equal(graph.color(efa), "#67e8f9");
+  assert.equal(graph.color(efa), graphInk.selected);
 });
 
 test("list selection clears stale hover but new canvas hover takes precedence", () => {
@@ -236,12 +247,12 @@ test("list selection clears stale hover but new canvas hover takes precedence", 
   index.fire("click", { target: { closest: () => ({ dataset: { node: "proj-virtuwa-hv" } }) } });
   const selected = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
-  assert.equal(graph.color(selected), "#67e8f9");
+  assert.equal(graph.color(selected), graphInk.selected);
   const hovered = graph.nodes.find((node) => node.id === "proj-clinic-flow");
   graph.callbacks.hover(hovered);
-  assert.equal(graph.color(hovered), "#67e8f9");
+  assert.equal(graph.color(hovered), graphInk.selected);
   graph.callbacks.hover(null);
-  assert.equal(graph.color(selected), "#67e8f9");
+  assert.equal(graph.color(selected), graphInk.selected);
 });
 
 test("client security work is described without exposing the original detail", () => {
@@ -466,4 +477,126 @@ test("list-index fallback shows the whole card without the clamp", () => {
   selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: "role-pro-event" } }) } });
   assert.doesNotMatch(panel.innerHTML, /is-clamped|graph-panel-more/);
   assert.equal(panel.dataset.side, undefined);
+});
+
+test("callout footer has no connection count", () => {
+  const { panel, selectors } = setup(false);
+  for (const id of ["me", "proj-virtuwa-hv", "domain-healthcare"]) {
+    selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: id } }) } });
+    assert.doesNotMatch(panel.innerHTML, /graph-meta|\d+\s+connections?/);
+    assert.match(panel.innerHTML, /<div class="graph-panel-foot">(<a class="graph-action"|<button type="button" id="graph-panel-copy")/);
+  }
+});
+
+test("Smoke palette: resting nodes use the group greys and focus blends to the selection ink", () => {
+  const { graph, selectors } = setup(false);
+  const me = graph.nodes.find((node) => node.id === "me");
+  const efa = graph.nodes.find((node) => node.id === "proj-efa");
+  assert.equal(graph.color(me), "#ededed");
+  assert.equal(graph.color(efa), graphGroups.project.color);
+  selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: "proj-efa" } }) } });
+  assert.equal(graph.color(efa), graphInk.selected);
+  assert.equal(graph.color(graph.nodes.find((node) => node.id === "domain-healthcare")), graphInk.dim);
+  for (const color of Object.values(graphGroups).map((group) => group.color)) assert.match(color, /^#([0-9a-f]{2})\1\1$/, "group fills are neutral greys");
+  assert.equal(mixInk("#000000", "#ffffff", 0.5), "rgba(128,128,128,1)");
+  assert.equal(mixInk(graphInk.dim, "#bdbdbd", 1), "#bdbdbd");
+  assert.equal(mixInk(graphInk.dim, "#bdbdbd", 0), graphInk.dim);
+});
+
+test("highlight changes ease over frames and stop continuous redraw once settled", () => {
+  const { graph, selectors } = setup(false);
+  const clock = performance.now;
+  let now = 1000;
+  performance.now = () => now;
+  try {
+    const efa = graph.nodes.find((node) => node.id === "proj-efa");
+    const far = graph.nodes.find((node) => node.id === "domain-healthcare");
+    graph.callbacks.pre();
+    selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: "proj-efa" } }) } });
+    assert.equal(graph.autoPause, false, "redraw runs while easing");
+    now += 16;
+    graph.callbacks.pre();
+    const midway = graph.color(far);
+    assert.notEqual(midway, graphInk.dim);
+    assert.notEqual(midway, graphGroups.domain.color);
+    assert.match(midway, /^rgba\(/);
+    for (let frame = 0; frame < 60; frame++) { now += 16; graph.callbacks.pre(); }
+    assert.equal(graph.color(far), graphInk.dim);
+    assert.equal(graph.color(efa), graphInk.selected);
+    assert.equal(graph.autoPause, true, "an idle graph pauses redraw again");
+  } finally {
+    performance.now = clock;
+  }
+});
+
+test("callout exit animates while inert, then hides; reopening mid-exit cancels it", async () => {
+  const { panel, selectors, animations } = setup(false, true, "", false, true);
+  const open = (id) => selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => Object.assign(element(), { dataset: { node: id } }) } });
+  open("proj-efa");
+  const entrance = animations.at(-1);
+  assert.equal(entrance.element, panel);
+  assert.deepEqual(entrance.keyframes.map((frame) => frame.opacity), [0, 1]);
+  document.fire("keydown", { key: "Escape" });
+  const leaving = animations.at(-1);
+  assert.deepEqual(leaving.keyframes.map((frame) => frame.opacity), [1, 0]);
+  assert.equal(panel.hidden, false, "the card stays visible for its exit");
+  assert.equal(panel.inert, true, "an exiting card takes no input");
+  assert.equal(location.hash, "", "state changes immediately");
+  leaving.finish();
+  await leaving.finished;
+  assert.equal(panel.hidden, true);
+  assert.equal(panel.inert, false);
+
+  open("proj-efa");
+  document.fire("keydown", { key: "Escape" });
+  const interrupted = animations.at(-1);
+  open("proj-virtuwa-hv");
+  assert.equal(interrupted.cancelled, true);
+  assert.equal(panel.inert, false);
+  assert.equal(panel.hidden, false);
+  assert.deepEqual(animations.at(-1).keyframes.map((frame) => frame.opacity), [0, 1], "reopening replays the entrance");
+  interrupted.finish();
+  await interrupted.finished;
+  assert.equal(panel.hidden, false, "a cancelled exit never hides the reopened card");
+});
+
+test("switching nodes swaps the content in place and Read more glides the card", () => {
+  const { graph, panel, selectors, animations } = setup(false, true, "", false, true);
+  const open = (id) => selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => Object.assign(element(), { dataset: { node: id } }) } });
+  const scroll = panel.querySelector(".graph-panel-scroll");
+  scroll.children = [element(), element()];
+  open("proj-efa");
+  const before = animations.length;
+  open("role-pro-event");
+  const swapped = animations.slice(before);
+  assert.ok(swapped.filter((animation) => scroll.children.includes(animation.element)).length === 2, "each content block fades up");
+  assert.ok(swapped.every((animation) => animation.keyframes.every((frame) => Object.keys(frame).every((key) => key === "opacity" || key === "transform"))), "compositor-only keyframes");
+
+  const body = panel.querySelector("#graph-panel-body");
+  body.clientHeight = 118;
+  body.offsetTop = 0;
+  const folded = { ...element(), offsetTop: 90, offsetHeight: 60 };
+  const visible = { ...element(), offsetTop: 0, offsetHeight: 40 };
+  body.children = [visible, folded];
+  const node = graph.nodes.find((entry) => entry.id === "role-pro-event");
+  node.y = 400;
+  graph.callbacks.frame();
+  scroll.scrollHeight = 900;
+  const more = panel.querySelector("#graph-panel-more");
+  const count = animations.length;
+  more.fire("click");
+  const expanded = animations.slice(count);
+  assert.equal(more.textContent, "Show less");
+  assert.ok(expanded.some((animation) => animation.element === folded), "folded content fades in");
+  assert.ok(!expanded.some((animation) => animation.element === visible), "already visible content does not flicker");
+});
+
+test("reduced motion changes the callout and highlight instantly", () => {
+  const { graph, panel, selectors, animations } = setup(false, true, "", true, true);
+  selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => Object.assign(element(), { dataset: { node: "proj-efa" } }) } });
+  document.fire("keydown", { key: "Escape" });
+  assert.equal(panel.hidden, true);
+  assert.equal(animations.length, 0);
+  assert.equal(graph.autoPause, undefined, "reduced motion never forces continuous redraw");
+  assert.equal(graph.color(graph.nodes.find((node) => node.id === "proj-efa")), graphGroups.project.color);
 });

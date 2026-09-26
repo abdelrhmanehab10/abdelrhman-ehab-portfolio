@@ -41,14 +41,14 @@ try {
     await retry(async()=>{const ready=await run(`document.documentElement.dataset.graphReady === 'true' && document.querySelector('#graph-panel-title')?.textContent.length > 0`); if(!ready)throw Error('not ready'); return true;});
     await sleep(350);
   }
-  const geometry = `(()=>{const s=document.querySelector('#graph-stage'),p=document.querySelector('#graph-panel'),sc=p.querySelector('.graph-panel-scroll'),a=p.querySelector('.graph-panel-arrow'),body=p.querySelector('#graph-panel-body');const sr=s.getBoundingClientRect(),pr=p.getBoundingClientRect();const side=p.dataset.side,L=parseFloat(p.style.left),T=parseFloat(p.style.top),offset=parseFloat(['left','right'].includes(side)?a.style.top:a.style.left);const x=side==='right'?L-30:side==='left'?L+p.offsetWidth+30:L+offset,y=side==='below'?T-30:side==='above'?T+p.offsetHeight+30:T+offset;let cyan=0;if(!a.hidden){const c=s.querySelector('canvas'),k=c.width/c.clientWidth,d=c.getContext('2d').getImageData(Math.round(x*k)-3,Math.round(y*k)-3,7,7).data;for(let i=0;i<d.length;i+=4)if(d[i]<150&&d[i+1]>200&&d[i+2]>220)cyan++}return {stageHeight:s.clientHeight,side,arrow:!a.hidden,x,y,cyan,width:p.offsetWidth,stageWidth:s.clientWidth,panelHeight:p.offsetHeight,scrollMax:parseFloat(sc.style.maxHeight),scrollHeight:sc.scrollHeight,scrollClient:sc.clientHeight,inside:pr.left>=sr.left-1&&pr.right<=sr.right+1&&pr.top>=sr.top-1&&pr.bottom<=sr.bottom+1,expanded:p.querySelector('#graph-panel-more')?.getAttribute('aria-expanded'),clamped:body.classList.contains('is-clamped'),title:p.querySelector('h2')?.textContent}})()`;
+  const geometry = `(()=>{const s=document.querySelector('#graph-stage'),p=document.querySelector('#graph-panel'),sc=p.querySelector('.graph-panel-scroll'),a=p.querySelector('.graph-panel-arrow'),body=p.querySelector('#graph-panel-body');const sr=s.getBoundingClientRect(),pr=p.getBoundingClientRect();const side=p.dataset.side,L=parseFloat(p.style.left),T=parseFloat(p.style.top),offset=parseFloat(['left','right'].includes(side)?a.style.top:a.style.left);const x=side==='right'?L-30:side==='left'?L+p.offsetWidth+30:L+offset,y=side==='below'?T-30:side==='above'?T+p.offsetHeight+30:T+offset;let lit=0;if(!a.hidden){const c=s.querySelector('canvas'),k=c.width/c.clientWidth,d=c.getContext('2d').getImageData(Math.round(x*k)-3,Math.round(y*k)-3,7,7).data;for(let i=0;i<d.length;i+=4)if(d[i]>225&&d[i+1]>225&&d[i+2]>225)lit++}return {stageHeight:s.clientHeight,side,arrow:!a.hidden,x,y,lit,width:p.offsetWidth,stageWidth:s.clientWidth,panelHeight:p.offsetHeight,scrollMax:parseFloat(sc.style.maxHeight),scrollHeight:sc.scrollHeight,scrollClient:sc.clientHeight,inside:pr.left>=sr.left-1&&pr.right<=sr.right+1&&pr.top>=sr.top-1&&pr.bottom<=sr.bottom+1,expanded:p.querySelector('#graph-panel-more')?.getAttribute('aria-expanded'),clamped:body.classList.contains('is-clamped'),title:p.querySelector('h2')?.textContent}})()`;
   await c('Page.enable'); await c('Runtime.enable');
   await visit(844,'me');
-  let r=await run(geometry); assert.ok(r.inside && r.side==='below' && r.arrow && r.cyan>=30 && r.width>=r.stageWidth-25,JSON.stringify(r));
+  let r=await run(geometry); assert.ok(r.inside && r.side==='below' && r.arrow && r.lit>=30 && r.width>=r.stageWidth-25,JSON.stringify(r));
   console.log('PHONE ROOT',JSON.stringify(r));
   await capture('focused-phone-root');
   r=await run(`(()=>{document.querySelector('#graph-panel-more').click();return ${geometry}})()`);
-  assert.ok(r.expanded==='true' && !r.clamped && r.scrollHeight>r.scrollClient && r.inside && r.arrow && r.cyan>=30, JSON.stringify(r));
+  assert.ok(r.expanded==='true' && !r.clamped && r.scrollHeight>r.scrollClient && r.inside && r.arrow && r.lit>=30, JSON.stringify(r));
   console.log('EXPANDED PHONE',JSON.stringify(r));
   await capture('focused-phone-expanded');
   await run(`(()=>{const s=document.querySelector('.graph-panel-scroll');s.scrollTop=s.scrollHeight;return s.scrollTop})()`);
@@ -58,10 +58,10 @@ try {
   await capture('focused-phone-expanded-scrolled');
   await visit(400,'me');
   r=await run(geometry); console.log('SHORT PHONE ROOT',JSON.stringify(r));
-  assert.ok(r.stageHeight===400 && r.inside && r.panelHeight<=r.stageHeight && (!r.arrow || r.cyan>=30),JSON.stringify(r));
+  assert.ok(r.stageHeight===400 && r.inside && r.panelHeight<=r.stageHeight && (!r.arrow || r.lit>=30),JSON.stringify(r));
   await capture('focused-phone-short');
   await visit(270,'me');
   r=await run(geometry); console.log('CRAMPED PHONE ROOT',JSON.stringify(r));
-  assert.ok(r.stageHeight===270 && (!r.arrow || r.cyan>=30),JSON.stringify(r));
+  assert.ok(r.stageHeight===270 && (!r.arrow || r.lit>=30),JSON.stringify(r));
   await capture('focused-phone-cramped');
 } finally { ws?.close(); chrome.kill(); server.close(); await sleep(250); rmSync(profile,{recursive:true,force:true}); }

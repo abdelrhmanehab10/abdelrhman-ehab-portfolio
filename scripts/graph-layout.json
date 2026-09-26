@@ -737,42 +737,42 @@
   ],
   "groups": {
     "root": {
-      "color": "#f8fafc",
+      "color": "#ededed",
       "size": 13,
       "label": "Me"
     },
     "hub": {
-      "color": "#67e8f9",
+      "color": "#d1d1d1",
       "size": 9,
       "label": "Sections"
     },
     "role": {
-      "color": "#cbd5e1",
+      "color": "#b3b3b3",
       "size": 6.5,
       "label": "Experience"
     },
     "project": {
-      "color": "#e2e8f0",
+      "color": "#bdbdbd",
       "size": 6,
       "label": "Projects"
     },
     "skill": {
-      "color": "#94a3b8",
+      "color": "#8a8a8a",
       "size": 6,
       "label": "Skills"
     },
     "domain": {
-      "color": "#cbd5e1",
+      "color": "#999999",
       "size": 6,
       "label": "Domains"
     },
     "craft": {
-      "color": "#e2e8f0",
+      "color": "#a3a3a3",
       "size": 6,
       "label": "Practices"
     },
     "link": {
-      "color": "#94a3b8",
+      "color": "#808080",
       "size": 5,
       "label": "Connect"
     }

@@ -9,8 +9,8 @@ The whole site is one interactive profile graph. Visitors pan, zoom and select n
 ## What this project demonstrates
 
 - A graph-only page that fills the viewport on desktop and phone, with a solid dark background and no visible toolbar or decorative page borders, built without a frontend framework.
-- Dark, interactive profile graph with pan, zoom and shareable `#node/<id>` links. Selecting a node opens a callout beside it (below or above it on phones); long details expand with Read more and scroll within the card. The keyboard-focus-only Skip to profile list link opens a keyboard-readable index with linked connections and Connect links; Return to graph restores graph focus. The complete index is also available without JavaScript or the graph library.
-- Reduced-motion support (the graph is pre-warmed without animated ticks); Escape resets the graph view, and double-click is an alternative reset gesture.
+- Dark greyscale ("Smoke") interactive profile graph with pan, zoom and shareable `#node/<id>` links. Selecting a node opens a callout beside it (below or above it on phones); long details expand with Read more and scroll within the card. The keyboard-focus-only Skip to profile list link opens a keyboard-readable index with linked connections and Connect links; Return to graph restores graph focus. The complete index is also available without JavaScript or the graph library.
+- Light, compositor-only motion: the callout animates open, closed, between nodes and on Read more, and canvas highlights ease in and out. Reduced-motion support turns all of it off (and pre-warms the graph without animated ticks); Escape resets the graph view, and double-click is an alternative reset gesture.
 - Search and social metadata, canonical URL, Open Graph/Twitter cards, and Person structured data.
 - Static deployment through GitHub Pages.
 

@@ -128,3 +128,27 @@ test('public copy stays safe', () => {
   const publicSurfaces = [html, JSON.stringify(graphNodes)].join('\n');
   assert.doesNotMatch(publicSurfaces, /443\/6000|passwordless sudo|rm, copy|sensitive VM\/connection data|Jisir process|`current` Nginx symlink|2\+ years delivering production dashboards/i);
 });
+
+test('Smoke palette keeps WCAG AA contrast for text, focus rings and node ink', async () => {
+  const css = readFileSync(new URL('../src/hero-graph.css', import.meta.url), 'utf8');
+  const root = css.match(/:root \{([\s\S]*?)\}/)[1];
+  const token = (name) => root.match(new RegExp(`--${name}: (#[0-9a-f]{6});`))?.[1];
+  const { graphInk } = await import('../src/hero-graph.js');
+  const luminance = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+    .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i], 0);
+  const ratio = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
+  const pairs = [
+    ['heading', 'surface', 4.5], ['text', 'surface', 4.5], ['muted', 'surface', 4.5], ['kicker', 'surface', 4.5],
+    ['link', 'surface', 4.5], ['text-2', 'surface', 4.5], ['text', 'tag-bg', 4.5], ['action-fg', 'action-bg', 4.5],
+    ['heading', 'bg', 4.5], ['text-2', 'bg', 4.5], ['muted', 'bg', 4.5], ['link', 'bg', 4.5], ['heading', 'surface-2', 4.5],
+    ['focus', 'bg', 3], ['focus', 'surface', 3],
+  ];
+  for (const [fg, bg, min] of pairs) {
+    assert.ok(token(fg) && token(bg), `--${fg} and --${bg} are defined`);
+    assert.ok(ratio(token(fg), token(bg)) >= min, `--${fg} on --${bg} is ${ratio(token(fg), token(bg)).toFixed(2)}:1, needs ${min}:1`);
+  }
+  for (const ink of [graphInk.label, graphInk.majorLabel]) assert.ok(ratio(ink, token('bg')) >= 4.5, `canvas label ${ink}`);
+  for (const { color } of Object.values(graphGroups)) assert.ok(ratio(color, token('bg')) >= 3, `node fill ${color}`);
+  assert.doesNotMatch(css, /#67e8f9|#a5f3fc|#060c17/i, 'no slate/cyan leftovers');
+});
