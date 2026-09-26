@@ -70,9 +70,8 @@ export function initHeroGraph() {
   const index = document.querySelector("#graph-index-wrap");
   const panel = document.querySelector("#graph-panel");
   const status = document.querySelector("#graph-status");
-  const listButton = document.querySelector("#btn-list");
-  const resetButton = document.querySelector("#btn-reset");
-  const motionButton = document.querySelector("#btn-motion");
+  const skipLink = document.querySelector(".skip-link");
+  const returnLink = document.querySelector("#graph-index-return");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const coarse = matchMedia("(pointer: coarse)").matches;
   const mobile = matchMedia("(max-width: 639px)");
@@ -91,7 +90,6 @@ export function initHeroGraph() {
     stage.hidden = true;
     index.classList.remove("graph-index-hidden");
     status.textContent = "Graph unavailable — showing profile list";
-    listButton.hidden = resetButton.hidden = motionButton.hidden = true;
   }
 
   const active = () => hovered || selected;
@@ -162,7 +160,7 @@ export function initHeroGraph() {
     selected = null;
     repaint();
     if (location.hash.startsWith("#node/")) history.replaceState(null, "", location.pathname + location.search);
-    if (restoreFocus) (lastFocus || listButton).focus();
+    if (restoreFocus) (lastFocus || stage).focus({ preventScroll: true });
     lastFocus = null;
   }
   function openNode(id, origin) {
@@ -224,8 +222,21 @@ export function initHeroGraph() {
     const button = event.target.closest("[data-node]");
     if (button) openNode(button.dataset.node, button);
   });
+  skipLink?.addEventListener("click", (event) => {
+    if (stage.hidden) return;
+    event.preventDefault();
+    index.focus({ preventScroll: true });
+  });
+  returnLink?.addEventListener("click", (event) => {
+    if (stage.hidden) return;
+    event.preventDefault();
+    stage.focus({ preventScroll: true });
+  });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !panel.hidden) closePanel();
+    if (event.key !== "Escape") return;
+    if (!panel.hidden) closePanel();
+    else if (index.contains(document.activeElement)) stage.focus({ preventScroll: true });
+    else resetView();
   });
   function syncHash() {
     if (!location.hash.startsWith("#node/")) {
@@ -236,20 +247,17 @@ export function initHeroGraph() {
     try { id = decodeURIComponent(location.hash.slice(6)); }
     catch { return; }
     if (byId.has(id) && selected !== id) {
-      openNode(id, index.querySelector(`[data-node="${id}"]`) || listButton);
+      openNode(id, index.querySelector(`[data-node="${id}"]`) || stage);
     }
   }
   window.addEventListener("hashchange", syncHash);
-  listButton.addEventListener("click", () => {
-    const open = !index.classList.toggle("graph-index-hidden");
-    listButton.setAttribute("aria-expanded", String(open));
-    listButton.textContent = open ? "Hide list" : "List view";
-  });
-  resetButton.addEventListener("click", () => {
-    closePanel({ restoreFocus: false });
+  function resetView() {
+    if (!graph) return;
+    closePanel({ restoreFocus: panel.contains(document.activeElement) });
     moved = false;
     fit(400);
-  });
+  }
+  host.addEventListener("dblclick", resetView);
   host.addEventListener("pointerdown", (event) => {
     press = event.isPrimary === false ? null : { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
   });
@@ -266,20 +274,12 @@ export function initHeroGraph() {
   });
   host.addEventListener("pointercancel", () => { press = null; });
   host.addEventListener("pointerup", (event) => {
-    if (press?.id === event.pointerId && !press.moved && event.button === 0 && motionButton.getAttribute("aria-pressed") === "true") {
+    if (press?.id === event.pointerId && !press.moved && event.button === 0 && reduced) {
       const clicked = nodeAt(event);
-      if (clicked) openNode(clicked.id, listButton);
+      if (clicked) openNode(clicked.id, stage);
     }
     press = null;
   });
-  motionButton.addEventListener("click", () => {
-    const paused = motionButton.getAttribute("aria-pressed") !== "true";
-    motionButton.setAttribute("aria-pressed", String(paused));
-    if (paused) graph?.cooldownTicks(0);
-    else graph?.cooldownTicks(coarse ? 120 : 200).d3ReheatSimulation();
-    motionButton.textContent = paused ? "Resume motion" : "Pause motion";
-  });
-
   // Static HTML index is generated from graphNodes at authoring time so it is
   // readable even with JavaScript disabled or when the module fails to load.
   if (typeof window.ForceGraph !== "function") {
@@ -327,10 +327,10 @@ export function initHeroGraph() {
         repaint();
       })
       .onNodeClick((node) => {
-        if (motionButton.getAttribute("aria-pressed") !== "true") openNode(node.id, listButton);
+        if (!reduced) openNode(node.id, stage);
       })
       .onBackgroundClick(() => {
-        if (motionButton.getAttribute("aria-pressed") !== "true") closePanel();
+        if (!reduced) closePanel();
       })
       .onRenderFramePost(() => positionPanel())
       .onEngineTick(() => { if (!moved && ++ticks % 12 === 0) fit(0); })
@@ -339,11 +339,8 @@ export function initHeroGraph() {
     graph.d3Force("charge").strength(-160).distanceMax(420);
     graph.d3Force("link").distance((edge) => edge.type === "contains" ? 45 : 90);
     graph.d3VelocityDecay(0.28);
-    if (reduced) {
-      graph.warmupTicks(220).cooldownTicks(0);
-      motionButton.setAttribute("aria-pressed", "true");
-      motionButton.textContent = "Resume motion";
-    } else graph.cooldownTicks(coarse ? 120 : 200).cooldownTime(Infinity);
+    if (reduced) graph.warmupTicks(220).cooldownTicks(0);
+    else graph.cooldownTicks(coarse ? 120 : 200).cooldownTime(Infinity);
     graph.graphData({
       nodes: graphNodes.map((node) => ({ ...node, val: graphGroups[node.group].size })),
       links: graphEdges.map((edge) => ({ ...edge })),
@@ -371,7 +368,7 @@ export function initHeroGraph() {
 
   function fit(duration) {
     if (!graph) return;
-    const time = motionButton.getAttribute("aria-pressed") === "true" ? 0 : duration;
+    const time = reduced ? 0 : duration;
     if (mobile.matches) {
       const bbox = graph.getGraphBbox();
       const root = graph.graphData().nodes.find((node) => node.id === "me");

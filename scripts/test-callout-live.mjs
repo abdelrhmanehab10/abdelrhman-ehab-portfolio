@@ -58,10 +58,10 @@ try {
   await capture('focused-phone-expanded-scrolled');
   await visit(400,'me');
   r=await run(geometry); console.log('SHORT PHONE ROOT',JSON.stringify(r));
-  assert.ok(r.stageHeight<350 && r.inside && r.panelHeight<=r.stageHeight && (!r.arrow || r.cyan>=30),JSON.stringify(r));
+  assert.ok(r.stageHeight===400 && r.inside && r.panelHeight<=r.stageHeight && (!r.arrow || r.cyan>=30),JSON.stringify(r));
   await capture('focused-phone-short');
   await visit(270,'me');
   r=await run(geometry); console.log('CRAMPED PHONE ROOT',JSON.stringify(r));
-  assert.ok(r.stageHeight<200 && (!r.arrow || r.cyan>=30),JSON.stringify(r));
+  assert.ok(r.stageHeight===270 && (!r.arrow || r.cyan>=30),JSON.stringify(r));
   await capture('focused-phone-cramped');
 } finally { ws?.close(); chrome.kill(); server.close(); await sleep(250); rmSync(profile,{recursive:true,force:true}); }

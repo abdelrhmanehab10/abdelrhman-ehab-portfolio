@@ -59,7 +59,6 @@
         if (document.documentElement.dataset.graphReady) return;
         document.querySelector("#graph-stage").hidden = true;
         document.querySelector("#graph-index-wrap").classList.remove("graph-index-hidden");
-        document.querySelector("#graph-controls").hidden = true;
       });
     </script>
     <script src="assets/vendor/force-graph-1.51.4.min.js" defer></script>
@@ -223,21 +222,16 @@
   </head>
   <body>
     <main id="main-content" class="graph-app">
+      <a class="skip-link" href="#graph-index-wrap">Skip to profile list</a>
       <h1 id="graph-title" class="visually-hidden">Abdelrhman Ehab · Frontend Engineer</h1>
-      <div id="graph-controls" aria-label="Graph controls">
-        <span id="graph-status" class="visually-hidden" role="status">Explore the profile graph</span>
-        <div class="graph-buttons">
-          <button id="btn-list" type="button" aria-controls="graph-index-wrap" aria-expanded="false">List view</button>
-          <button id="btn-reset" type="button">Reset view</button>
-          <button id="btn-motion" type="button" aria-pressed="false">Pause motion</button>
-        </div>
-      </div>
-      <div id="graph-stage" role="group" aria-label="Interactive graph of Abdelrhman Ehab's work" aria-describedby="graph-instructions">
-        <p id="graph-instructions" class="visually-hidden">Drag to pan, scroll or pinch to zoom. Select a node to see its neighbours. Use List view or Tab to explore the profile by keyboard.</p>
+      <span id="graph-status" class="visually-hidden" role="status">Explore the profile graph</span>
+      <div id="graph-stage" role="group" aria-label="Interactive graph of Abdelrhman Ehab's work" aria-describedby="graph-instructions" tabindex="-1">
+        <p id="graph-instructions" class="visually-hidden">Drag to pan, scroll or pinch to zoom. Select a node to see its neighbours. Use the Skip to profile list link or Tab to explore the profile. Press Escape to close details or leave the list; on the graph, Escape resets the view. Double-click the graph to reset it.</p>
         <div id="graph-canvas-host" aria-hidden="true"></div>
         <div id="graph-panel" role="dialog" aria-modal="false" aria-labelledby="graph-panel-title" hidden tabindex="-1"></div>
       </div>
-      <div id="graph-index-wrap" class="graph-index-hidden" aria-label="Profile graph as a list">
+      <div id="graph-index-wrap" class="graph-index-hidden" aria-label="Profile graph as a list" tabindex="-1">
+        <a id="graph-index-return" href="#graph-stage">Return to graph</a>
         <h2>Profile index</h2>
         <p>All 52 nodes in the graph, grouped by section. Use Tab to explore the list and follow its connection links. <span class="graph-index-interactive-hint">Press Enter on a node to open its details.</span></p>
         <!-- graph-index:start -->
