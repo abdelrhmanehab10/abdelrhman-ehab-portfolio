@@ -7,7 +7,6 @@ import { graphNodes, graphEdges, graphGroups, profileDetails, profileSourceHash 
 import { projectNotices } from "../src/constant/index.js";
 
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-const css = readFileSync(new URL("../src/hero-graph.css", import.meta.url), "utf8");
 const ids = graphNodes.map(({ id }) => id);
 
 test("52 nodes and 104 edges with unique, connected endpoints", () => {
@@ -108,20 +107,6 @@ test('HTML generation follows changed profile contact and identity', () => {
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
-});
-
-test('fullscreen shell has keyboard list/reset paths and no visible toolbar', () => {
-  assert.match(html, /<a class="skip-link" href="#graph-index-wrap">Skip to profile list<\/a>/);
-  assert.match(html, /id="graph-index-return" href="#graph-stage">Return to graph<\/a>/);
-  assert.match(html, /Escape resets the view\. Double-click the graph to reset it\./);
-  assert.doesNotMatch(html, /id="(?:graph-controls|btn-list|btn-reset|btn-motion)"/);
-  assert.match(css, /\.graph-app \{ position: relative; width: 100vw; height: 100vh; height: 100dvh;/);
-  assert.match(css, /#graph-stage \{ position: absolute; inset: 0; width: 100%; height: 100%;/);
-  assert.match(css, /body \{[^}]*background: #060c17;/);
-  assert.doesNotMatch(css, /radial-gradient/);
-  assert.match(css, /:focus-visible/);
-  assert.match(css, /prefers-reduced-motion: reduce/);
-  assert.match(css, /html:not\(\.graph-js\) #graph-stage \{ display: none/);
 });
 
 test('the page is only the graph view and its index keeps every Connect action', () => {

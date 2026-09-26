@@ -73,7 +73,6 @@ export function initHeroGraph() {
   const skipLink = document.querySelector(".skip-link");
   const returnLink = document.querySelector("#graph-index-return");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const motionPaused = reduced;
   const coarse = matchMedia("(pointer: coarse)").matches;
   const mobile = matchMedia("(max-width: 639px)");
   let graph;
@@ -275,7 +274,7 @@ export function initHeroGraph() {
   });
   host.addEventListener("pointercancel", () => { press = null; });
   host.addEventListener("pointerup", (event) => {
-    if (press?.id === event.pointerId && !press.moved && event.button === 0 && motionPaused) {
+    if (press?.id === event.pointerId && !press.moved && event.button === 0 && reduced) {
       const clicked = nodeAt(event);
       if (clicked) openNode(clicked.id, stage);
     }
@@ -328,10 +327,10 @@ export function initHeroGraph() {
         repaint();
       })
       .onNodeClick((node) => {
-        if (!motionPaused) openNode(node.id, stage);
+        if (!reduced) openNode(node.id, stage);
       })
       .onBackgroundClick(() => {
-        if (!motionPaused) closePanel();
+        if (!reduced) closePanel();
       })
       .onRenderFramePost(() => positionPanel())
       .onEngineTick(() => { if (!moved && ++ticks % 12 === 0) fit(0); })
@@ -369,7 +368,7 @@ export function initHeroGraph() {
 
   function fit(duration) {
     if (!graph) return;
-    const time = motionPaused ? 0 : duration;
+    const time = reduced ? 0 : duration;
     if (mobile.matches) {
       const bbox = graph.getGraphBbox();
       const root = graph.graphData().nodes.find((node) => node.id === "me");
