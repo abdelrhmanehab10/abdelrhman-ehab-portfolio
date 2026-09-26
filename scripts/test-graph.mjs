@@ -128,3 +128,4 @@ test('public copy stays safe', () => {
   const publicSurfaces = [html, JSON.stringify(graphNodes)].join('\n');
   assert.doesNotMatch(publicSurfaces, /443\/6000|passwordless sudo|rm, copy|sensitive VM\/connection data|Jisir process|`current` Nginx symlink|2\+ years delivering production dashboards/i);
 });
+

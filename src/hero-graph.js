@@ -26,6 +26,29 @@ const facts = (meta) => (meta || "").replace(/^\(|\)$/g, "").split(/\s\|\s|\s·\
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const CALLOUT_GAP = 30;
 const CALLOUT_MARGIN = 12;
+// Smoke canvas palette. Resting node fills per group live in scripts/graph-layout.json
+// (generated into graphGroups); these are the highlight, ring, label and edge inks.
+export const graphInk = {
+  selected: "#f2f2f2", ring: "#e0e0e0", selectedRing: "#ffffff", halo: "rgba(255,255,255,0.3)",
+  label: "#d6d6d6", majorLabel: "#f2f2f2", dim: "rgba(255,255,255,0.08)", dimLabel: "rgba(255,255,255,0.14)",
+  edge: "rgba(255,255,255,0.14)", edgeDim: "rgba(255,255,255,0.04)", edgeFocus: "rgba(236,236,236,0.8)",
+};
+const EASE = "cubic-bezier(.2,.8,.2,1)";
+const RIPPLE_MS = 520;
+const rgbaOf = (color) => {
+  const hex = /^#([0-9a-f]{6})$/i.exec(color);
+  if (hex) { const n = parseInt(hex[1], 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255, 1]; }
+  const [r, g, b, a = 1] = color.match(/[\d.]+/g).map(Number);
+  return [r, g, b, a];
+};
+// Blends two inks; the end points return the original strings so settled colours are exact.
+export function mixInk(from, to, amount) {
+  if (amount <= 0) return from;
+  if (amount >= 1) return to;
+  const a = rgbaOf(from), b = rgbaOf(to);
+  const [r, g, bl, al] = a.map((value, i) => value + (b[i] - value) * amount);
+  return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(bl)},${+al.toFixed(3)})`;
+}
 
 // Places the callout beside the node (right, else left) when it fits on a wide stage,
 // otherwise below or above it; phones always use the vertical placement. Returns stage
@@ -84,6 +107,16 @@ export function initHeroGraph() {
   let press = null;
   let moved = false;
   let ticks = 0;
+  let exit = null;
+  // Highlight easing: each node and edge moves toward its target state over ~180ms. The
+  // library redraws continuously only while something is easing (autoPauseRedraw), so an
+  // idle graph still costs no frames; reduced motion skips straight to the target.
+  const nodeMix = new Map();
+  const selectMix = new Map();
+  const edgeMix = new Map();
+  let easing = false;
+  let lastFrame = 0;
+  let ripple = null;
 
   function showFallback() {
     index.insertBefore(panel, index.querySelector("#graph-index"));
@@ -94,24 +127,69 @@ export function initHeroGraph() {
 
   const active = () => hovered || selected;
   const neighbourhood = (id) => new Set([id, ...(adjacency.get(id) || [])]);
-  function nodeColor(node) {
+  const litTarget = (id) => { const focus = active(); return !focus || neighbourhood(focus).has(id) ? 1 : 0; };
+  const selectTarget = (id) => id === active() ? 1 : 0;
+  // 0 = dimmed, 1 = resting, 2 = touching the focused node.
+  const edgeTarget = (edge) => {
     const focus = active();
-    if (!focus) return graphGroups[node.group].color;
-    return neighbourhood(focus).has(node.id) ? (node.id === focus ? "#67e8f9" : "#e2e8f0") : "rgba(148,163,184,0.12)";
+    if (!focus) return 1;
+    return idOf(edge.source) === focus || idOf(edge.target) === focus ? 2 : 0;
+  };
+  const current = (map, key, target) => map.has(key) ? map.get(key) : target;
+  const litOf = (node) => current(nodeMix, node.id, litTarget(node.id));
+  const selectOf = (node) => current(selectMix, node.id, selectTarget(node.id));
+  const edgeOf = (edge) => current(edgeMix, edge, edgeTarget(edge));
+  function nodeColor(node) {
+    return mixInk(graphInk.dim, mixInk(graphGroups[node.group].color, graphInk.selected, selectOf(node)), litOf(node));
   }
   function edgeColor(edge) {
-    const focus = active();
-    if (!focus) return "rgba(148,163,184,0.23)";
-    return idOf(edge.source) === focus || idOf(edge.target) === focus
-      ? "rgba(103,232,249,0.9)" : "rgba(148,163,184,0.05)";
+    const mix = edgeOf(edge);
+    return mix <= 1 ? mixInk(graphInk.edgeDim, graphInk.edge, mix) : mixInk(graphInk.edge, graphInk.edgeFocus, mix - 1);
   }
   function edgeWidth(edge) {
-    const focus = active();
-    return focus && (idOf(edge.source) === focus || idOf(edge.target) === focus) ? 2.2 : 1;
+    return 1 + Math.max(0, edgeOf(edge) - 1) * 1.2;
+  }
+  function step() {
+    if (!easing) return;
+    const now = performance.now();
+    const k = 1 - Math.exp(-Math.min(64, now - lastFrame) / 55);
+    lastFrame = now;
+    let moving = !!ripple && now - ripple.start < RIPPLE_MS;
+    if (!moving) ripple = null;
+    const ease = (map, key, target) => {
+      let value = current(map, key, target);
+      value += (target - value) * k;
+      if (Math.abs(target - value) < 0.01) value = target;
+      else moving = true;
+      map.set(key, value);
+    };
+    const { nodes, links } = graph.graphData();
+    for (const node of nodes) {
+      ease(nodeMix, node.id, litTarget(node.id));
+      ease(selectMix, node.id, selectTarget(node.id));
+    }
+    for (const edge of links || []) ease(edgeMix, edge, edgeTarget(edge));
+    if (!moving) {
+      easing = false;
+      graph.autoPauseRedraw(true);
+    }
   }
   function repaint() {
-    graph?.nodeColor(nodeColor).linkColor(edgeColor).linkWidth(edgeWidth);
+    if (!graph) return;
+    if (reduced) {
+      nodeMix.clear(); selectMix.clear(); edgeMix.clear();
+    } else if (!easing) {
+      easing = true;
+      lastFrame = performance.now();
+      graph.autoPauseRedraw(false);
+    }
+    graph.nodeColor(nodeColor).linkColor(edgeColor).linkWidth(edgeWidth);
   }
+  // Callout motion uses the Web Animations API; it is skipped
+  // under reduced motion (and where the API is missing), leaving instant state changes.
+  const motion = (element, keyframes, options) => !reduced && typeof element.animate === "function"
+    ? element.animate(keyframes, { easing: EASE, ...options }) : null;
+  const sideShift = () => ({ right: "-10px, 0", left: "10px, 0", below: "0, -10px", above: "0, 10px" })[panel.dataset.side] || "0, 0";
   function nodeAt(event) {
     const canvas = host.querySelector("canvas");
     if (!canvas || !graph) return null;
@@ -155,20 +233,45 @@ export function initHeroGraph() {
   }
 
   function closePanel({ restoreFocus = true } = {}) {
-    if (panel.hidden) return;
-    panel.hidden = true;
+    if (panel.hidden || exit) return;
     selected = null;
     repaint();
     if (location.hash.startsWith("#node/")) history.replaceState(null, "", location.pathname + location.search);
     if (restoreFocus) (lastFocus || stage).focus({ preventScroll: true });
     lastFocus = null;
+    // The card plays its exit while inert, then hides; state and focus change at once.
+    const leaving = motion(panel, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: `translate(${sideShift()}) scale(.97)` }],
+      { duration: 160, easing: "cubic-bezier(.4,0,1,1)", fill: "forwards" });
+    if (!leaving) {
+      panel.hidden = true;
+      return;
+    }
+    exit = leaving;
+    panel.inert = true;
+    leaving.finished.then(() => {
+      if (exit !== leaving) return;
+      exit = null;
+      panel.inert = false;
+      panel.hidden = true;
+      leaving.cancel();
+    }, () => {});
   }
   function openNode(id, origin) {
     const node = byId.get(id);
     if (!node) return;
     lastFocus = origin || document.activeElement;
+    // Reopening during an exit cancels it and plays the entrance again.
+    if (exit) {
+      exit.cancel();
+      exit = null;
+      panel.inert = false;
+      panel.hidden = true;
+    }
+    const swapping = !panel.hidden;
+    const from = { left: parseFloat(panel.style.left), top: parseFloat(panel.style.top) };
     hovered = null;
     selected = id;
+    ripple = reduced ? null : { id, start: performance.now() };
     const link = nodeLinkHTML(node, "graph-action");
     const notice = projectNotices[id] ? `<p class="graph-notice">${escapeHTML(projectNotices[id])}</p>` : "";
     const detail = facts(node.meta);
@@ -187,8 +290,7 @@ export function initHeroGraph() {
       ${node.bullets?.length ? `<ul class="graph-bullets">${node.bullets.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>` : ""}
       ${node.tags?.length ? `<div class="graph-tags">${node.tags.map((tag) => `<span>${escapeHTML(tag)}</span>`).join("")}</div>` : ""}</div>
       ${long ? `<button type="button" id="graph-panel-more" class="graph-more" aria-expanded="false" aria-controls="graph-panel-body">Read more</button>` : ""}
-      <div class="graph-panel-foot">${link || '<button type="button" id="graph-panel-copy" class="graph-copy">Copy link</button>'}
-      <p class="graph-meta">${adjacency.get(id)?.size || 0} connections</p></div></div>`;
+      <div class="graph-panel-foot">${link || '<button type="button" id="graph-panel-copy" class="graph-copy">Copy link</button>'}</div></div>`;
     panel.hidden = false;
     delete panel.dataset.side;
     panel.querySelector("#graph-panel-close").addEventListener("click", () => closePanel());
@@ -196,11 +298,28 @@ export function initHeroGraph() {
       const more = panel.querySelector("#graph-panel-more");
       more.addEventListener("click", () => {
         const open = more.getAttribute("aria-expanded") !== "true";
-        panel.querySelector("#graph-panel-body").classList.toggle("is-clamped", !open);
+        const body = panel.querySelector("#graph-panel-body");
+        const top = parseFloat(panel.style.top);
+        const fold = body.clientHeight;
+        body.classList.toggle("is-clamped", !open);
         more.setAttribute("aria-expanded", String(open));
         more.textContent = open ? "Show less" : "Read more";
+        motion(more, [{ opacity: 0.5, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { duration: 180 });
         panelVersion++;
         positionPanel();
+        // FLIP: glide the card from its old top to the new one.
+        const shift = top - parseFloat(panel.style.top);
+        if (shift) motion(panel, [{ transform: `translateY(${shift}px)` }, { transform: "none" }], { duration: 280 });
+        if (open) {
+          const reveal = body.clientHeight - fold;
+          if (reveal > 0) motion(body, [{ clipPath: `inset(0 0 ${reveal}px 0)` }, { clipPath: "inset(0 0 0px 0)" }], { duration: 280 });
+          let delay = 0;
+          for (const child of body.children) {
+            if (child.offsetTop - body.offsetTop < fold) continue;
+            motion(child, [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260, delay, fill: "backwards" });
+            delay = Math.min(delay + 40, 120);
+          }
+        }
       });
     }
     if (!link) {
@@ -213,6 +332,18 @@ export function initHeroGraph() {
     }
     panelVersion++;
     positionPanel();
+    if (swapping) {
+      // Already open on another node: slide from the old spot and fade the new content up.
+      const dx = from.left - parseFloat(panel.style.left), dy = from.top - parseFloat(panel.style.top);
+      if (dx || dy) motion(panel, [{ transform: `translate(${dx || 0}px, ${dy || 0}px)` }, { transform: "none" }], { duration: 240 });
+      let delay = 0;
+      for (const child of panel.querySelector(".graph-panel-scroll").children) {
+        motion(child, [{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], { duration: 220, delay, fill: "backwards" });
+        delay = Math.min(delay + 20, 60);
+      }
+    } else {
+      motion(panel, [{ opacity: 0, transform: `translate(${sideShift()}) scale(.96)` }, { opacity: 1, transform: "none" }], { duration: 240 });
+    }
     panel.focus({ preventScroll: true });
     repaint();
     history.replaceState(null, "", `#node/${id}`);
@@ -234,7 +365,7 @@ export function initHeroGraph() {
   });
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
-    if (!panel.hidden) closePanel();
+    if (selected) closePanel();
     else if (index.contains(document.activeElement)) stage.focus({ preventScroll: true });
     else resetView();
   });
@@ -298,28 +429,49 @@ export function initHeroGraph() {
       .nodeCanvasObjectMode(() => "after")
       .nodeCanvasObject((node, ctx, scale) => {
         const major = node.group === "root" || node.group === "hub";
-        const focus = active();
-        const lit = !focus || neighbourhood(focus).has(node.id);
-        // Ring/weight distinguish hubs even in monochrome or grayscale.
-        if (major || node.id === focus) {
+        const lit = litOf(node);
+        const chosen = selectOf(node);
+        const radius = Math.sqrt(node.val) * graph.nodeRelSize();
+        // Ring/weight distinguish hubs in the monochrome palette; the focused node gains a
+        // brighter, heavier ring and a faint halo, both eased with the highlight.
+        if (major || chosen > 0) {
           ctx.beginPath();
-          ctx.arc(node.x, node.y, Math.sqrt(node.val) * graph.nodeRelSize() + 2 / scale, 0, 2 * Math.PI);
-          ctx.strokeStyle = lit ? "#67e8f9" : "rgba(148,163,184,0.12)";
-          ctx.lineWidth = (major ? 1.7 : 2) / scale;
+          ctx.arc(node.x, node.y, radius + (2 + chosen) / scale, 0, 2 * Math.PI);
+          ctx.strokeStyle = mixInk(mixInk(graphInk.dim, graphInk.ring, lit), graphInk.selectedRing, chosen);
+          ctx.globalAlpha = major ? 1 : chosen;
+          ctx.lineWidth = (1.7 + 0.3 * chosen) / scale;
           ctx.stroke();
+          if (chosen > 0) {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, radius + (2 + 4 * chosen) / scale, 0, 2 * Math.PI);
+            ctx.strokeStyle = graphInk.halo;
+            ctx.globalAlpha = chosen;
+            ctx.lineWidth = 1 / scale;
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1;
         }
-        if (!major && scale < 1.5 && node.id !== focus) return;
+        if (ripple?.id === node.id) {
+          const progress = Math.min(1, (performance.now() - ripple.start) / RIPPLE_MS);
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, radius + (4 + 14 * (1 - (1 - progress) ** 3)) / scale, 0, 2 * Math.PI);
+          ctx.strokeStyle = graphInk.selectedRing;
+          ctx.globalAlpha = 0.55 * (1 - progress);
+          ctx.lineWidth = 1.5 / scale;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+        if (!major && scale < 1.5 && chosen === 0) return;
         const size = Math.max(10 / scale, 2.2);
         ctx.font = `${major ? 700 : 500} ${size}px Manrope, sans-serif`;
         ctx.textBaseline = "top";
-        const radius = Math.sqrt(node.val) * graph.nodeRelSize();
         const screen = graph.graph2ScreenCoords(node.x, node.y);
         const textWidth = ctx.measureText(node.label).width * scale;
         // Flip long labels inward when their centred placement would clip.
         ctx.textAlign = screen.x - textWidth / 2 < 8 ? "left" :
           screen.x + textWidth / 2 > stage.clientWidth - 8 ? "right" : "center";
-        ctx.fillStyle = lit ? "#e2e8f0" : "rgba(148,163,184,0.12)";
-        ctx.fillText(node.label, node.x, node.y + radius + 2 / scale);
+        ctx.fillStyle = mixInk(graphInk.dimLabel, major ? graphInk.majorLabel : graphInk.label, Math.max(lit, chosen));
+        ctx.fillText(node.label, node.x, node.y + radius + (2 + 5 * chosen) / scale);
       })
       .onNodeHover((node) => {
         hovered = node?.id || null;
@@ -332,6 +484,7 @@ export function initHeroGraph() {
       .onBackgroundClick(() => {
         if (!reduced) closePanel();
       })
+      .onRenderFramePre(() => step())
       .onRenderFramePost(() => positionPanel())
       .onEngineTick(() => { if (!moved && ++ticks % 12 === 0) fit(0); })
       .onEngineStop(() => { if (!moved) fit(reduced ? 0 : 400); });
@@ -345,6 +498,11 @@ export function initHeroGraph() {
       nodes: graphNodes.map((node) => ({ ...node, val: graphGroups[node.group].size })),
       links: graphEdges.map((edge) => ({ ...edge })),
     });
+    if (!reduced) {
+      const { nodes, links } = graph.graphData();
+      for (const node of nodes) { nodeMix.set(node.id, 1); selectMix.set(node.id, 0); }
+      for (const edge of links) edgeMix.set(edge, 1);
+    }
     for (const name of ["wheel", "pointerdown", "touchstart"]) {
       host.addEventListener(name, () => { moved = true; }, { passive: true });
     }
