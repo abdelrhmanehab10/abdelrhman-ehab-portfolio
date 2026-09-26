@@ -38,7 +38,7 @@ try {
     await c('Emulation.setDeviceMetricsOverride',{width:390,height,deviceScaleFactor:2,mobile:true});
     await c('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
     await c('Page.navigate',{url:`http://127.0.0.1:${server.address().port}/?viewport=${height}#node/${id}`});
-    await retry(async()=>{const ready=await run(`document.querySelector('#graph-status')?.textContent.includes('52 nodes') && document.querySelector('#graph-panel-title')?.textContent.length > 0`); if(!ready)throw Error('not ready'); return true;});
+    await retry(async()=>{const ready=await run(`document.documentElement.dataset.graphReady === 'true' && document.querySelector('#graph-panel-title')?.textContent.length > 0`); if(!ready)throw Error('not ready'); return true;});
     await sleep(350);
   }
   const geometry = `(()=>{const s=document.querySelector('#graph-stage'),p=document.querySelector('#graph-panel'),sc=p.querySelector('.graph-panel-scroll'),a=p.querySelector('.graph-panel-arrow'),body=p.querySelector('#graph-panel-body');const sr=s.getBoundingClientRect(),pr=p.getBoundingClientRect();const side=p.dataset.side,L=parseFloat(p.style.left),T=parseFloat(p.style.top),offset=parseFloat(['left','right'].includes(side)?a.style.top:a.style.left);const x=side==='right'?L-30:side==='left'?L+p.offsetWidth+30:L+offset,y=side==='below'?T-30:side==='above'?T+p.offsetHeight+30:T+offset;let cyan=0;if(!a.hidden){const c=s.querySelector('canvas'),k=c.width/c.clientWidth,d=c.getContext('2d').getImageData(Math.round(x*k)-3,Math.round(y*k)-3,7,7).data;for(let i=0;i<d.length;i+=4)if(d[i]<150&&d[i+1]>200&&d[i+2]>220)cyan++}return {stageHeight:s.clientHeight,side,arrow:!a.hidden,x,y,cyan,width:p.offsetWidth,stageWidth:s.clientWidth,panelHeight:p.offsetHeight,scrollMax:parseFloat(sc.style.maxHeight),scrollHeight:sc.scrollHeight,scrollClient:sc.clientHeight,inside:pr.left>=sr.left-1&&pr.right<=sr.right+1&&pr.top>=sr.top-1&&pr.bottom<=sr.bottom+1,expanded:p.querySelector('#graph-panel-more')?.getAttribute('aria-expanded'),clamped:body.classList.contains('is-clamped'),title:p.querySelector('h2')?.textContent}})()`;
@@ -58,10 +58,10 @@ try {
   await capture('focused-phone-expanded-scrolled');
   await visit(400,'me');
   r=await run(geometry); console.log('SHORT PHONE ROOT',JSON.stringify(r));
-  assert.ok(r.stageHeight<230 && r.inside && r.panelHeight<=r.stageHeight && (!r.arrow || r.cyan>=30),JSON.stringify(r));
+  assert.ok(r.stageHeight<350 && r.inside && r.panelHeight<=r.stageHeight && (!r.arrow || r.cyan>=30),JSON.stringify(r));
   await capture('focused-phone-short');
   await visit(270,'me');
   r=await run(geometry); console.log('CRAMPED PHONE ROOT',JSON.stringify(r));
-  assert.ok(r.stageHeight<100 && (!r.arrow || r.cyan>=30),JSON.stringify(r));
+  assert.ok(r.stageHeight<200 && (!r.arrow || r.cyan>=30),JSON.stringify(r));
   await capture('focused-phone-cramped');
 } finally { ws?.close(); chrome.kill(); server.close(); await sleep(250); rmSync(profile,{recursive:true,force:true}); }

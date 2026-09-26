@@ -1,18 +1,19 @@
 # Graph-only page verification
 
-The page is now the graph view alone. Checked on the real page served from localhost with `chrome-devtools-axi` (Chrome) at 1440 × 900 and 390 × 844 (DPR 3, mobile, touch).
+The page is the graph view alone. Fresh default-view screenshots were captured from the locally served page in Chrome with `chrome-devtools-axi` at 1440 × 900 and 390 × 844 (DPR 3, mobile, touch).
 
 | State | Desktop 1440 × 900 | Phone 390 × 844 |
 | --- | --- | --- |
-| Settled default | [desktop](desktop-default.png) | [phone](mobile-default.png) |
+| Decluttered default (JavaScript enabled) | [desktop](desktop-default.png) | [phone](mobile-default.png) |
 | List view with a project's details | [desktop](desktop-list-detail.png) | [phone list](mobile-list.png) |
 | Connect and role details | [email](desktop-connect-email.png) | [resume](mobile-detail-resume.png), [role](mobile-detail-role.png) |
 | Node details callout | [beside its node](desktop-callout.png), [after zoom and pan](desktop-callout-panned.png) | [profile](mobile-callout-profile.png), [reduced motion](mobile-callout-reduced.png) |
 | Graph library unavailable (list-index fallback) | | [static card in the index](mobile-fallback-detail.png) |
 
+- **Decluttered shell:** the graph stage has no outline border; its background and rounded shape remain. The controls remain right-aligned without node/connection totals, and removing `#graph-caption` gives the stage more height. `#graph-status` remains a visually hidden `role="status"` for fallback announcements, but successful graph load does not replace it with counts. The stage's `aria-describedby` points to visually hidden drag/zoom/selection and keyboard instructions. The no-JavaScript profile index explains Tab navigation and connection links; only the interactive List view shows the Enter-to-open hint.
 - **Fills the page:** `main` is exactly the viewport, and document scroll size equals the viewport at both widths (1440 × 900 and 390 × 844). This holds with List view open, and with a detail panel open, because the list scrolls inside the stage area. No header, navigation, hero, `section` or footer remains; the accessible `h1`, title, description, the root node and its label identify Abdelrhman Ehab.
 - **Connect:** the Email node opens `mailto:abdelrhmanehab047@gmail.com`; the LinkedIn and GitHub nodes open the profile URLs in a new tab; the Resume (PDF) action has `download`. Clicking it in Chrome downloaded a file byte-identical to `assets/abdelrhmanehab_resume.pdf`. The same links are rendered in the List view index, so they also work without JavaScript.
-- **Keyboard:** starting from the top of the page, 300 Tab presses reached all 52 index node buttons and all 6 node links (4 Connect, 2 project sites) without scrolling the page. Enter opens a node, and Escape returns focus to it (see `scripts/test-hero-live.mjs`).
+- **Keyboard:** starting from the top of the page, 300 Tab presses reached all 52 index node buttons and all 6 node links (4 Connect, 2 project sites) without scrolling the page. With the interactive graph active, Enter opens a node and Escape returns focus to it (see `scripts/test-hero-live.mjs`).
 - **Node details callout:** selecting a node opens `#graph-panel` as a card pinned beside that node. The arrow points at it when alignment is possible.
   - **Desktop:** the card sits to the right of the node, flips to the left near the right edge, and drops below or above the node when neither side fits. It stays clamped inside the stage.
   - **Phone:** the card sits full-width below the node, or above it near the bottom of the stage.
@@ -26,4 +27,4 @@ The page is now the graph view alone. Checked on the real page served from local
 - **Console:** no messages on desktop or phone loads. An inline favicon replaces the previous `/favicon.ico` 404.
 - **Sharing:** Open Graph/Twitter now use [`assets/images/og-graph.png`](../../assets/images/og-graph.png), a 1200 × 630 capture of this page, in place of a client storefront screenshot.
 
-`HERO_GRAPH_EVIDENCE_DIR=<dir> node scripts/test-hero-live.mjs` (headless `google-chrome`) also passed. It covers the desktop and phone paths, the callout placement after zoom and pan, paused and reduced-motion picking, deep links, vendor-script failure, and JavaScript disabled (complete index, no blank stage).
+`HERO_GRAPH_EVIDENCE_DIR=<dir> node scripts/test-hero-live.mjs` (headless `google-chrome`) and `HERO_GRAPH_EVIDENCE_DIR=<dir> node scripts/test-callout-live.mjs` also passed. They cover the desktop and phone paths, the callout placement after zoom and pan, paused and reduced-motion picking, deep links, vendor-script failure, and JavaScript disabled at both widths (complete index, no blank stage).

@@ -287,6 +287,14 @@ test("List view toggles index visibility and expanded state", () => {
   assert.equal(button.textContent, "List view");
 });
 
+test("successful graph load does not announce totals and library failure remains announced", () => {
+  const { selectors } = setup(false);
+  assert.doesNotMatch(selectors.get("#graph-status").textContent, /\d+\s+nodes\s*·\s*\d+\s+connections/);
+
+  const failed = setup(false, false);
+  assert.equal(failed.selectors.get("#graph-status").textContent, "Graph unavailable — showing profile list");
+});
+
 test("library failure keeps list-selected details visible", () => {
   const { panel, stage, selectors } = setup(false, false);
   assert.equal(stage.hidden, true);

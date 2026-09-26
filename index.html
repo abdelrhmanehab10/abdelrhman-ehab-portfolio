@@ -225,21 +225,21 @@
     <main id="main-content" class="graph-app">
       <h1 id="graph-title" class="visually-hidden">Abdelrhman Ehab · Frontend Engineer</h1>
       <div id="graph-controls" aria-label="Graph controls">
-        <span id="graph-status" role="status">Explore the profile graph</span>
+        <span id="graph-status" class="visually-hidden" role="status">Explore the profile graph</span>
         <div class="graph-buttons">
           <button id="btn-list" type="button" aria-controls="graph-index-wrap" aria-expanded="false">List view</button>
           <button id="btn-reset" type="button">Reset view</button>
           <button id="btn-motion" type="button" aria-pressed="false">Pause motion</button>
         </div>
       </div>
-      <div id="graph-stage" role="group" aria-label="Interactive graph of Abdelrhman Ehab's work">
+      <div id="graph-stage" role="group" aria-label="Interactive graph of Abdelrhman Ehab's work" aria-describedby="graph-instructions">
+        <p id="graph-instructions" class="visually-hidden">Drag to pan, scroll or pinch to zoom. Select a node to see its neighbours. Use List view or Tab to explore the profile by keyboard.</p>
         <div id="graph-canvas-host" aria-hidden="true"></div>
         <div id="graph-panel" role="dialog" aria-modal="false" aria-labelledby="graph-panel-title" hidden tabindex="-1"></div>
       </div>
-      <p id="graph-caption">Large outlined nodes are sections; smaller nodes are work, skills and connections. Drag to pan, scroll or pinch to zoom, select a node to see its neighbours. Use List view or Tab to explore by keyboard.</p>
       <div id="graph-index-wrap" class="graph-index-hidden" aria-label="Profile graph as a list">
         <h2>Profile index</h2>
-        <p>All 52 nodes in the graph, grouped by section. Select a node for its details and connections.</p>
+        <p>All 52 nodes in the graph, grouped by section. Use Tab to explore the list and follow its connection links. <span class="graph-index-interactive-hint">Press Enter on a node to open its details.</span></p>
         <!-- graph-index:start -->
         <ul id="graph-index">
   <li id="graph-node-me" tabindex="-1"><button type="button" data-node="me">Abdelrhman Ehab</button><span class="graph-index-meta">Frontend Engineer · Arabic: Native · English: Professional working proficiency</span><span class="graph-index-summary">Frontend Engineer with 4+ years of professional web-development experience, including 2+ years building production React, Angular, and Vue applications with TypeScript. Specializes in Arabic-first and bilingual RTL interfaces, complex forms, role-based access control, dashboards, and workflow-heavy products across healthcare, virtualization, regulatory, editorial, and e-commerce domains. Experienced in building Node.js/Express services and delivering applications through GitHub Actions, Docker, Nginx, Linux, and Cloudflare. Strong at turning complex requirements into maintainable, accessible, and production-ready user experiences.</span><ul class="graph-index-bullets"><li>DevOps &amp; Server Infrastructure: VM console with encrypted WebSocket connectivity and managed TLS.</li><li>Data-Driven Features: file import validation audit, error-handling logic; MongoDB queries and debugging.</li></ul><div class="graph-index-tags"><span>React (Vite, TanStack Router, React Query, shadcn/ui)</span><span>Angular (v17-18 migrations, Nx, Metronic)</span><span>Vue (Pinia, vue-router)</span><span>Node.js</span><span>Express</span></div><p class="graph-index-connections">Connected to: <a href="#graph-node-hub-experience">Experience</a>, <a href="#graph-node-hub-projects">Projects</a>, <a href="#graph-node-hub-skills">Core Skills</a>, <a href="#graph-node-hub-domains">Domains</a>, <a href="#graph-node-hub-craft">How I Work</a>, <a href="#graph-node-hub-connect">Connect</a></p></li>

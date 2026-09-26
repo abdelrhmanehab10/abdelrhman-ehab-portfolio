@@ -356,7 +356,6 @@ export function initHeroGraph() {
       if (!moved) fit(0);
     }).observe(stage);
     mobile.addEventListener("change", () => { if (!moved) fit(0); });
-    status.textContent = `${graphNodes.length} nodes · ${graphEdges.length} connections`;
     document.documentElement.dataset.graphReady = "true";
     // With cooldownTicks(0), the library has no animated tick on which to
     // refit; let it commit its warmup positions to the canvas first.
