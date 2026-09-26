@@ -27,6 +27,8 @@ html.graph-js #graph-index-wrap.graph-index-hidden:focus-within { position: stat
 #graph-index-wrap h2 { font-size: 1.2rem; }
 #graph-index-wrap h3 { font-size: 1rem; }
 #graph-index-wrap p { line-height: 1.55; margin: .25rem 0 .7rem; }
+.graph-index-interactive-hint { display: none; }
+html[data-graph-ready="true"] #graph-stage:not([hidden]) ~ #graph-index-wrap .graph-index-interactive-hint { display: inline; }
 #graph-index-wrap ul { list-style: none; padding: 0; margin: 0; }
 #graph-index-wrap > ul > li { margin: 1rem 0; }
 #graph-index-wrap ul ul { padding-left: 1rem; }
