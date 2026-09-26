@@ -85,7 +85,7 @@ function setup(mobile, libraryAvailable = true, initialHash = "", reduced = fals
     nodes, callbacks: {}, scale: 1, center: null, offset: 0, visibleScale: 1, visibleOffset: 0, rendering: true,
     width() { return this; }, height() { return this; }, backgroundColor() { return this; },
     nodeId() { return this; }, nodeVal() { return this; }, nodeRelSize(value) { return value === undefined ? 5 : this; },
-    nodeLabel() { return this; }, nodeColor(callback) { this.color = callback; return this; }, linkColor() { return this; }, linkWidth() { return this; },
+    nodeLabel() { return this; }, nodeColor(callback) { this.color = callback; return this; }, linkColor(callback) { this.edgeColor = callback; return this; }, linkWidth(callback) { this.edgeWidth = callback; return this; },
     linkCurvature() { return this; }, nodeCanvasObjectMode() { return this; }, nodeCanvasObject() { return this; },
     onNodeHover(callback) { this.callbacks.hover = callback; return this; },
     onNodeClick(callback) { this.callbacks.click = callback; return this; },
@@ -229,7 +229,7 @@ test("prefers-reduced-motion automatically warms the graph without animated tick
 });
 
 test("list selection reactivates a previously hovered node on canvas return", () => {
-  const { graph, selectors } = setup(false);
+  const { graph, selectors } = setup(false, true, "", true);
   const host = selectors.get("#graph-canvas-host");
   const efa = graph.nodes.find((node) => node.id === "proj-efa");
   const virtu = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
@@ -241,7 +241,7 @@ test("list selection reactivates a previously hovered node on canvas return", ()
 });
 
 test("list selection clears stale hover but new canvas hover takes precedence", () => {
-  const { graph, selectors, panel } = setup(false);
+  const { graph, selectors, panel } = setup(false, true, "", true);
   graph.callbacks.hover(graph.nodes.find((node) => node.id === "proj-efa"));
   const index = selectors.get("#graph-index-wrap");
   index.fire("click", { target: { closest: () => ({ dataset: { node: "proj-virtuwa-hv" } }) } });
@@ -489,7 +489,7 @@ test("callout footer has no connection count", () => {
 });
 
 test("Smoke palette: resting nodes use the group greys and focus blends to the selection ink", () => {
-  const { graph, selectors } = setup(false);
+  const { graph, selectors } = setup(false, true, "", true);
   const me = graph.nodes.find((node) => node.id === "me");
   const efa = graph.nodes.find((node) => node.id === "proj-efa");
   assert.equal(graph.color(me), "#ededed");
@@ -511,12 +511,17 @@ test("highlight changes ease over frames and stop continuous redraw once settled
   try {
     const efa = graph.nodes.find((node) => node.id === "proj-efa");
     const far = graph.nodes.find((node) => node.id === "domain-healthcare");
-    graph.callbacks.pre();
+    const edge = graph.links.find((link) => link.source === "proj-efa");
     selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: "proj-efa" } }) } });
     assert.equal(graph.autoPause, false, "redraw runs while easing");
+    assert.equal(graph.color(far), graphGroups.domain.color, "first focus starts at rest");
+    assert.equal(graph.color(efa), graphGroups.project.color);
+    assert.equal(graph.edgeColor(edge), graphInk.edge);
     now += 16;
     graph.callbacks.pre();
     const midway = graph.color(far);
+    assert.notEqual(graph.edgeColor(edge), graphInk.edge);
+    assert.notEqual(graph.edgeColor(edge), graphInk.edgeFocus);
     assert.notEqual(midway, graphInk.dim);
     assert.notEqual(midway, graphGroups.domain.color);
     assert.match(midway, /^rgba\(/);
@@ -527,6 +532,15 @@ test("highlight changes ease over frames and stop continuous redraw once settled
   } finally {
     performance.now = clock;
   }
+});
+
+test("initial hash selection eases from resting graph ink", () => {
+  const { graph } = setup(false, true, "#node/proj-efa");
+  const selected = graph.nodes.find((node) => node.id === "proj-efa");
+  const far = graph.nodes.find((node) => node.id === "domain-healthcare");
+  assert.equal(graph.color(selected), graphGroups.project.color);
+  assert.equal(graph.color(far), graphGroups.domain.color);
+  assert.equal(graph.autoPause, false);
 });
 
 test("callout exit animates while inert, then hides; reopening mid-exit cancels it", async () => {

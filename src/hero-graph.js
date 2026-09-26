@@ -495,6 +495,11 @@ export function initHeroGraph() {
       nodes: graphNodes.map((node) => ({ ...node, val: graphGroups[node.group].size })),
       links: graphEdges.map((edge) => ({ ...edge })),
     });
+    if (!reduced) {
+      const { nodes, links } = graph.graphData();
+      for (const node of nodes) { nodeMix.set(node.id, 1); selectMix.set(node.id, 0); }
+      for (const edge of links) edgeMix.set(edge, 1);
+    }
     for (const name of ["wheel", "pointerdown", "touchstart"]) {
       host.addEventListener(name, () => { moved = true; }, { passive: true });
     }
