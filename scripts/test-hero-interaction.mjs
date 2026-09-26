@@ -574,6 +574,21 @@ test("callout exit animates while inert, then hides; reopening mid-exit cancels 
   assert.equal(panel.hidden, false, "a cancelled exit never hides the reopened card");
 });
 
+test("a second Escape during exit follows the list focus back to the graph", async () => {
+  const { panel, stage, selectors, animations } = setup(false, true, "", false, true);
+  const index = selectors.get("#graph-index-wrap");
+  index.fire("click", { target: { closest: () => Object.assign(index.querySelector('[data-node="me"]'), { dataset: { node: "me" } }) } });
+  document.fire("keydown", { key: "Escape" });
+  const leaving = animations.at(-1);
+  assert.equal(panel.hidden, false);
+  assert.equal(document.activeElement.parent, index);
+  document.fire("keydown", { key: "Escape" });
+  assert.equal(document.activeElement, stage);
+  leaving.finish();
+  await leaving.finished;
+  assert.equal(panel.hidden, true);
+});
+
 test("switching nodes swaps the content in place and Read more glides the card", () => {
   const { graph, panel, selectors, animations } = setup(false, true, "", false, true);
   const open = (id) => selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => Object.assign(element(), { dataset: { node: id } }) } });
@@ -607,9 +622,32 @@ test("switching nodes swaps the content in place and Read more glides the card",
   assert.ok(!expanded.some((animation) => animation.element === partial), "partially visible content does not flicker");
 });
 
+test("summary-only Read more reveals hidden lines without fading the summary", () => {
+  const { panel, selectors, animations } = setup(false, true, "", false, true);
+  selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => ({ dataset: { node: "hub-experience" } }) } });
+  const body = panel.querySelector("#graph-panel-body");
+  body.classList.add("is-clamped");
+  body.offsetTop = 0;
+  Object.defineProperty(body, "clientHeight", { get: () => body.classList.contains("is-clamped") ? 118 : 175 });
+  const summary = { ...element(), offsetTop: 0, offsetHeight: 175 };
+  body.children = [summary];
+  const before = animations.length;
+  panel.querySelector("#graph-panel-more").fire("click");
+  const reveal = animations.slice(before);
+  assert.equal(panel.querySelector("#graph-panel-more").getAttribute("aria-expanded"), "true");
+  assert.ok(reveal.some(({ element, keyframes }) => element === body && keyframes[0].clipPath === "inset(0 0 57px 0)"));
+  assert.ok(reveal.some(({ element }) => element === panel.querySelector("#graph-panel-more")));
+  assert.ok(!reveal.some(({ element }) => element === summary));
+});
+
 test("reduced motion changes the callout and highlight instantly", () => {
   const { graph, panel, selectors, animations } = setup(false, true, "", true, true);
-  selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => Object.assign(element(), { dataset: { node: "proj-efa" } }) } });
+  selectors.get("#graph-index-wrap").fire("click", { target: { closest: () => Object.assign(element(), { dataset: { node: "hub-experience" } }) } });
+  const body = panel.querySelector("#graph-panel-body");
+  body.classList.add("is-clamped");
+  Object.defineProperty(body, "clientHeight", { get: () => body.classList.contains("is-clamped") ? 118 : 175 });
+  panel.querySelector("#graph-panel-more").fire("click");
+  assert.equal(animations.length, 0);
   document.fire("keydown", { key: "Escape" });
   assert.equal(panel.hidden, true);
   assert.equal(animations.length, 0);

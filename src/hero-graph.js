@@ -185,7 +185,7 @@ export function initHeroGraph() {
     }
     graph.nodeColor(nodeColor).linkColor(edgeColor).linkWidth(edgeWidth);
   }
-  // Callout motion uses the Web Animations API on opacity/transform only; it is skipped
+  // Callout motion uses the Web Animations API; it is skipped
   // under reduced motion (and where the API is missing), leaving instant state changes.
   const motion = (element, keyframes, options) => !reduced && typeof element.animate === "function"
     ? element.animate(keyframes, { easing: EASE, ...options }) : null;
@@ -304,12 +304,15 @@ export function initHeroGraph() {
         body.classList.toggle("is-clamped", !open);
         more.setAttribute("aria-expanded", String(open));
         more.textContent = open ? "Show less" : "Read more";
+        motion(more, [{ opacity: 0.5, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { duration: 180 });
         panelVersion++;
         positionPanel();
-        // FLIP: glide the card from its old top to the new one, and fade in what was folded.
+        // FLIP: glide the card from its old top to the new one.
         const shift = top - parseFloat(panel.style.top);
         if (shift) motion(panel, [{ transform: `translateY(${shift}px)` }, { transform: "none" }], { duration: 280 });
         if (open) {
+          const reveal = body.clientHeight - fold;
+          if (reveal > 0) motion(body, [{ clipPath: `inset(0 0 ${reveal}px 0)` }, { clipPath: "inset(0 0 0px 0)" }], { duration: 280 });
           let delay = 0;
           for (const child of body.children) {
             if (child.offsetTop - body.offsetTop < fold) continue;
@@ -362,7 +365,7 @@ export function initHeroGraph() {
   });
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
-    if (!panel.hidden) closePanel();
+    if (selected) closePanel();
     else if (index.contains(document.activeElement)) stage.focus({ preventScroll: true });
     else resetView();
   });

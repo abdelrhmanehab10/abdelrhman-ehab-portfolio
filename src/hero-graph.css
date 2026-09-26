@@ -63,7 +63,7 @@ html[data-graph-ready="true"] #graph-stage:not([hidden]) ~ #graph-index-wrap .gr
    left/top, side and arrow every frame. In the list-index fallback it is a static card. */
 #graph-panel { position: absolute; z-index: 20; left: 12px; top: 12px; width: min(330px, calc(100% - 24px)); border: 1px solid var(--line-strong); border-radius: 16px; background: var(--surface); color: var(--text); box-shadow: 0 18px 50px var(--shadow), 0 0 0 1px var(--glow); }
 /* Open, close, content swap and Read more are animated from hero-graph.js with the Web
-   Animations API (opacity and transform only), so an exit can finish before hiding. */
+   Animations API, so an exit can finish before hiding. */
 #graph-panel[inert] { pointer-events: none; }
 #graph-panel[data-side="right"] { transform-origin: 0 60px; }
 #graph-panel[data-side="left"] { transform-origin: 100% 60px; }
