@@ -589,9 +589,10 @@ test("switching nodes swaps the content in place and Read more glides the card",
   const body = panel.querySelector("#graph-panel-body");
   body.clientHeight = 118;
   body.offsetTop = 0;
-  const folded = { ...element(), offsetTop: 90, offsetHeight: 60 };
-  const visible = { ...element(), offsetTop: 0, offsetHeight: 40 };
-  body.children = [visible, folded];
+  const visible = { ...element(), offsetTop: 0, offsetHeight: 140 };
+  const partial = { ...element(), offsetTop: 90, offsetHeight: 60 };
+  const folded = { ...element(), offsetTop: 130, offsetHeight: 60 };
+  body.children = [visible, partial, folded];
   const node = graph.nodes.find((entry) => entry.id === "role-pro-event");
   node.y = 400;
   graph.callbacks.frame();
@@ -602,7 +603,8 @@ test("switching nodes swaps the content in place and Read more glides the card",
   const expanded = animations.slice(count);
   assert.equal(more.textContent, "Show less");
   assert.ok(expanded.some((animation) => animation.element === folded), "folded content fades in");
-  assert.ok(!expanded.some((animation) => animation.element === visible), "already visible content does not flicker");
+  assert.ok(!expanded.some((animation) => animation.element === visible), "a summary crossing the fold stays visible");
+  assert.ok(!expanded.some((animation) => animation.element === partial), "partially visible content does not flicker");
 });
 
 test("reduced motion changes the callout and highlight instantly", () => {

@@ -300,7 +300,7 @@ export function initHeroGraph() {
         const open = more.getAttribute("aria-expanded") !== "true";
         const body = panel.querySelector("#graph-panel-body");
         const top = parseFloat(panel.style.top);
-        const fold = body.clientHeight * 0.55;
+        const fold = body.clientHeight;
         body.classList.toggle("is-clamped", !open);
         more.setAttribute("aria-expanded", String(open));
         more.textContent = open ? "Show less" : "Read more";
@@ -312,7 +312,7 @@ export function initHeroGraph() {
         if (open) {
           let delay = 0;
           for (const child of body.children) {
-            if (child.offsetTop - body.offsetTop + child.offsetHeight <= fold) continue;
+            if (child.offsetTop - body.offsetTop < fold) continue;
             motion(child, [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260, delay, fill: "backwards" });
             delay = Math.min(delay + 40, 120);
           }
