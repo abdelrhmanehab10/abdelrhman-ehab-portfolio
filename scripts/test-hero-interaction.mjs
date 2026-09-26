@@ -25,7 +25,8 @@ function element() {
     getAttribute(name) { return attributes[name] ?? null; },
     setAttribute(name, value) { attributes[name] = value; },
     focus() { document.activeElement = this; },
-    querySelector(selector) { return selector === "canvas" ? canvas : element(); },
+    contains(child) { return child === this || child?.parent === this; },
+    querySelector(selector) { return selector === "canvas" ? canvas : element(); }
   };
 }
 const canvas = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 390, height: 480 }) };
@@ -33,7 +34,7 @@ const canvas = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 390, he
 function setup(mobile, libraryAvailable = true, initialHash = "", reduced = false) {
   const selectors = new Map([
     "#graph-stage", "#graph-canvas-host", "#graph-index-wrap", "#graph-panel", "#graph-status",
-    "#btn-list", "#btn-reset", "#btn-motion",
+    ".skip-link", "#graph-index-return",
   ].map((key) => [key, element()]));
   const stage = selectors.get("#graph-stage");
   const panel = selectors.get("#graph-panel");
@@ -50,12 +51,16 @@ function setup(mobile, libraryAvailable = true, initialHash = "", reduced = fals
   const nodeButtons = new Map();
   index.querySelector = (selector) => {
     if (!selector.startsWith("[data-node=")) return element();
-    if (!nodeButtons.has(selector)) nodeButtons.set(selector, element());
+    if (!nodeButtons.has(selector)) {
+      const button = element();
+      button.parent = index;
+      nodeButtons.set(selector, button);
+    }
     return nodeButtons.get(selector);
   };
   const documentHandlers = {};
   globalThis.document = {
-    documentElement: { dataset: {} }, activeElement: selectors.get("#btn-list"),
+    documentElement: { dataset: {} }, activeElement: selectors.get("#graph-stage"),
     querySelector: (key) => selectors.get(key),
     addEventListener(name, handler) { documentHandlers[name] = handler; },
     fire(name, event) { documentHandlers[name]?.(event); },
@@ -139,9 +144,8 @@ test("hash navigation opens the newly linked node and closes on another section"
   assert.equal(location.hash, "#contact");
 });
 
-test("paused pointer selects a node even when the library has a stale link hover", () => {
-  const { graph, panel, selectors } = setup(false);
-  selectors.get("#btn-motion").fire("click");
+test("reduced-motion pointer selects a node even when the library has a stale link hover", () => {
+  const { graph, panel, selectors } = setup(false, true, "", true);
   const host = selectors.get("#graph-canvas-host");
   const actual = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
   const pointer = { pointerId: 1, clientX: actual.x * graph.zoom(), clientY: 0, button: 0 };
@@ -156,12 +160,11 @@ test("paused pointer selects a node even when the library has a stale link hover
   assert.equal(panel.hidden, false);
 });
 
-test("paused picking chooses the topmost node at an overlap", () => {
-  const { graph, panel, selectors } = setup(false);
+test("reduced-motion picking chooses the topmost node at an overlap", () => {
+  const { graph, panel, selectors } = setup(false, true, "", true);
   const lower = graph.nodes.find((node) => node.id === "proj-efa");
   const upper = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
   lower.x = upper.x - 2;
-  selectors.get("#btn-motion").fire("click");
   const host = selectors.get("#graph-canvas-host");
   const pointer = { pointerId: 1, clientX: lower.x * graph.zoom(), clientY: 0, button: 0 };
   host.fire("pointerdown", pointer);
@@ -169,9 +172,8 @@ test("paused picking chooses the topmost node at an overlap", () => {
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
 });
 
-test("paused pan and zoom redraw the view before picking a visible node", () => {
-  const { graph, panel, selectors } = setup(false);
-  selectors.get("#btn-motion").fire("click");
+test("reduced-motion pan and zoom redraw the view before picking a visible node", () => {
+  const { graph, panel, selectors } = setup(false, true, "", true);
   graph.zoom(0.3);
   graph.offset = 14;
   graph.render();
@@ -184,10 +186,9 @@ test("paused pan and zoom redraw the view before picking a visible node", () => 
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
 });
 
-test("paused dragging redraws a moved node without selecting it on release", () => {
-  const { graph, panel, selectors } = setup(false);
+test("reduced-motion dragging redraws a moved node without selecting it on release", () => {
+  const { graph, panel, selectors } = setup(false, true, "", true);
   const host = selectors.get("#graph-canvas-host");
-  selectors.get("#btn-motion").fire("click");
   assert.equal(graph.rendering, true);
   const actual = graph.nodes.find((node) => node.id === "proj-virtuwa-hv");
   const start = { pointerId: 1, clientX: actual.x * graph.zoom(), clientY: 0, button: 0 };
@@ -204,21 +205,15 @@ test("paused dragging redraws a moved node without selecting it on release", () 
   assert.match(panel.innerHTML, /<h2 id="graph-panel-title">VirtuWa HV/);
 });
 
-test("paused and reduced-motion pointer movement updates neighbour highlighting without force ticks", () => {
-  for (const reduced of [false, true]) {
-    const { graph, selectors } = setup(false, true, "", reduced);
-    if (!reduced) selectors.get("#btn-motion").fire("click");
+test("prefers-reduced-motion automatically warms the graph without animated ticks", () => {
+  const { graph, selectors } = setup(false, true, "", true);
+  assert.equal(graph.cooldown, 0);
+  const host = selectors.get("#graph-canvas-host");
+  for (const id of ["proj-efa", "proj-virtuwa-hv"]) {
+    const node = graph.nodes.find((entry) => entry.id === id);
+    host.fire("pointermove", { pointerId: 1, clientX: node.x * graph.zoom(), clientY: 0 });
+    assert.equal(graph.color(node), "#67e8f9");
     assert.equal(graph.cooldown, 0);
-    assert.equal(graph.rendering, true);
-    const host = selectors.get("#graph-canvas-host");
-    for (const id of ["proj-efa", "proj-virtuwa-hv"]) {
-      const node = graph.nodes.find((entry) => entry.id === id);
-      host.fire("pointermove", { pointerId: 1, clientX: node.x * graph.zoom(), clientY: 0 });
-      assert.equal(graph.color(node), "#67e8f9");
-      assert.equal(graph.cooldown, 0);
-    }
-    selectors.get("#btn-motion").fire("click");
-    assert.equal(graph.reheated, true);
   }
 });
 
@@ -272,19 +267,16 @@ test("deployment detail omits private topology and privileged command scope", ()
   assert.match(panel.innerHTML, /Least-privilege sudo rules scoped to the deployment commands only/);
 });
 
-test("List view toggles index visibility and expanded state", () => {
-  const { selectors } = setup(false);
+test("keyboard skip and return links expose the list without a controls bar", () => {
+  const { selectors, stage } = setup(false);
   const index = selectors.get("#graph-index-wrap");
-  const button = selectors.get("#btn-list");
-  assert.equal(index.classList.contains("graph-index-hidden"), true);
-  button.fire("click");
-  assert.equal(index.classList.contains("graph-index-hidden"), false);
-  assert.equal(button.getAttribute("aria-expanded"), "true");
-  assert.equal(button.textContent, "Hide list");
-  button.fire("click");
-  assert.equal(index.classList.contains("graph-index-hidden"), true);
-  assert.equal(button.getAttribute("aria-expanded"), "false");
-  assert.equal(button.textContent, "List view");
+  let prevented = false;
+  selectors.get(".skip-link").fire("click", { preventDefault() { prevented = true; } });
+  assert.equal(prevented, true);
+  assert.equal(document.activeElement, index);
+  selectors.get("#graph-index-return").fire("click", { preventDefault() { prevented = true; } });
+  assert.equal(document.activeElement, stage);
+  assert.equal(selectors.has("#btn-list"), false);
 });
 
 test("successful graph load does not announce totals and library failure remains announced", () => {
@@ -300,7 +292,6 @@ test("library failure keeps list-selected details visible", () => {
   assert.equal(stage.hidden, true);
   const index = selectors.get("#graph-index-wrap");
   assert.equal(index.classList.contains("graph-index-hidden"), false);
-  assert.equal(selectors.get("#btn-list").hidden, true);
   index.fire("click", { target: { closest: () => ({ dataset: { node: "proj-efa" } }) } });
   assert.equal(panel.parent, index);
   assert.equal(panel.hidden, false);
@@ -322,16 +313,27 @@ test("library failure honors initial and changed deep links with list focus rest
   assert.equal(location.hash, "");
 });
 
-test("reset restores the same mobile and desktop view after zoom and pan", async () => {
+test("Escape and double-click reset the graph after zoom and pan", async () => {
   for (const mobile of [false, true]) {
-    const { graph, selectors } = setup(mobile);
+    const { graph, panel, selectors } = setup(mobile);
     const opening = { scale: graph.zoom(), center: graph.center };
     graph.zoom(5);
     graph.centerAt(50, 50);
-    selectors.get("#btn-reset").fire("click");
+    document.fire("keydown", { key: "Escape" });
     await new Promise((resolve) => setTimeout(resolve, 0));
     assert.equal(graph.zoom(), opening.scale);
     assert.deepEqual(graph.center, opening.center);
+    graph.zoom(5);
+    selectors.get("#graph-canvas-host").fire("dblclick");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(graph.zoom(), opening.scale);
+    assert.deepEqual(graph.center, opening.center);
+    const origin = selectors.get("#graph-index-wrap").querySelector('[data-node="me"]');
+    location.hash = "#node/me";
+    window.fire("hashchange");
+    selectors.get("#graph-canvas-host").fire("dblclick");
+    assert.equal(panel.hidden, true);
+    assert.equal(document.activeElement, origin, "double-click reset restores focus from a closed callout");
   }
 });
 
